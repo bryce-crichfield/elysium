@@ -1,9 +1,9 @@
 package game;
 
-import game.event.LazyEvent;
 import game.event.Event;
 import game.io.Audio;
 import game.io.Keyboard;
+import game.io.Mouse;
 import game.state.GameState;
 
 
@@ -11,15 +11,17 @@ import java.awt.*;
 import java.time.Duration;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Game {
-    public static final int SCREEN_WIDTH = 480;
-    public static final int SCREEN_HEIGHT = 320;
+    public static final int SCREEN_WIDTH = 480*2;
+    public static final int SCREEN_HEIGHT = 320*2;
     public static final int TILE_SIZE = 32;
-    private final LazyEvent<Consumer<Game>> endOfUpdate = new LazyEvent<>();
     private final Keyboard keyboard = new Keyboard();
+    private final Mouse mouse = new Mouse();
     private final Audio audio = new Audio();
     private final Stack<GameState> stateStack = new Stack<>();
+
     Game() throws Exception {
         // set volume
         // set volume
@@ -34,13 +36,39 @@ public class Game {
         audio.load("resources/Shapeforms Audio Free Sound Effects/type_preview/swipe.wav", "beep.wav");
         audio.load("resources/Shapeforms Audio Free Sound Effects/sci_fi_weapons/lock_on.wav", "select.wav");
 
-        endOfUpdate.listenWith(consumer -> {
-            consumer.accept(this);
-        });
-    }
 
-    public Event<Consumer<Game>> deferred() {
-        return endOfUpdate;
+        // Delegate keyboard events to the current game state
+        Keyboard.pressed.addListener(keyCode -> {
+            if (stateStack.isEmpty()) {
+                return;
+            }
+
+            stateStack.peek().onKeyPressed(keyCode);
+        });
+
+        Mouse.moved.addListener(event -> {
+            if (stateStack.isEmpty()) {
+                return;
+            }
+
+            stateStack.peek().onMouseMoved(event);
+        });
+
+        Mouse.clicked.addListener(event -> {
+            if (stateStack.isEmpty()) {
+                return;
+            }
+
+            stateStack.peek().onMouseClicked(event);
+        });
+
+        Mouse.wheel.addListener(event -> {
+            if (stateStack.isEmpty()) {
+                return;
+            }
+
+            stateStack.peek().onMouseWheelMoved(event);
+        });
     }
 
     public Audio getAudio() {
@@ -51,11 +79,16 @@ public class Game {
         return keyboard;
     }
 
-    public void pushState(GameState state) {
+    public Mouse getMouse() {
+        return mouse;
+    }
+
+    public void pushState(Function<Game, GameState> factory) {
         if (!stateStack.isEmpty()) {
             stateStack.peek().onExit();
         }
 
+        var state = factory.apply(this);
         stateStack.push(state);
         state.onEnter();
     }
@@ -77,8 +110,6 @@ public class Game {
         }
 
         keyboard.onUpdate();
-
-        endOfUpdate.flush();
     }
 
     void onRender(Graphics2D graphics) {

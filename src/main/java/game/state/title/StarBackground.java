@@ -23,9 +23,15 @@ public class StarBackground {
     private final int starMinSize = 2;
     private final int starMaxSize = 8;
 
+    private final int screenWidth;
+    private final int screenHeight;
+
 
     public StarBackground(GameState gameState, int screenWidth, int screenHeight) {
         this.gameState = gameState;
+
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
 
         for (float[] star : stars) {
             star[starX] = Util.random(0, screenWidth);
@@ -69,6 +75,14 @@ public class StarBackground {
     }
 
     public void onRender(Graphics2D graphics) {
+        // Draw dark gradient background with black at the bottom and dark dark blue at the top
+        Color black = new Color(0x000000);
+        Color darkBlue = new Color(0x0A001A);
+        GradientPaint gradient = new GradientPaint(0, 0, black, 0, screenHeight, darkBlue);
+        graphics.setPaint(gradient);
+        graphics.fillRect(0, 0, screenWidth, screenHeight);
+
+
         for (float[] star : stars) {
             float warble = star[starWarble];
             int x = (int) star[starX];

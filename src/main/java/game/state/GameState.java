@@ -1,32 +1,38 @@
 package game.state;
 
 import game.Game;
-import game.event.Event;
-import game.event.LazyEvent;
-import game.event.SubscriptionManager;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
-@Getter
 @RequiredArgsConstructor
 public abstract class GameState {
-    private final Game game;
-    private final Event<Graphics2D> onWorldRender = new Event<>();
-    private final Event<Graphics2D> onGuiRender = new Event<>();
-    private final SubscriptionManager subscriptions = new SubscriptionManager();
+    protected final Game game;
 
-    public abstract void onEnter();
+    public void onEnter() {}
+
+    public void onMouseMoved(MouseEvent event) {
+    }
+    public void onMouseDragged(MouseEvent event) {
+    }
+    public void onMouseClicked(MouseEvent event) {
+    }
+    public void onMousePressed(MouseEvent event) {
+    }
+    public void onMouseReleased(MouseEvent event) {
+    }
+    public void onMouseWheelMoved(MouseWheelEvent event) {
+    }
+
+    public void onKeyPressed(int keyCode) {}
+    public void onKeyReleased(int keyCode) {}
+    public void onKeyTyped(char keyChar) {}
 
     public abstract void onUpdate(Duration delta);
-
     public abstract void onRender(Graphics2D graphics);
 
-    public void onExit() {
-        getOnGuiRender().clear();
-        getOnWorldRender().clear();
-        getSubscriptions().unsubscribeAll();
-    }
+    public void onExit() {}
 }

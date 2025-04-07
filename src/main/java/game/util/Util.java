@@ -1,9 +1,6 @@
 package game.util;
 
-import game.form.element.FormElement;
-
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;

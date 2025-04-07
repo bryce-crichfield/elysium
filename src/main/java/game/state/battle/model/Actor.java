@@ -3,7 +3,7 @@ package game.state.battle.model;
 import game.character.GameCharacter;
 import game.character.StarTrooper;
 import game.state.battle.event.*;
-import game.state.battle.player.Cursor;
+import game.state.battle.state.Cursor;
 
 import java.awt.*;
 import java.time.Duration;
@@ -46,6 +46,8 @@ public class Actor {
         this.waiting = waiting;
     }
 
+    public void setSelected(boolean isSelected) { this.selected = isSelected; }
+
     public int getAttackDistance() {
         return character.getStats().getRange();
     }
@@ -82,11 +84,11 @@ public class Actor {
         }
     }
 
-    public void onActorSelected(Actor actor) {
-        if (actor.equals(this)) {
-            selected = true;
-        }
-    }
+//    public void onActorSelected(Actor actor) {
+//        if (actor.equals(this)) {
+//            selected = true;
+//        }
+//    }
 
     public void onActorDeselected(Actor actor) {
         if (actor.equals(this)) {

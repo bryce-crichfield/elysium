@@ -1,0 +1,106 @@
+package game.state.battle.controller;
+
+import game.io.Keyboard;
+import game.state.battle.event.ActorSelected;
+//import game.state.battle.hud.StatsMenu;
+import game.state.battle.model.Actor;
+import game.state.battle.state.BattleState;
+import game.state.battle.state.Cursor;
+
+import java.awt.*;
+import java.time.Duration;
+import java.util.Optional;
+
+public class ObserverPlayerController extends PlayerController {
+//    private final StatsMenu hoveredActorStats;
+
+    public ObserverPlayerController(BattleState state) {
+        super(state);
+//        hoveredActorStats = new StatsMenu(20, 20, ActorSelected.event);
+    }
+
+
+    @Override
+    public void onKeyPressed(int keyCode) {
+        state.getCursor().onKeyPressed(keyCode);
+        if (keyCode == Keyboard.PRIMARY) {
+            this.selectActor();
+        }
+    }
+
+    public final void selectActor() {
+        int cursorX = state.getCursor().getCursorX();
+        int cursorY = state.getCursor().getCursorY();
+
+        Optional<Actor> hovered = state.getWorld().getActorByPosition(cursorX, cursorY);
+
+        if (hovered.isEmpty()) {
+            return;
+        }
+
+        if (hovered.get().isPlayer()) {
+            if (hovered.get().isWaiting())
+                return;
+            state.getSelection().select(hovered.get());
+            state.transitionTo(SelectActionPlayerController::new);
+
+//            ActorSelected.event.fire(actor.get());
+        }
+    }
+
+    private void forceHoveredActorStats() {
+        int cx = state.getCursor().getCursorX();
+        int cy = state.getCursor().getCursorY();
+        Optional<Actor> hov = state.getWorld().getActorByPosition(cx, cy);
+        hov.ifPresent(actor -> {
+//            onChangeHovered.fire(actor);
+//            hoveredActorStats.setVisible(true);
+        });
+    }
+
+    @Override
+    public void onEnter() {
+        forceHoveredActorStats();
+
+        state.getCursor().enterBlinkingMode();
+        state.getCursor().setColor(Color.WHITE);
+
+//        context.addListener(ActorSelected.event).run(actor -> {
+//            battleStateMachine.transitionTo(new SelectActionPlayerController(this));
+//            ControllerTransition.defer.fire(() -> new SelectActionPlayerController(this));
+//        });
+
+//        on(CursorMoved.event).run(this::hoverActor);
+    }
+
+    @Override
+    public void onUpdate(Duration delta) {
+        state.getCursor().onUpdate(delta);
+    }
+
+    @Override
+    public void onWorldRender(Graphics2D graphics) {
+        state.getCursor().onRender(graphics);
+    }
+
+    @Override
+    public void onGuiRender(Graphics2D graphics) {
+//        hoveredActorStats.onRender(graphics);
+    }
+
+    private void hoverActor(Cursor cursor) {
+        int cursorX = state.getCursor().getCursorX();
+        int cursorY = state.getCursor().getCursorY();
+
+        Optional<Actor> actor = state.getWorld().getActorByPosition(cursorX, cursorY);
+        if (actor.isEmpty()) {
+//            hoveredActorStats.setVisible(false);
+        }
+
+        if (actor.isPresent()) {
+            Actor hovered = actor.get();
+//            hoveredActorStats.setVisible(true);
+//            onChangeHovered.fire(hovered);
+        }
+    }
+ }

@@ -2,8 +2,12 @@ package game;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 public class Window extends JFrame {
     private final Game game;
@@ -24,6 +28,47 @@ public class Window extends JFrame {
         canvas.setFocusable(true);
         canvas.requestFocus();
         canvas.addKeyListener(game.getKeyboard());
+        // In the Window constructor, after adding the mouse listeners
+        canvas.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                transformMouseEvent(e).ifPresent(game.getMouse()::mousePressed);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                transformMouseEvent(e).ifPresent(game.getMouse()::mouseReleased);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                transformMouseEvent(e).ifPresent(game.getMouse()::mouseClicked);
+            }
+        });
+
+        canvas.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                transformMouseEvent(e).ifPresent(game.getMouse()::mouseMoved);
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                transformMouseEvent(e).ifPresent(game.getMouse()::mouseDragged);
+            }
+        });
+
+        canvas.addMouseWheelListener(
+                e -> {
+                    Optional<Point> point = transformCoordinates(e.getX(), e.getY());
+                    if (point.isPresent()) {
+                        MouseWheelEvent transformedEvent = new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
+                                (int) point.get().getX(), (int) point.get().getY(), e.getClickCount(), e.isPopupTrigger(),
+                                e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+                        game.getMouse().mouseWheelMoved(transformedEvent);
+                    }
+                }
+        );
 
         this.add(canvas);
         this.pack();
@@ -31,6 +76,58 @@ public class Window extends JFrame {
         canvas.createBufferStrategy(4);
         strategy = canvas.getBufferStrategy();
     }
+
+
+
+    public Optional<MouseEvent> transformMouseEvent(MouseEvent event) {
+        var point = transformCoordinates(event.getX(), event.getY());
+        if (point.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new MouseEvent(event.getComponent(), event.getID(), event.getWhen(), event.getModifiersEx(),
+                (int) point.get().getX(), (int) point.get().getY(), event.getClickCount(), event.isPopupTrigger(), event.getButton()));
+    }
+
+    public Optional<Point> transformCoordinates(int canvasX, int canvasY) {
+        float canvasAspectRatio = (float) canvas.getWidth() / (float) canvas.getHeight();
+        float bufferAspectRatio = (float) buffer.getWidth() / (float) buffer.getHeight();
+
+        int displayWidth;
+        int displayHeight;
+
+        if (bufferAspectRatio > canvasAspectRatio) {
+            displayWidth = canvas.getWidth();
+            displayHeight = (int) (canvas.getWidth() / bufferAspectRatio);
+        } else {
+            displayHeight = canvas.getHeight();
+            displayWidth = (int) (canvas.getHeight() * bufferAspectRatio);
+        }
+
+        int centerX = (canvas.getWidth() - displayWidth) / 2;
+        int centerY = (canvas.getHeight() - displayHeight) / 2;
+
+        // Check if coordinates are outside the game area (in letterbox space)
+        if (canvasX < centerX || canvasX > centerX + displayWidth ||
+                canvasY < centerY || canvasY > centerY + displayHeight) {
+            // Coordinates are in letterbox space
+            return Optional.empty();
+        }
+
+        // Convert canvas coordinates to game buffer coordinates
+        // Use ratio method to preserve precision
+        float xRatio = (canvasX - centerX) / (float) displayWidth;
+        float yRatio = (canvasY - centerY) / (float) displayHeight;
+        int gameX = (int) (xRatio * buffer.getWidth());
+        int gameY = (int) (yRatio * buffer.getHeight());
+
+        // Clamp to game boundaries
+        gameX = Math.max(0, Math.min(gameX, buffer.getWidth() - 1));
+        gameY = Math.max(0, Math.min(gameY, buffer.getHeight() - 1));
+
+        return Optional.of(new Point(gameX, gameY));
+    }
+
 
     public void onRender(float updateTime, float renderTime) {
         this.repaint();
@@ -45,6 +142,7 @@ public class Window extends JFrame {
 
         Graphics2D g2 = (Graphics2D) strategy.getDrawGraphics();
         g2.setColor(Color.BLACK);
+
         g2.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         float canvasAspectRatio = (float) canvas.getWidth() / (float) canvas.getHeight();

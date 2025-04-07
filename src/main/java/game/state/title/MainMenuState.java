@@ -1,99 +1,117 @@
 package game.state.title;
 
 import game.Game;
-import game.form.element.FormElement;
-import game.form.element.FormGrid;
-import game.form.element.FormMenu;
-import game.form.element.FormSlider;
-import game.form.properties.*;
-import game.form.properties.layout.FormGridLayout;
-import game.form.properties.layout.FormHorizontalLayout;
-import game.form.properties.layout.FormVerticalLayout;
-import game.io.Keyboard;
+import game.gui.GuiElement;
+import game.gui.control.GuiButton;
+import game.gui.input.GuiMouseHandler;
+import game.gui.layout.GuiVerticalLayout;
+import game.gui.scroll.GuiScrollManager;
+import game.gui.style.GuiBackground;
 import game.state.GameState;
-import game.state.battle.BattleState;
-import game.state.options.OptionsMenuState;
-import game.state.overworld.PlayOverworldState;
 
-import javax.swing.text.html.Option;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class MainMenuState extends GameState {
     StarBackground starBackground;
-    FormMenu menu;
-    private final int menuWidth = 200;
-    private final int menuHeight = 300;
-
+    GuiElement test;
+    float scrollPercentage = 0.0f;
     public MainMenuState(Game game) {
         super(game);
         starBackground = new StarBackground(this, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
-        int menuX = (Game.SCREEN_WIDTH - menuWidth) / 2;
-        int menuY = (Game.SCREEN_HEIGHT - menuHeight) / 2;
-        menu = new FormMenu(menuX, menuY, menuWidth, menuHeight);
-        menu.setLayout(new FormVerticalLayout());
-        menu.setMargin(new FormMargin(10, 10, 10, 10));
-        menu.setFillPaint(Color.BLACK);
-        menu.setRounding(20);
+//        TextField textField = new TextField(0, 0, 100, 20);
+//        TextField text2 = new TextField(0, 0, 100, 20);
+//        Button btn = new Button(0, 0, 50, 20, "Click Me Again Again and Again");
+//        btn.setOnClick(() -> {
+//        });
 
-        BiFunction<String, Runnable, FormElement> option = (name, onPrimary) -> {
-            FormElement element = new FormElement(100, 20);
-            FormText text = new FormText();
-            text.setValue(name);
-            text.setSize(16);
-            element.setText(text);
-            element.setHorizontalTextAlignment(FormAlignment.CENTER);
-            element.setVerticalTextAlignment(FormAlignment.CENTER);
-            element.setVisible(true);
-            element.getOnPrimary().listenWith(event -> onPrimary.run());
-            return element;
-        };
-
-        menu.addCaretChild(option.apply("Battle", () -> {
-            getGame().deferred().fire(g -> {
-                g.pushState(new BattleState(g));
-            });
+        test = new GuiElement(300,300 , 100, 75);
+        test.setBackground(new GuiBackground.SolidColor(Color.BLUE));
+        test.setGuiMouseHandler(GuiMouseHandler.onClick(() -> {
+            System.out.println("Clicked on test element");
         }));
+        var layout = new GuiVerticalLayout();
+        layout.setSpacing(5);
+        layout.setPadding(5);
+        test.setLayout(layout);
 
-        menu.addCaretChild(option.apply("Overworld", () -> {
+        var child = new GuiElement(10, 10, 50, 25);
+        child.setBackground(new GuiBackground.SolidColor(Color.RED));
+        child.setGuiMouseHandler(GuiMouseHandler.onClick(() -> {
+            System.out.println("Clicked on child element");
 
         }));
+        test.addChild(child);
 
-        menu.addCaretChild(option.apply("Options", () -> {
-            getGame().deferred().fire(g -> {
-                g.pushState(new OptionsMenuState(g));
-            });
-        }));
+        var child2 = new GuiButton(10, 10, 50, 25);
+        child2.setBackground(new GuiBackground.SolidColor(Color.GRAY));
+        child2.setText("Click me");
+        child2.onClick(() -> System.out.println("Clicked on button element"));
 
-        menu.addCaretChild(option.apply("Exit", () -> {
-            System.exit(0);
-        }));
+        test.addChild(child2);
 
-        FormSlider formSlider = new FormSlider(0, 100, 50, 1);
-        formSlider.setSize(100, 20);
-        menu.addCaretChild(formSlider);
+        var child3 = new GuiElement(10, 10, 50, 25);
+        child3.setBackground(new GuiBackground.SolidColor(Color.YELLOW));
+        test.addChild(child3);
+
+        var child4 = new GuiElement(10, 10, 50, 25);
+        child4.setBackground(new GuiBackground.SolidColor(Color.ORANGE));
+        test.addChild(child4);
+
+        var child5 = new GuiElement(10, 10, 50, 25);
+        child5.setBackground(new GuiBackground.SolidColor(Color.CYAN));
+        test.addChild(child5);
+
+        var scrollManager = new GuiScrollManager();
+        test.setScrollManager(scrollManager);
     }
 
     @Override
     public void onEnter() {
-        getSubscriptions().on(getOnGuiRender()).run(starBackground::onRender);
-        getSubscriptions().on(getOnGuiRender()).run(menu::onRender);
-        getSubscriptions().on(Keyboard.keyPressed).run(menu::onKeyPressed);
+    }
+
+    @Override
+    public void onMouseWheelMoved(MouseWheelEvent event) {
+        test.onMouseWheelMoved(event);
+    }
+
+    @Override
+    public void onKeyPressed(int keyCode) {
+        // up and down on scroll
+        if (keyCode == KeyEvent.VK_UP) {
+            scrollPercentage -= 0.1f;
+            scrollPercentage = Math.max(0.0f, scrollPercentage);
+            test.getScrollManager().scrollToPercentage(scrollPercentage);
+        } else if (keyCode == KeyEvent.VK_DOWN) {
+            scrollPercentage += 0.1f;
+            scrollPercentage = Math.min(1.0f, scrollPercentage);
+            test.getScrollManager().scrollToPercentage(scrollPercentage);
+        }
+    }
+
+    @Override
+    public void onMouseClicked(MouseEvent event) {
+        test.onMouseClicked(event);
+    }
+
+    @Override
+    public void onMouseMoved(MouseEvent event) {
     }
 
     @Override
     public void onUpdate(Duration delta) {
         starBackground.onUpdate(delta);
+        test.onUpdate(delta);
     }
 
     @Override
     public void onRender(Graphics2D graphics) {
-        getOnGuiRender().fire(graphics);
+        starBackground.onRender(graphics);
+        test.onRender(graphics);
+//        gui.render(graphics);
     }
 }

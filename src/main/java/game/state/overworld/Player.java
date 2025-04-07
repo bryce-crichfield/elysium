@@ -16,7 +16,7 @@ public class Player extends Entity {
 
     @Override
     public void onUpdate(Duration dt) {
-        int speed = (int) (2 * 1e4);
+        int speed = (int) (2 * 1e3);
 
         if (game.getKeyboard().down(Keyboard.UP)) {
             accelerationY = -speed;
@@ -33,8 +33,8 @@ public class Player extends Entity {
         if (game.getKeyboard().down(Keyboard.RIGHT)) {
             accelerationX = speed;
         }
-        super.onUpdate(dt);
 
+        super.onUpdate(dt);
     }
 
     @Override

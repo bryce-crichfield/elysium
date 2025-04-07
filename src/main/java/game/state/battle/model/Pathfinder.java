@@ -1,5 +1,6 @@
 package game.state.battle.model;
 
+import game.state.battle.state.World;
 import game.util.Util;
 
 import java.util.*;
