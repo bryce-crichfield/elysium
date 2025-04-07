@@ -1,6 +1,7 @@
 package game;
 
 import game.event.Event;
+import game.event.EventListener;
 import game.io.Audio;
 import game.io.Keyboard;
 import game.io.Mouse;
@@ -8,6 +9,7 @@ import game.state.GameState;
 
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.time.Duration;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -25,16 +27,16 @@ public class Game {
     Game() throws Exception {
         // set volume
         // set volume
-        audio.load(
-                "resources/Shapeforms Audio Free Sound Effects/Dystopia – Ambience and Drone Preview/AUDIO/AMBIENCE_SPACECRAFT_HOLD_LOOP.wav",
-                "drone.wav"
-        );
-//        audio.loopPlayForever("drone.wav", 0.1f);
-
-        audio.load("resources/Shapeforms Audio Free Sound Effects/Cassette Preview/AUDIO/button.wav", "button.wav");
-        audio.load("resources/Shapeforms Audio Free Sound Effects/future_ui/beep.wav", "caret.wav");
-        audio.load("resources/Shapeforms Audio Free Sound Effects/type_preview/swipe.wav", "beep.wav");
-        audio.load("resources/Shapeforms Audio Free Sound Effects/sci_fi_weapons/lock_on.wav", "select.wav");
+//        audio.load(
+//                "resources/Shapeforms Audio Free Sound Effects/Dystopia – Ambience and Drone Preview/AUDIO/AMBIENCE_SPACECRAFT_HOLD_LOOP.wav",
+//                "drone.wav"
+//        );
+////        audio.loopPlayForever("drone.wav", 0.1f);
+//
+//        audio.load("resources/Shapeforms Audio Free Sound Effects/Cassette Preview/AUDIO/button.wav", "button.wav");
+//        audio.load("resources/Shapeforms Audio Free Sound Effects/future_ui/beep.wav", "caret.wav");
+//        audio.load("resources/Shapeforms Audio Free Sound Effects/type_preview/swipe.wav", "beep.wav");
+//        audio.load("resources/Shapeforms Audio Free Sound Effects/sci_fi_weapons/lock_on.wav", "select.wav");
 
 
         // Delegate keyboard events to the current game state
@@ -46,29 +48,20 @@ public class Game {
             stateStack.peek().onKeyPressed(keyCode);
         });
 
-        Mouse.moved.addListener(event -> {
+        EventListener<MouseEvent> dispatchMouseEventListener = event -> {
             if (stateStack.isEmpty()) {
                 return;
             }
 
-            stateStack.peek().onMouseMoved(event);
-        });
+            stateStack.peek().dispatchMouseEvent(event);
+        };
 
-        Mouse.clicked.addListener(event -> {
-            if (stateStack.isEmpty()) {
-                return;
-            }
-
-            stateStack.peek().onMouseClicked(event);
-        });
-
-        Mouse.wheel.addListener(event -> {
-            if (stateStack.isEmpty()) {
-                return;
-            }
-
-            stateStack.peek().onMouseWheelMoved(event);
-        });
+        Mouse.moved.addListener(dispatchMouseEventListener);
+        Mouse.clicked.addListener(dispatchMouseEventListener);
+        Mouse.wheel.addListener(dispatchMouseEventListener);
+        Mouse.dragged.addListener(dispatchMouseEventListener);
+        Mouse.pressed.addListener(dispatchMouseEventListener);
+        Mouse.released.addListener(dispatchMouseEventListener);
     }
 
     public Audio getAudio() {

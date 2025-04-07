@@ -1,6 +1,8 @@
 package game.gui.layout;
 
-import game.gui.GuiElement;
+
+import game.gui.GuiComponent;
+import game.gui.GuiContainer;
 
 import java.util.List;
 
@@ -34,8 +36,8 @@ public class GuiVerticalLayout implements GuiLayout {
     }
 
     @Override
-    public void onLayout(GuiElement parent) {
-        List<GuiElement> children = parent.getChildren();
+    public void onLayout(GuiContainer parent) {
+        List<GuiComponent> children = parent.getChildren();
         if (children.isEmpty()) {
             return;
         }
@@ -47,7 +49,7 @@ public class GuiVerticalLayout implements GuiLayout {
 
         // First calculate total height of all children + spacing
         int totalChildrenHeight = 0;
-        for (GuiElement child : children) {
+        for (var child : children) {
             if (child.isVisible()) {
                 totalChildrenHeight += child.getHeight();
                 if (totalChildrenHeight > 0) {
@@ -99,7 +101,7 @@ public class GuiVerticalLayout implements GuiLayout {
 
         // Position each child
         int currentY = startY;
-        for (GuiElement child : children) {
+        for (var child : children) {
             if (!child.isVisible()) {
                 continue;
             }
@@ -133,9 +135,9 @@ public class GuiVerticalLayout implements GuiLayout {
     /**
      * Calculates the sum of all visible children heights without spacing.
      */
-    private int getTotalChildrenHeight(List<GuiElement> children) {
+    private int getTotalChildrenHeight(List<GuiComponent> children) {
         int totalHeight = 0;
-        for (GuiElement child : children) {
+        for (GuiComponent child : children) {
             if (child.isVisible()) {
                 totalHeight += child.getHeight();
             }

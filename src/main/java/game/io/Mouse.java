@@ -16,7 +16,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     public static final Event<MouseEvent> clicked = new Event<>();
     public static final Event<MouseEvent> moved = new Event<>();
     public static final Event<MouseEvent> dragged = new Event<>();
-    public static final Event<MouseWheelEvent> wheel = new Event<>();
+    public static final Event<MouseEvent> wheel = new Event<>();
 
     // State tracking
     private final boolean[] oldButtons;
@@ -138,5 +138,16 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         wheel.fire(e);
+    }
+
+    public static MouseEvent translateEvent(MouseEvent e, int x, int y) {
+        if (e instanceof MouseWheelEvent) {
+            return new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
+                    x, y, e.getClickCount(), e.isPopupTrigger(), ((MouseWheelEvent) e).getScrollType(),
+                    ((MouseWheelEvent) e).getScrollAmount(), ((MouseWheelEvent) e).getWheelRotation());
+        } else {
+            return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
+                    x, y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
+        }
     }
 }

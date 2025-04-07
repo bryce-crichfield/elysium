@@ -1,5 +1,7 @@
 package game;
 
+import game.io.Mouse;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -85,8 +87,8 @@ public class Window extends JFrame {
             return Optional.empty();
         }
 
-        return Optional.of(new MouseEvent(event.getComponent(), event.getID(), event.getWhen(), event.getModifiersEx(),
-                (int) point.get().getX(), (int) point.get().getY(), event.getClickCount(), event.isPopupTrigger(), event.getButton()));
+
+        return Optional.of(Mouse.translateEvent(event, (int) point.get().getX(), (int) point.get().getY()));
     }
 
     public Optional<Point> transformCoordinates(int canvasX, int canvasY) {
