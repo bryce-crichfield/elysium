@@ -8,6 +8,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
+import game.gui.style.GuiLabel;
 import game.state.GameState;
 
 import java.awt.*;
@@ -48,6 +49,10 @@ public class MainMenuState extends GameState {
 
     public GuiComponent createTestScroll(int x, int y){
         var container = new GuiScrollPanel(x, y, 300, 300);
+
+        GuiLabel text = new GuiLabel(100, 20, "You'll need to replace @Month and @Year with the specific month and year you want to filter by, or use parameters if you're running this from an application.\n" +
+                "Would you like any modifications to this solution");
+        container.addChild(text);
         for (int i = 0; i < 25; i++) {
             Color color = i % 2 == 0 ? Color.RED : Color.GREEN;
             container.addChild(createTestBox(10, i * 30, 280, 25, "Test: " + (i + 1), color));
