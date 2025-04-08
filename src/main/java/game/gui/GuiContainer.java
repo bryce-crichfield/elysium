@@ -70,8 +70,13 @@ public class GuiContainer extends GuiComponent {
 
     @Override
     protected final boolean onMouseEvent(MouseEvent e) {
-        for (GuiComponent child : children) {
-            if (child.processMouseEvent(e)) {
+        // Propagate backwards because insertion order implicitly defines z-order
+        for (int i = children.size() - 1; i >= 0; i--) {
+            var child = children.get(i);
+            if (children.get(i).processMouseEvent(e)) {
+                if (child instanceof GuiScrollPanel) {
+                    System.out.println("ScrollPanel handled it");
+                }
                 return true;
             }
         }

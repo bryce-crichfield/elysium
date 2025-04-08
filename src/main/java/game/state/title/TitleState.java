@@ -4,9 +4,12 @@ import game.Game;
 import game.graphics.background.StarBackground;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
+import game.gui.GuiScrollPanel;
 import game.gui.input.GuiHoverHandler;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
+import game.gui.layout.GuiVerticalLayout;
+import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
 import game.state.GameState;
@@ -84,7 +87,24 @@ public class TitleState extends GameState {
             System.exit(0);
         }));
 
+        container.addChild(createTestScrollPanel( 100, 100));
+
         mainMenu = container;
+    }
+
+    public GuiComponent createTestScrollPanel(int x, int y) {
+        var scrollPane = new GuiScrollPanel(x, y, 300, 200);
+        scrollPane.setLayout(new GuiVerticalLayout());
+
+        for (int i = 0; i < 20; i++) {
+            var label = new GuiLabel(0, 25, "Label " + (i + 1));
+            scrollPane.addChild(label);
+        }
+
+        scrollPane.setBorder(new GuiBorder(Color.WHITE, 2));
+        scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
+
+        return scrollPane;
     }
 
     public GuiComponent createMenuButton(int x, int y, String text, Runnable onClick) {

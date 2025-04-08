@@ -30,7 +30,6 @@ public class GuiMouseManager {
     public static boolean dispatchToCapturedComponent(MouseEvent e) {
         boolean isCapturedEvent = (e.getID() == MouseEvent.MOUSE_DRAGGED || e.getID() == MouseEvent.MOUSE_RELEASED);
         if (capturedComponent != null && isCapturedEvent) {
-            System.out.println("Dispatching event to captured component: " + e);
             // Send directly to captured component
             capturedComponent.processMouseEvent(e);
 

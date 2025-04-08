@@ -90,11 +90,13 @@ public abstract class GuiComponent {
         isHovered = isInBounds;
 
         if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
-            hoverHandlers.forEach(h -> h.onEnter(e));
+            // HOW DOES THIS WORK!?!?!?
+            GuiHoverManager.getInstance().enter(e, this);
         }
 
         if (mouseExited && !GuiMouseManager.hasCapturedComponent()) {
-            hoverHandlers.forEach(h -> h.onExit(e));
+            // HOW DOES THIS WORK!?!?!?
+            GuiHoverManager.getInstance().exit(e, this);
         }
 
         // Check if point is within bounds for other events
@@ -142,5 +144,15 @@ public abstract class GuiComponent {
 
     protected void addHoverHandler(GuiHoverHandler guiHoverHandler) {
         hoverHandlers.add(guiHoverHandler);
+    }
+
+    public final void dispatchOnEnter(MouseEvent event) {
+        isHovered = true;
+        hoverHandlers.forEach(h -> h.onEnter(event));
+    }
+
+    public final void dispatchOnExit(MouseEvent event) {
+        isHovered = false;
+        hoverHandlers.forEach(h -> h.onExit(event));
     }
 }
