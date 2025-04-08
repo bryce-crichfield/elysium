@@ -8,7 +8,7 @@ import java.time.Duration;
 public interface Transitions {
     static TransitionFactory fade(Duration duration, Color color, Easing easing) {
         return (source, target, callback) -> {
-            FadeTransition transition = new FadeTransition(duration, color, easing);
+            FadeTransition transition = new FadeTransition(source, target, duration, color, easing);
             if (callback != null) {
                 transition.setOnCompleteCallback(complete -> callback.run());
             }

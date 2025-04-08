@@ -62,7 +62,7 @@ public final class Game {
     }
 
     private void dispatchKeyEvent(int keyCode) {
-        if (stateManager.getStateStack().isEmpty() || stateManager.isTransitioning()) {
+        if (!stateManager.hasState() || stateManager.isTransitioning()) {
             return;
         }
 
@@ -70,7 +70,7 @@ public final class Game {
     }
 
     private void dispatchMouseEvent(MouseEvent event) {
-        if (stateManager.getStateStack().isEmpty() || stateManager.isTransitioning()) {
+        if (!stateManager.hasState() || stateManager.isTransitioning()) {
             return;
         }
 

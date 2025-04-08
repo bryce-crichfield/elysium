@@ -1,7 +1,5 @@
 package game.transition;
 
-import game.Game;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
@@ -19,21 +17,6 @@ public class PixelateTransition extends Transition {
         this.targetImage = targetImage;
         this.maxPixelSize = maxPixelSize;
         this.isIntro = isIntro;
-    }
-
-    // Method to capture the current screen as a source image
-    public static BufferedImage captureScreen(Game game) {
-        BufferedImage image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-
-        // Render the current game state to the image
-        if (!game.getStateStack().isEmpty()) {
-            game.getStateStack().peek().onRender(g);
-        }
-
-        g.dispose();
-        return image;
     }
 
     @Override
@@ -54,8 +37,7 @@ public class PixelateTransition extends Transition {
         int tempWidth = width / pixelSize;
         int tempHeight = height / pixelSize;
 
-        BufferedImage tempImage = new BufferedImage(tempWidth, tempHeight,
-                BufferedImage.TYPE_INT_ARGB);
+        var tempImage = new BufferedImage(tempWidth, tempHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D tempGraphics = tempImage.createGraphics();
 
         // Choose which image to draw based on progress

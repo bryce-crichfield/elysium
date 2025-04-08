@@ -1,10 +1,8 @@
 package game.state;
 
 import game.Game;
-import game.transition.PixelateTransition;
 import game.transition.Transition;
 import game.transition.TransitionFactory;
-import lombok.Getter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,173 +11,133 @@ import java.util.Stack;
 
 public class GameStateManager {
     private final Game game;
-    @Getter
-    private final Stack<GameState> stateStack = new Stack<>();
+    private final Stack<GameState> states = new Stack<>();
+
     private Transition transition;
-    private boolean isTransitioning = false;
-
-    // Add these to track states during transition
-    private GameState currentVisibleState;
-    private GameState pendingState;
-    private boolean isPoppingState = false;
-
+    private TransitionType transitionType = TransitionType.NONE;
+    private GameState target; // Only used during PUSH transitions
     public GameStateManager(Game game) {
         this.game = game;
     }
 
-    public void pushState(GameStateFactory stateFactory, TransitionFactory transitionFactory) {
-        if (stateStack.isEmpty()) {
-            var state = stateFactory.create(game);
-            stateStack.push(state);
-            currentVisibleState = state;
-            state.onEnter();
+    // Method to capture the current screen as a source image
+    public static BufferedImage captureScreen(GameState state) {
+        var image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        var g = image.createGraphics();
+        state.render(g);
+        g.dispose();
+        return image;
+    }
+
+    public void pushState(GameStateFactory factory, TransitionFactory transitionFactory) {
+        if (states.isEmpty()) {
+            // Special case for first state
+            GameState newState = factory.create(game);
+            states.push(newState);
+            newState.onEnter();
             return;
         }
 
-        // Already in transition, ignore
-        if (isTransitioning) {
-            return;
+        if (transitionType != TransitionType.NONE) {
+            throw new IllegalStateException("Already transitioning");
         }
 
-        // Get current state
-        GameState oldState = stateStack.peek();
-        currentVisibleState = oldState;
+        // Create and prepare the new state
+        target = factory.create(game);
 
-        // Create the new state
-        GameState newState = stateFactory.create(game);
-        pendingState = newState;
+        // Capture current and target visuals
+        BufferedImage source = captureScreen(states.peek());
+        BufferedImage target = captureScreen(this.target);
 
-        // Capture the current screen
-        BufferedImage sourceImage = PixelateTransition.captureScreen(game);
-
-        // Temporarily push and setup new state for screenshot
-        stateStack.push(newState);
-        newState.onEnter();
-
-        // Capture what the new state would look like
-        BufferedImage targetImage = PixelateTransition.captureScreen(game);
-
-        // Restore stack to original state
-        stateStack.pop();
-
-        // Start the transition
-        isTransitioning = true;
-        isPoppingState = false;
-
-        // Create the transition with duration parameter
-        transition = transitionFactory.create(
-                sourceImage,
-                targetImage,
-                this::completeTransition
-        );
+        // Set up transition
+        transitionType = TransitionType.PUSH;
+        transition = transitionFactory.create(source, target, this::completeTransition);
     }
 
     public void popState(TransitionFactory transitionFactory) {
-        if (stateStack.isEmpty() || stateStack.size() == 1) {
-            // Either no states or only one state (can't pop the last state)
-            if (!stateStack.isEmpty()) {
-                stateStack.peek().onExit();
-                stateStack.pop();
+        if (states.size() <= 1) {
+            // Handle basic cases
+            if (!states.isEmpty()) {
+                states.peek().onExit();
+                states.pop();
             }
             return;
         }
 
-        // Already in transition, ignore
-        if (isTransitioning) {
-            return;
+        if (transitionType != TransitionType.NONE) {
+            throw new IllegalStateException("Already transitioning");
         }
 
-        // Store reference to current state that will be popped
-        GameState topState = stateStack.peek();
-        currentVisibleState = topState;
+        // Set up the transition
+        BufferedImage source = captureScreen(states.peek());
+        BufferedImage target = captureScreen(states.get(states.size() - 2));
 
-        // Capture the current screen
-        BufferedImage sourceImage = PixelateTransition.captureScreen(game);
-
-        // Temporarily set up the stack to look like after the pop
-        stateStack.pop();
-        GameState previousState = stateStack.peek();
-        pendingState = previousState;
-        previousState.onEnter();
-
-        // Capture what the previous state looks like
-        BufferedImage targetImage = PixelateTransition.captureScreen(game);
-
-        // Put the stack back how it was
-        previousState.onExit();
-        stateStack.push(topState);
-
-        // Start the transition
-        isTransitioning = true;
-        isPoppingState = true;
-
-        // Create transition with duration parameter
-        transition = transitionFactory.create(
-                sourceImage,
-                targetImage,
-                this::completeTransition
-        );
+        transitionType = TransitionType.POP;
+        transition = transitionFactory.create(source, target, this::completeTransition);
     }
 
     private void completeTransition() {
-        isTransitioning = false;
-
-        if (isPoppingState) {
-            // Handle pop state completion
-            GameState topState = stateStack.pop();
-            topState.onExit();
-
-            if (!stateStack.isEmpty()) {
-                GameState previousState = stateStack.peek();
-                previousState.onEnter();
-                currentVisibleState = previousState;
-            }
-        } else {
-            // Handle push state completion
-            if (pendingState != null) {
-                if (currentVisibleState != null) {
-                    currentVisibleState.onExit();
+        switch (transitionType) {
+            case PUSH:
+                if (!states.isEmpty()) {
+                    states.peek().onExit();
                 }
-                stateStack.push(pendingState);
-                pendingState.onEnter();
-                currentVisibleState = pendingState;
-                pendingState = null;
-            }
+                states.push(target);
+                target.onEnter();
+                target = null;
+                break;
+
+            case POP:
+                GameState oldState = states.pop();
+                oldState.onExit();
+                if (!states.isEmpty()) {
+                    states.peek().onEnter();
+                }
+                break;
         }
+
+        transitionType = TransitionType.NONE;
+        transition = null;
     }
 
     public boolean isTransitioning() {
-        return isTransitioning;
+        return transitionType != TransitionType.NONE;
+    }
+
+    public boolean hasState() {
+        return !states.isEmpty();
     }
 
     public void update(Duration delta) {
-        if (isTransitioning && transition != null) {
+        if (isTransitioning()) {
             transition.update(delta);
         }
 
-        if (!isTransitioning && !stateStack.isEmpty()) {
-            stateStack.peek().update(delta);
-        } else if (currentVisibleState != null) {
-            // During transition, update the visible state
-            currentVisibleState.update(delta);
+        if (!isTransitioning() && hasState()) {
+            states.peek().update(delta);
         }
     }
 
     public void render(Graphics2D graphics) {
         // During transition, we let the transition handle rendering
-        if (isTransitioning && transition != null) {
+        if (isTransitioning()) {
             transition.render(graphics, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
             return;
         }
 
         // Normal rendering when not transitioning
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().render(graphics);
+        if (!states.isEmpty()) {
+            states.peek().render(graphics);
         }
     }
 
     public GameState getCurrentState() {
-        return isTransitioning ? currentVisibleState :
-                (stateStack.isEmpty() ? null : stateStack.peek());
+        if (!isTransitioning() && hasState()) {
+            return states.peek();
+        }
+
+        return null;
     }
+
+    private enum TransitionType {NONE, PUSH, POP}
 }
