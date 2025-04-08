@@ -109,7 +109,7 @@ public class GameStateManager {
     }
 
     public void update(Duration delta) {
-        if (isTransitioning()) {
+        if (isTransitioning() && hasState()) {
             transition.update(delta);
         }
 
@@ -120,7 +120,7 @@ public class GameStateManager {
 
     public void render(Graphics2D graphics) {
         // During transition, we let the transition handle rendering
-        if (isTransitioning()) {
+        if (isTransitioning() && hasState()) {
             transition.render(graphics, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
             return;
         }

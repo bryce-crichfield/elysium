@@ -31,12 +31,6 @@ public interface GuiMouseHandler {
     default void onMouseWheelMoved(MouseWheelEvent e) {
     }
 
-    default void onMouseEntered(MouseEvent e) {
-    }
-
-    default void onMouseExited(MouseEvent e) {
-    }
-
     default void dispatchMouseEvent(MouseEvent e) {
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             onMousePressed(e);
@@ -50,10 +44,6 @@ public interface GuiMouseHandler {
             onMouseMoved(e);
         } else if (e.getID() == MouseEvent.MOUSE_WHEEL) {
             onMouseWheelMoved((MouseWheelEvent) e);
-        } else if (e.getID() == MouseEvent.MOUSE_ENTERED) {
-            onMouseEntered(e);
-        } else if (e.getID() == MouseEvent.MOUSE_EXITED) {
-            onMouseExited(e);
         }
     }
 }

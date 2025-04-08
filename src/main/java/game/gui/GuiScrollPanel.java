@@ -151,6 +151,7 @@ public class GuiScrollPanel extends GuiContainer {
 
         // Convert to local space first
         Point localPoint = transformToLocalSpace(e.getPoint());
+        boolean isInBounds = containsPoint(localPoint);
 
         // Check if we're in bounds
         if (!containsPoint(localPoint) && !GuiMouseManager.isCapturedComponent(this)) return false;

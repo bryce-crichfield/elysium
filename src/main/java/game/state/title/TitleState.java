@@ -4,6 +4,7 @@ import game.Game;
 import game.graphics.background.StarBackground;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
+import game.gui.input.GuiHoverHandler;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBorder;
@@ -89,7 +90,22 @@ public class TitleState extends GameState {
     public GuiComponent createMenuButton(int x, int y, String text, Runnable onClick) {
         var button = new GuiComponent(x, y, BUTTON_WIDTH, BUTTON_HEIGHT) {
             private final boolean hovered = false;
-            private final GuiBorder border = new GuiBorder(Color.WHITE, 2);
+            private GuiBorder border = new GuiBorder(Color.WHITE, 2);
+
+            {
+                this.addHoverHandler(new GuiHoverHandler() {
+
+                    @Override
+                    public void onEnter(MouseEvent event) {
+                        border = border.withColor(Color.YELLOW);
+                    }
+
+                    @Override
+                    public void onExit(MouseEvent event) {
+                        border = border.withColor(Color.WHITE);
+                    }
+                });
+            }
 
             @Override
             protected void onRender(Graphics2D g) {
@@ -112,12 +128,8 @@ public class TitleState extends GameState {
         };
 
         var mouseClick = GuiMouseHandler.onClick(onClick);
-        var mouseHover = new GuiMouseHandler() {
-
-        };
-
         button.addMouseHandler(mouseClick);
-        button.addMouseHandler(mouseHover);
+
 //        button.setBorder(new GuiBorder(Color.WHITE, 2));
 
         return button;
@@ -159,6 +171,11 @@ public class TitleState extends GameState {
 
     @Override
     public void onMouseClicked(MouseEvent event) {
+        mainMenu.processMouseEvent(event);
+    }
+
+    @Override
+    public void onMouseMoved(MouseEvent event) {
         mainMenu.processMouseEvent(event);
     }
 

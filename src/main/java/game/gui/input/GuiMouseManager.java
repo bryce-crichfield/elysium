@@ -15,6 +15,10 @@ public class GuiMouseManager {
         return capturedComponent.equals(component);
     }
 
+    public static boolean hasCapturedComponent() {
+        return capturedComponent != null;
+    }
+
     public static void setMouseCapture(GuiComponent component) {
         capturedComponent = component;
     }

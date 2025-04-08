@@ -1,9 +1,9 @@
 package game.gui;
 
-import game.gui.input.GuiKeyHandler;
-import game.gui.input.GuiMouseHandler;
+import game.gui.input.*;
 import game.input.Mouse;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -15,12 +15,20 @@ public abstract class GuiComponent {
     // Input handler delegation - keeps the flexibility
     protected final List<GuiMouseHandler> mouseHandlers = new ArrayList<>();
     protected final List<GuiKeyHandler> keyHandlers = new ArrayList<>();
+    protected final List<GuiFocusHandler> focusHandlers = new ArrayList<>();
+    protected final List<GuiHoverHandler> hoverHandlers = new ArrayList<>();
     @Getter
     protected int x, y, width, height;
     @Getter
     protected boolean visible = true;
     @Getter
     protected boolean enabled = true;
+    @Getter
+    @Setter
+    protected boolean isFocused = true;
+    @Getter
+    protected boolean isHovered = false;
+
     protected GuiComponent parent;
 
     public GuiComponent(int x, int y, int width, int height) {
@@ -66,17 +74,36 @@ public abstract class GuiComponent {
     }
 
     // Process mouse events and delegate to handlers
-    public boolean processMouseEvent(MouseEvent e) {
+    public boolean processMouseEvent(MouseEvent event) {
         if (!visible || !enabled) return false;
 
         // Transform coordinates to local space
-        Point localPoint = transformToLocalSpace(e.getPoint());
-
-        // Check if point is within bounds
-        if (!containsPoint(localPoint)) return false;
+        Point localPoint = transformToLocalSpace(event.getPoint());
+        boolean isInBounds = containsPoint(localPoint);
 
         // Move the event to local coordinates
-        e = Mouse.translateEvent(e, localPoint.x, localPoint.y);
+        var e = Mouse.translateEvent(event, localPoint.x, localPoint.y);
+
+        // Check for hover events
+        boolean mouseEntered = e.getID() == MouseEvent.MOUSE_MOVED && (!isHovered && isInBounds);
+        boolean mouseExited = e.getID() == MouseEvent.MOUSE_MOVED && (isHovered && !isInBounds);
+        isHovered = isInBounds;
+
+        if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
+            hoverHandlers.forEach(h -> h.onEnter(e));
+        }
+
+        if (mouseExited && !GuiMouseManager.hasCapturedComponent()) {
+            hoverHandlers.forEach(h -> h.onExit(e));
+        }
+
+        // Check if point is within bounds for other events
+        if (!isInBounds && !GuiMouseManager.isCapturedComponent(this)) return false;
+
+        // Set focus on mouse click
+        if (event.getID() == MouseEvent.MOUSE_PRESSED && isInBounds) {
+            GuiFocusManager.getInstance().setFocus(this);
+        }
 
         // If the event gets handled by the component itself, return true
         if (onMouseEvent(e)) return true;
@@ -111,5 +138,9 @@ public abstract class GuiComponent {
     protected void setSize(int width, int height) {
         this.width = width;
         this.height = height;
+    }
+
+    protected void addHoverHandler(GuiHoverHandler guiHoverHandler) {
+        hoverHandlers.add(guiHoverHandler);
     }
 }
