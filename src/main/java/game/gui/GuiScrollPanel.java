@@ -1,7 +1,7 @@
 package game.gui;
 
 import game.gui.input.GuiMouseManager;
-import game.io.Mouse;
+import game.input.Mouse;
 import lombok.Getter;
 
 import java.awt.*;

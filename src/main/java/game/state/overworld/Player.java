@@ -1,7 +1,7 @@
 package game.state.overworld;
 
 import game.Game;
-import game.io.Keyboard;
+import game.input.Keyboard;
 
 import java.awt.*;
 import java.time.Duration;

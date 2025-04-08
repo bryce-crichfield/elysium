@@ -1,6 +1,6 @@
 package game.state.battle.controller;
 
-import game.io.Keyboard;
+import game.input.Keyboard;
 import game.state.battle.event.*;
 //import game.state.battle.hud.StatsMenu;
 import game.state.battle.model.Pathfinder;

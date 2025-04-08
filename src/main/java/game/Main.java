@@ -1,8 +1,11 @@
 package game;
 
-import game.state.title.MainMenuState;
+import game.state.title.TitleState;
+import game.transition.Transitions;
+import game.util.Easing;
 import game.util.Util;
 
+import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -14,7 +17,7 @@ public enum Main {
     public static void main(String[] args) throws Exception {
         Game game = new Game();
         Window window = new Window(640 * 3, 480 * 3, game);
-        game.pushState(MainMenuState::new);
+        game.getStateManager().pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
 
         Instant lastUpdate = Instant.now();
         Instant lastRender = Instant.now();

@@ -1,19 +1,23 @@
 package game;
 
-import game.event.Event;
 import game.event.EventListener;
-import game.io.Audio;
-import game.io.Keyboard;
-import game.io.Mouse;
+import game.audio.Audio;
+import game.graphics.background.BackgroundManager;
+import game.input.Keyboard;
+import game.input.Mouse;
+import game.graphics.postprocessing.PostProcessingManager;
+import game.graphics.postprocessing.VignetteEffect;
 import game.state.GameState;
-
+import game.state.GameStateFactory;
+import game.state.GameStateManager;
+import game.transition.*;
+import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.Stack;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Game {
     public static final int SCREEN_WIDTH = 480*2;
@@ -22,38 +26,44 @@ public class Game {
     private final Keyboard keyboard = new Keyboard();
     private final Mouse mouse = new Mouse();
     private final Audio audio = new Audio();
-    private final Stack<GameState> stateStack = new Stack<>();
+
+    @Getter
+    private PostProcessingManager postProcessing;
+
+    @Getter
+    private final GameStateManager stateManager;
 
     Game() throws Exception {
+        // Initialize the state manager
+        stateManager = new GameStateManager(this);
+
         // set volume
-        // set volume
-//        audio.load(
-//                "resources/Shapeforms Audio Free Sound Effects/Dystopia – Ambience and Drone Preview/AUDIO/AMBIENCE_SPACECRAFT_HOLD_LOOP.wav",
-//                "drone.wav"
-//        );
+        audio.load(
+                "resources/Shapeforms Audio Free Sound Effects/Dystopia – Ambience and Drone Preview/AUDIO/AMBIENCE_SPACECRAFT_HOLD_LOOP.wav",
+                "drone.wav"
+        );
 ////        audio.loopPlayForever("drone.wav", 0.1f);
 //
-//        audio.load("resources/Shapeforms Audio Free Sound Effects/Cassette Preview/AUDIO/button.wav", "button.wav");
-//        audio.load("resources/Shapeforms Audio Free Sound Effects/future_ui/beep.wav", "caret.wav");
-//        audio.load("resources/Shapeforms Audio Free Sound Effects/type_preview/swipe.wav", "beep.wav");
-//        audio.load("resources/Shapeforms Audio Free Sound Effects/sci_fi_weapons/lock_on.wav", "select.wav");
-
+        audio.load("resources/Shapeforms Audio Free Sound Effects/Cassette Preview/AUDIO/button.wav", "button.wav");
+        audio.load("resources/Shapeforms Audio Free Sound Effects/future_ui/beep.wav", "caret.wav");
+        audio.load("resources/Shapeforms Audio Free Sound Effects/type_preview/swipe.wav", "beep.wav");
+        audio.load("resources/Shapeforms Audio Free Sound Effects/sci_fi_weapons/lock_on.wav", "select.wav");
 
         // Delegate keyboard events to the current game state
         Keyboard.pressed.addListener(keyCode -> {
-            if (stateStack.isEmpty()) {
+            if (stateManager.getStateStack().isEmpty() || stateManager.isTransitioning()) {
                 return;
             }
 
-            stateStack.peek().onKeyPressed(keyCode);
+            stateManager.getCurrentState().onKeyPressed(keyCode);
         });
 
         EventListener<MouseEvent> dispatchMouseEventListener = event -> {
-            if (stateStack.isEmpty()) {
+            if (stateManager.getStateStack().isEmpty() || stateManager.isTransitioning()) {
                 return;
             }
 
-            stateStack.peek().dispatchMouseEvent(event);
+            stateManager.getCurrentState().dispatchMouseEvent(event);
         };
 
         Mouse.moved.addListener(dispatchMouseEventListener);
@@ -62,6 +72,9 @@ public class Game {
         Mouse.dragged.addListener(dispatchMouseEventListener);
         Mouse.pressed.addListener(dispatchMouseEventListener);
         Mouse.released.addListener(dispatchMouseEventListener);
+
+        postProcessing = new PostProcessingManager(SCREEN_WIDTH, SCREEN_HEIGHT);
+        postProcessing.addProcessor(new VignetteEffect(100, 0.5f));
     }
 
     public Audio getAudio() {
@@ -76,38 +89,36 @@ public class Game {
         return mouse;
     }
 
-    public void pushState(Function<Game, GameState> factory) {
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().onExit();
-        }
-
-        var state = factory.apply(this);
-        stateStack.push(state);
-        state.onEnter();
-    }
-
-    public void popState() {
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().onExit();
-            stateStack.pop();
-        }
-
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().onEnter();
-        }
-    }
-
     void onUpdate(Duration delta) {
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().onUpdate(delta);
-        }
+        stateManager.update(delta);
 
-        keyboard.onUpdate();
+        if (!stateManager.isTransitioning()) {
+            keyboard.onUpdate();
+        }
     }
 
     void onRender(Graphics2D graphics) {
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().onRender(graphics);
-        }
+        // Create a buffer to render the game to
+        BufferedImage gameBuffer = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D bufferGraphics = gameBuffer.createGraphics();
+
+        // Render game to buffer
+        stateManager.render(bufferGraphics);
+
+        bufferGraphics.dispose();
+
+        // Apply post-processing effects
+        BufferedImage processed = postProcessing.process(gameBuffer);
+
+        // Draw the processed result to the screen
+        graphics.drawImage(processed, 0, 0, null);
+    }
+
+    public int getWidth() {
+        return SCREEN_WIDTH;
+    }
+
+    public int getHeight() {
+        return SCREEN_HEIGHT;
     }
 }

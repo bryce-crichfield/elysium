@@ -2,7 +2,7 @@ package game.state.overworld;
 
 import game.Game;
 import game.state.GameState;
-import game.state.title.StarBackground;
+import game.graphics.background.StarBackground;
 import game.util.Camera;
 import game.util.Util;
 
@@ -32,7 +32,7 @@ public class OverworldState extends GameState {
         f1.getTile(0, 0).setExit("f2");
         f2.getTile(5, 5).setExit("f1");
 
-        starBackground = new StarBackground(this, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        addBackground(StarBackground::new);
     }
 
     @Override
@@ -42,8 +42,6 @@ public class OverworldState extends GameState {
 
     @Override
     public void onUpdate(Duration delta) {
-        starBackground.onUpdate(delta);
-
         player.onUpdate(delta);
 
         float dt = Util.perSecond(delta);
@@ -75,10 +73,7 @@ public class OverworldState extends GameState {
 
     @Override
     public void onRender(Graphics2D graphics) {
-        graphics.setColor(new Color(0x0A001A));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
-        starBackground.onRender(graphics);
 
         AffineTransform restore = graphics.getTransform();
         AffineTransform cameraTransform = camera.getTransform();

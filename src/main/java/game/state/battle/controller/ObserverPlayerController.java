@@ -1,13 +1,14 @@
 package game.state.battle.controller;
 
-import game.io.Keyboard;
-import game.state.battle.event.ActorSelected;
+import game.input.Keyboard;
 //import game.state.battle.hud.StatsMenu;
 import game.state.battle.model.Actor;
 import game.state.battle.state.BattleState;
 import game.state.battle.state.Cursor;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -19,6 +20,19 @@ public class ObserverPlayerController extends PlayerController {
 //        hoveredActorStats = new StatsMenu(20, 20, ActorSelected.event);
     }
 
+
+    @Override
+    public void onMouseClicked(MouseEvent event) {
+        state.getCursor().onMouseClicked(event);
+        if (event.getButton() == MouseEvent.BUTTON1) {
+            this.selectActor();
+        }
+    }
+
+    @Override
+    public void onMouseWheelMoved(MouseWheelEvent event) {
+        state.getCursor().onMouseWheelMoved(event);
+    }
 
     @Override
     public void onKeyPressed(int keyCode) {

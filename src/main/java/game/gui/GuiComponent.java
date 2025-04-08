@@ -2,12 +2,11 @@ package game.gui;
 
 import game.gui.input.GuiKeyHandler;
 import game.gui.input.GuiMouseHandler;
-import game.io.Mouse;
+import game.input.Mouse;
 import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +14,6 @@ import java.util.List;
 public abstract class GuiComponent {
     @Getter
     protected int x, y, width, height;
-
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
 
     @Getter
     protected boolean visible = true;
@@ -108,5 +102,15 @@ public abstract class GuiComponent {
 
     protected boolean containsPoint(Point point) {
         return point.x >= 0 && point.x < width && point.y >= 0 && point.y < height;
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    protected void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 }

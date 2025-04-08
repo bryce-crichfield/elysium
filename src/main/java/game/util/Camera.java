@@ -53,4 +53,18 @@ public class Camera {
         transform.translate(-cameraX, -cameraY);
         return transform;
     }
+
+    public int getWorldX(int screenX) {
+        // Convert screen coordinates to world coordinates
+        float screenCenterX = Game.SCREEN_WIDTH / 2.0f;
+        float worldX = (screenX - screenCenterX) / zoom + x;
+        return Math.round(worldX);
+    }
+
+    public int getWorldY(int screenY) {
+        // Convert screen coordinates to world coordinates
+        float screenCenterY = Game.SCREEN_HEIGHT / 2.0f;
+        float worldY = (screenY - screenCenterY) / zoom + y;
+        return Math.round(worldY);
+    }
 }

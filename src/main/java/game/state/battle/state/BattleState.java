@@ -1,22 +1,27 @@
 package game.state.battle.state;
 
 import game.Game;
+import game.input.Mouse;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
 import game.state.battle.controller.ObserverPlayerController;
 import game.state.battle.model.Actor;
-import game.state.title.StarBackground;
+import game.state.title.TitleState;
+import game.graphics.background.StarBackground;
+import game.transition.Transitions;
 import game.util.Camera;
+import game.util.Easing;
 import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.Optional;
 
 public class BattleState extends GameState {
-    private final StarBackground starBackground;
     private final Camera camera;
     private final World world;
     private final Cursor cursor;
@@ -31,7 +36,7 @@ public class BattleState extends GameState {
         camera = new Camera(game);
         world = new World(16, 16);
         cursor = new Cursor(camera, game, world);
-        starBackground = new StarBackground(this, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        addBackground(StarBackground::new);
 
         for (Actor actor : world.getActors()) {
 //            getSubscriptions().on(ActionActorMoved.event).run(actor::onActorMoved);
@@ -55,13 +60,34 @@ public class BattleState extends GameState {
     public void onEnter() {
     }
 
+    @Override
+    public void onMouseClicked(MouseEvent event) {
+        // translate from screen coordinates to world coordinates
+        int worldX = (int) camera.getWorldX(event.getX());
+        int worldY = (int) camera.getWorldY(event.getY());
+        var e = Mouse.translateEvent(event, worldX, worldY);
+        currentController.ifPresent(c -> c.onMouseClicked(e));
+    }
+
+    @Override
+    public void onMouseWheelMoved(MouseWheelEvent event) {
+        // translate from screen coordinates to world coordinates
+        int worldX = (int) camera.getWorldX(event.getX());
+        int worldY = (int) camera.getWorldY(event.getY());
+        var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
+        currentController.ifPresent(c -> c.onMouseWheelMoved(e));
+    }
+
     public void onKeyPressed(int keycode) {
         currentController.ifPresent(c -> c.onKeyPressed(keycode));
+
+        if (keycode == KeyEvent.VK_ESCAPE) {
+            game.getStateManager().pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+        }
     }
 
     @Override
     public void onUpdate(Duration delta) {
-        starBackground.onUpdate(delta);
         world.onUpdate(delta);
 
 //        if (getGame().getKeyboard().pressed(KeyEvent.VK_ESCAPE)) {
@@ -73,12 +99,7 @@ public class BattleState extends GameState {
 
     @Override
     public void onRender(Graphics2D graphics) {
-        // Clean the screen
-        graphics.setColor(new Color(0x0A001A));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
-
         // Render the star background
-        starBackground.onRender(graphics);
 
         // Get the camera worldTransform and render the world
         var guiTransform = graphics.getTransform();
