@@ -25,12 +25,13 @@ public class Audio {
     }
 
     public void play(String name) {
-        Clip clip = sounds.get(name);
-        if (clip.isRunning()) {
-            clip.stop();
-        }
-        clip.setFramePosition(0);
-        clip.start();
+        return;
+//        Clip clip = sounds.get(name);
+//        if (clip.isRunning()) {
+//            clip.stop();
+//        }
+//        clip.setFramePosition(0);
+//        clip.start();
     }
 
     public void loopPlayForever(String name, float volume) {

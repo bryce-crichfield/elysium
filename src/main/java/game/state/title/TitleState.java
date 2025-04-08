@@ -29,7 +29,6 @@ public class TitleState extends GameState {
     private static final int BUTTON_WIDTH = 250;
     private static final int BUTTON_HEIGHT = 50;
     private static final int BUTTON_SPACING = 20;
-    StarBackground starBackground;
     GuiComponent mainMenu;
 
     public TitleState(Game game) {
@@ -97,7 +96,7 @@ public class TitleState extends GameState {
         scrollPane.setLayout(new GuiVerticalLayout());
 
         for (int i = 0; i < 20; i++) {
-            var label = new GuiLabel(0, 25, "Label " + (i + 1));
+            var label = new GuiLabel(10000, 25, "Label " + (i + 1));
             scrollPane.addChild(label);
         }
 

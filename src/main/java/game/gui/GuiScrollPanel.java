@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
 import game.input.Mouse;
 import lombok.Getter;
@@ -151,16 +152,30 @@ public class GuiScrollPanel extends GuiContainer {
 
         // Convert to local space first
         Point localPoint = transformToLocalSpace(e.getPoint());
-        boolean isInBounds = containsPoint(localPoint);
+        boolean isInBounds = containsPoint(localPoint) || isPointOnScrollbar(localPoint);
 
-        // Check if we're in bounds
-        if (!containsPoint(localPoint) && !GuiMouseManager.isCapturedComponent(this)) return false;
+        boolean mouseEntered = e.getID() == MouseEvent.MOUSE_MOVED && (!isHovered && isInBounds);
+        boolean mouseExited = e.getID() == MouseEvent.MOUSE_MOVED && (isHovered && !isInBounds);
+        isHovered = isInBounds;
 
-        // Check for scrollbar interaction first
+        if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
+            // HOW DOES THIS WORK!?!?!?
+            GuiHoverManager.getInstance().enter(e, this);
+        }
+
+        if (mouseExited && !GuiMouseManager.hasCapturedComponent()) {
+            // HOW DOES THIS WORK!?!?!?
+            GuiHoverManager.getInstance().exit(e, this);
+        }
+
+        // Check that we are not hovered and not captured by some dragging event
+        if (!isHovered && !GuiMouseManager.isCapturedComponent(this)) return false;
+
+        // Check to see if there is a scroll bar interaction (click, release or drag).  If there isn't, but we are hovered
+        // return true to ensure we consume the event.
         if (isPointOnScrollbar(localPoint) || GuiMouseManager.isCapturedComponent(this)) {
             var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
-
-            return handleScrollbarInteraction(localEvent, localPoint);
+            return handleScrollbarInteraction(localEvent, localPoint) || isHovered;
         }
 
         // Handle mouse wheel for scrolling
@@ -278,7 +293,8 @@ public class GuiScrollPanel extends GuiContainer {
                 Rectangle thumbBounds = scrollState.getHorizontalThumbBounds(width, height);
                 if (thumbBounds != null && thumbBounds.contains(localPoint)) {
                     isDraggingHorizontal = true;
-                    dragStart = localPoint;
+                    isDraggingVertical = false; // Make sure vertical is off
+                    dragStart = new Point(localPoint);
                     dragStartScrollX = scrollState.getScrollXOffset();
                     dragStartScrollY = scrollState.getScrollYOffset();
                     GuiMouseManager.setMouseCapture(this); // Capture mouse events
@@ -305,16 +321,10 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     private boolean isPointOnScrollbar(Point localPoint) {
-        if (isVerticalBarVisible) {
-            Rectangle trackBounds = scrollState.getVerticalScrollbarBounds(width, height);
-            return trackBounds.contains(localPoint);
-        }
-
-        if (isHorizontalBarVisible) {
-            Rectangle trackBounds = scrollState.getHorizontalScrollbarBounds(width, height);
-            return trackBounds.contains(localPoint);
-        }
-
+        var verticalBounds = scrollState.getVerticalScrollbarBounds(width, height);
+        var horizontalBounds = scrollState.getHorizontalScrollbarBounds(width, height);
+        if (isVerticalBarVisible && verticalBounds.contains(localPoint)) return true;
+        if (isHorizontalBarVisible && horizontalBounds.contains(localPoint)) return true;
         return false;
     }
 
@@ -451,7 +461,6 @@ public class GuiScrollPanel extends GuiContainer {
             // Calculate thumb position
             float scrollRatio = scrollX / getMaxScrollX();
             int thumbX = track.x + (int) ((track.width - thumbWidth) * scrollRatio);
-
             return new Rectangle(thumbX, track.y, thumbWidth, track.height);
         }
     }

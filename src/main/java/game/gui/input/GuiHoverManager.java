@@ -30,4 +30,11 @@ public class GuiHoverManager {
             hoveredComponent = null;
         }
     }
+
+    public void clear() {
+        if (hoveredComponent != null) {
+            hoveredComponent.dispatchOnExit(null);
+            hoveredComponent = null;
+        }
+    }
 }
