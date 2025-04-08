@@ -1,6 +1,4 @@
-package game.state.battle.state;
-
-import game.state.battle.model.Actor;
+package game.state.battle.model;
 
 import java.util.Optional;
 

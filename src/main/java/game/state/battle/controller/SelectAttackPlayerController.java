@@ -1,18 +1,17 @@
 package game.state.battle.controller;
 
 import game.event.Event;
-//import game.state.battle.hud.StatsMenu;
+import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
+import game.state.battle.model.Cursor;
 import game.state.battle.model.Raycast;
-import game.state.battle.state.BattleState;
-import game.state.battle.state.Cursor;
 
 import java.awt.*;
 import java.time.Duration;
 
 public class SelectAttackPlayerController extends PlayerController {
     private final game.event.Event<Actor> onChangeHovered;
-//    private final StatsMenu hoveredActorStats;
+    //    private final StatsMenu hoveredActorStats;
     Raycast raycast;
 
     protected SelectAttackPlayerController(BattleState state) {

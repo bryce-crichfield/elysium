@@ -1,12 +1,13 @@
 package game.transition;
 
 import game.util.Easing;
+
 import java.awt.*;
 import java.time.Duration;
 
 public class FadeTransition extends Transition {
-    private Color color;
-    private Easing easing;
+    private final Color color;
+    private final Easing easing;
 
     public FadeTransition(Duration duration, Color color, Easing easing) {
         super(duration);

@@ -1,7 +1,7 @@
 package game.state.title;
 
 import game.Game;
-import game.graphics.background.*;
+import game.graphics.background.StarBackground;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.input.GuiMouseHandler;
@@ -9,7 +9,7 @@ import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
 import game.state.GameState;
-import game.state.battle.state.BattleState;
+import game.state.battle.BattleState;
 import game.state.options.OptionsState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -20,18 +20,76 @@ import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class TitleState extends GameState {
-    StarBackground starBackground;
-    GuiComponent mainMenu;
     private static final Color BUTTON_COLOR = new Color(50, 50, 100, 200);
     private static final Color BUTTON_HOVER_COLOR = new Color(70, 70, 150, 220);
     private static final int BUTTON_WIDTH = 250;
     private static final int BUTTON_HEIGHT = 50;
     private static final int BUTTON_SPACING = 20;
+    StarBackground starBackground;
+    GuiComponent mainMenu;
+
+    public TitleState(Game game) {
+        super(game);
+
+        addBackground(StarBackground::new);
+
+        // Main container
+        var container = new GuiContainer(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        container.setLayout(new GuiNullLayout());
+
+        // Calculate center position
+        int centerX = Game.SCREEN_WIDTH / 2;
+        int startY = Game.SCREEN_HEIGHT / 3;
+
+        // Add title
+        container.addChild(createTitleLabel(centerX, startY - 40));
+
+        // Add menu buttons
+        int currentY = startY;
+
+        // Continue button
+        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Continue", () -> {
+            System.out.println("Continue game");
+            // Load saved game logic would go here
+        }));
+        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
+
+        // New Game button
+        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "New Game", () -> {
+            System.out.println("New game started");
+            var transition = Transitions.pixelate(Duration.ofMillis(500), 32, true);
+            game.pushState(BattleState::new, transition);
+//            this.game.pushState(BattleState::new, Transitions.fade(Duration.ofMillis(500), Color.BLACK, Easing.easeIn()));
+        }));
+        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
+
+        // Options button
+        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Options", () -> {
+            System.out.println("Options opened");
+            game.pushState(OptionsState::new, Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeIn()));
+        }));
+        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
+
+        // Credits button
+        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Credits", () -> {
+            System.out.println("Credits opened");
+//            this.game.pushState(CreditsState::new, Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeIn()));
+        }));
+        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
+
+        // Exit button
+        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Exit", () -> {
+            System.out.println("Exiting game");
+            System.exit(0);
+        }));
+
+        mainMenu = container;
+    }
 
     public GuiComponent createMenuButton(int x, int y, String text, Runnable onClick) {
         var button = new GuiComponent(x, y, BUTTON_WIDTH, BUTTON_HEIGHT) {
-            private boolean hovered = false;
-            private GuiBorder border = new GuiBorder(Color.WHITE, 2);
+            private final boolean hovered = false;
+            private final GuiBorder border = new GuiBorder(Color.WHITE, 2);
 
             @Override
             protected void onRender(Graphics2D g) {
@@ -83,64 +141,6 @@ public class TitleState extends GameState {
         titleLabel.setPosition(x, y);
 
         return titleLabel;
-    }
-
-    public TitleState(Game game) {
-        super(game);
-
-        addBackground(StarBackground::new);
-
-        // Main container
-        var container = new GuiContainer(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
-        container.setLayout(new GuiNullLayout());
-
-        // Calculate center position
-        int centerX = Game.SCREEN_WIDTH / 2;
-        int startY = Game.SCREEN_HEIGHT / 3;
-
-        // Add title
-        container.addChild(createTitleLabel(centerX, startY - 40));
-
-        // Add menu buttons
-        int currentY = startY;
-
-        // Continue button
-        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Continue", () -> {
-            System.out.println("Continue game");
-            // Load saved game logic would go here
-        }));
-        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
-
-        // New Game button
-        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "New Game", () -> {
-            System.out.println("New game started");
-            var transition = Transitions.pixelate(Duration.ofMillis(500), 32, true);
-            game.getStateManager().pushState(BattleState::new, transition);
-//            this.game.pushState(BattleState::new, Transitions.fade(Duration.ofMillis(500), Color.BLACK, Easing.easeIn()));
-        }));
-        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
-
-        // Options button
-        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Options", () -> {
-            System.out.println("Options opened");
-            game.getStateManager().pushState(OptionsState::new, Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeIn()));
-        }));
-        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
-
-        // Credits button
-        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Credits", () -> {
-            System.out.println("Credits opened");
-//            this.game.pushState(CreditsState::new, Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeIn()));
-        }));
-        currentY += BUTTON_HEIGHT + BUTTON_SPACING;
-
-        // Exit button
-        container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "Exit", () -> {
-            System.out.println("Exiting game");
-            System.exit(0);
-        }));
-
-        mainMenu = container;
     }
 
     @Override

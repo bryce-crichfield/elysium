@@ -1,14 +1,18 @@
 package game.gui.input;
 
-import game.gui.GuiComponent;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 public interface GuiMouseHandler {
+    static GuiMouseHandler onClick(Runnable action) {
+        return new GuiMouseHandler() {
+            @Override
+            public void onMouseClicked(MouseEvent e) {
+                action.run();
+            }
+        };
+    }
+
     default void onMousePressed(MouseEvent e) {
     }
 
@@ -32,16 +36,6 @@ public interface GuiMouseHandler {
 
     default void onMouseExited(MouseEvent e) {
     }
-
-    static GuiMouseHandler onClick(Runnable action) {
-        return new GuiMouseHandler() {
-            @Override
-            public void onMouseClicked(MouseEvent e) {
-                action.run();
-            }
-        };
-    }
-
 
     default void dispatchMouseEvent(MouseEvent e) {
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {

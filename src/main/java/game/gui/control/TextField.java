@@ -11,18 +11,16 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class TextField extends GuiComponent {
+    private final int blinkInterval = 500; // milliseconds
     private GuiLabel text;
     private GuiBackground background;
-
     @Getter
     @Setter
     private boolean isEditable = true;
-
     // Cursor
     private int cursorPosition = 0;
     private boolean cursorVisible = true;
     private Instant lastBlinkTime = Instant.now();
-    private final int blinkInterval = 500; // milliseconds
 
     public TextField(int x, int y, int width, int height) {
         super(x, y, width, height);

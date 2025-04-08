@@ -6,17 +6,6 @@ package game.util;
 @FunctionalInterface
 public interface Easing {
     /**
-     * Calculates the eased value based on start, end, duration, and elapsed time.
-     *
-     * @param start    Starting value
-     * @param end      Ending value
-     * @param duration Total duration
-     * @param elapsed  Elapsed time
-     * @return The eased value
-     */
-    float ease(float start, float end, float duration, float elapsed);
-
-    /**
      * Linear interpolation (no easing)
      */
     static Easing linear() {
@@ -82,4 +71,15 @@ public interface Easing {
             return start + (end - start) * (t * t * t + 1);
         };
     }
+
+    /**
+     * Calculates the eased value based on start, end, duration, and elapsed time.
+     *
+     * @param start    Starting value
+     * @param end      Ending value
+     * @param duration Total duration
+     * @param elapsed  Elapsed time
+     * @return The eased value
+     */
+    float ease(float start, float end, float duration, float elapsed);
 }

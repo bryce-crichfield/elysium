@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GuiComponent {
+    // Input handler delegation - keeps the flexibility
+    protected final List<GuiMouseHandler> mouseHandlers = new ArrayList<>();
+    protected final List<GuiKeyHandler> keyHandlers = new ArrayList<>();
     @Getter
     protected int x, y, width, height;
-
     @Getter
     protected boolean visible = true;
     @Getter
@@ -42,7 +44,8 @@ public abstract class GuiComponent {
         g.setTransform(originalTransform);
     }
 
-    protected void onRender(Graphics2D g) {}
+    protected void onRender(Graphics2D g) {
+    }
 
     // Simple inheritance for updates
     public void update(Duration delta) {
@@ -53,10 +56,6 @@ public abstract class GuiComponent {
     protected void onUpdate(Duration delta) {
         // Base implementation
     }
-
-    // Input handler delegation - keeps the flexibility
-    protected final List<GuiMouseHandler> mouseHandlers = new ArrayList<>();
-    protected final List<GuiKeyHandler> keyHandlers = new ArrayList<>();
 
     public void addMouseHandler(GuiMouseHandler handler) {
         mouseHandlers.add(handler);

@@ -27,7 +27,7 @@ public class Event<T> {
 
     public void fire(T event) {
         for (EventListener<T> listener : listeners) {
-            listener.onEvent(event);
+            listener.consume(event);
         }
     }
 }

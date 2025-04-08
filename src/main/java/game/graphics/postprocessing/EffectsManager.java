@@ -2,23 +2,36 @@ package game.graphics.postprocessing;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostProcessingManager {
-    private List<PostProcessor> processors = new ArrayList<>();
-    private BufferedImage buffer;
+public class EffectsManager {
+    private final List<Effect> effects = new ArrayList<>();
+    private final BufferedImage buffer;
 
-    public PostProcessingManager(int width, int height) {
+    public EffectsManager(int width, int height) {
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     }
 
-    public void addProcessor(PostProcessor processor) {
-        processors.add(processor);
+    public void addEffect(Effect processor) {
+        effects.add(processor);
     }
 
-    public void removeProcessor(PostProcessor processor) {
-        processors.remove(processor);
+    public void removeEffect(Effect processor) {
+        effects.remove(processor);
+    }
+
+    public void clearEffects() {
+        effects.clear();
+    }
+
+    public void update(Duration delta) {
+        for (Effect processor : effects) {
+            if (processor.isEnabled()) {
+                processor.update(delta);
+            }
+        }
     }
 
     public BufferedImage process(BufferedImage input) {
@@ -26,7 +39,7 @@ public class PostProcessingManager {
         BufferedImage current = input;
 
         // Apply each processor in sequence
-        for (PostProcessor processor : processors) {
+        for (Effect processor : effects) {
             if (processor.isEnabled()) {
                 // Clear buffer
                 Graphics2D g = buffer.createGraphics();

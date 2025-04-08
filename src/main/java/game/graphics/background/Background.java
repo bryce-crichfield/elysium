@@ -3,7 +3,7 @@ package game.graphics.background;
 import java.awt.*;
 import java.time.Duration;
 
-public abstract class  Background {
+public abstract class Background {
     protected int screenWidth;
     protected int screenHeight;
 
@@ -13,5 +13,6 @@ public abstract class  Background {
     }
 
     public abstract void update(Duration delta);
+
     public abstract void render(Graphics2D graphics);
 }

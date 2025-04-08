@@ -1,6 +1,9 @@
 package game.gui.style;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 
 import java.awt.*;
 

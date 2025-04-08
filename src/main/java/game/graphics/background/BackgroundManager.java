@@ -2,8 +2,8 @@ package game.graphics.background;
 
 import java.awt.*;
 import java.time.Duration;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BackgroundManager {
     private final int screenWidth;

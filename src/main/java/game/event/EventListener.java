@@ -1,9 +1,6 @@
 package game.event;
 
+@FunctionalInterface
 public interface EventListener<T> {
-    void onEvent(T event);
-
-    default void listenTo(Event<T> event) {
-        event.addListener(this);
-    }
+    void consume(T event);
 }

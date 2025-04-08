@@ -1,7 +1,7 @@
 package game.state.battle.controller;
 
 import game.event.EventContext;
-import game.state.battle.state.BattleState;
+import game.state.battle.BattleState;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -21,7 +21,9 @@ public abstract class BattleController {
     public abstract void onEnter();
 
     public abstract void onUpdate(Duration delta);
+
     public abstract void onWorldRender(Graphics2D graphics);
+
     public abstract void onGuiRender(Graphics2D graphics);
 
     public void onExit() {

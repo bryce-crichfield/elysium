@@ -1,13 +1,13 @@
 package game.state.battle.controller;
 
 //import game.state.battle.hud.ItemsMenu;
-import game.state.battle.state.BattleState;
+
+import game.state.battle.BattleState;
 
 import java.awt.*;
 import java.time.Duration;
 
-public class SelectItemPlayerController extends PlayerController
-{
+public class SelectItemPlayerController extends PlayerController {
 //    ItemsMenu itemsMenu;
 
     public SelectItemPlayerController(BattleState state) {

@@ -1,4 +1,4 @@
-package game.state.overworld;
+package game.state.overworld.entity;
 
 import game.Game;
 import game.input.Keyboard;

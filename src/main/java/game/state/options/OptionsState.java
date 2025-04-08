@@ -7,10 +7,8 @@ import game.gui.GuiTabPane;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
-import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
 import game.state.GameState;
-import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
 
@@ -20,11 +18,11 @@ import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class OptionsState extends GameState {
-    private GuiContainer mainContainer;
     private static final Color BUTTON_COLOR = new Color(50, 50, 100, 200);
     private static final Color BUTTON_HOVER_COLOR = new Color(70, 70, 150, 220);
     private static final int BUTTON_WIDTH = 120;
     private static final int BUTTON_HEIGHT = 40;
+    private final GuiContainer mainContainer;
 
     public OptionsState(Game game) {
         super(game);
@@ -68,13 +66,13 @@ public class OptionsState extends GameState {
 
         // Add back and save buttons
         GuiComponent backButton = createButton((Game.SCREEN_WIDTH - 300) / 2, 550, "Back", () -> {
-            this.game.getStateManager().popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
+            this.game.popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
         });
 
         GuiComponent saveButton = createButton((Game.SCREEN_WIDTH + 60) / 2, 550, "Save", () -> {
             System.out.println("Saving options");
             // Save options logic would go here
-            this.game.getStateManager().popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
+            this.game.popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
         });
 
         mainContainer.addChild(backButton);
@@ -172,7 +170,7 @@ public class OptionsState extends GameState {
 
     private GuiComponent createButton(int x, int y, String text, Runnable onClick) {
         var button = new GuiComponent(x, y, BUTTON_WIDTH, BUTTON_HEIGHT) {
-            private boolean hovered = false;
+            private final boolean hovered = false;
 
             @Override
             protected void onRender(Graphics2D g) {

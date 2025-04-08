@@ -1,12 +1,10 @@
 package game.state.battle.controller;
 
+import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
-import game.state.battle.state.BattleState;
 import lombok.Getter;
 
-import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public abstract class PlayerController extends BattleController {

@@ -3,22 +3,17 @@ package game.state.battle.hud;
 //import game.gui.element.FormElement;
 //import game.gui.element.FormMenu;
 //import game.gui.properties.*;
-import game.state.battle.controller.*;
-import game.state.battle.state.BattleState;
-import game.util.Util;
 
-import java.awt.*;
+import game.state.battle.BattleState;
 
 public class ActionsMenu {
+    private static final int WIDTH = 160;
+    private static final int HEIGHT = 95;
     private BattleState state;
-
     public ActionsMenu(int x, int y, BattleState state) {
         this(x, y);
         this.state = state;
     }
-
-    private static final int WIDTH = 160;
-    private static final int HEIGHT = 95;
 
 //    private final FormElement title = Util.pure(() -> {
 //        FormElement title = new FormElement(WIDTH, 20);

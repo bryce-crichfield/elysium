@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompositeTransition extends Transition {
-    private List<Transition> transitions = new ArrayList<>();
+    private final List<Transition> transitions = new ArrayList<>();
 
     public CompositeTransition(Duration duration) {
         super(duration);

@@ -1,13 +1,10 @@
 package game.state.battle.controller;
 
 import game.event.Event;
-//import game.gui.properties.FormAlignment;
-//import game.gui.properties.layout.FormVerticalLayout;
 import game.input.Keyboard;
+import game.state.battle.BattleState;
 import game.state.battle.event.ActorHovered;
-//import game.state.battle.hud.StatsMenu;
 import game.state.battle.model.Actor;
-import game.state.battle.state.BattleState;
 
 import java.awt.*;
 import java.time.Duration;

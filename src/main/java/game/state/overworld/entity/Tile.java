@@ -1,11 +1,11 @@
-package game.state.overworld;
+package game.state.overworld.entity;
 
 import java.awt.*;
 import java.util.Optional;
 
 public class Tile {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     private Optional<String> exitId = Optional.empty();
 
     public Tile(int x, int y) {

@@ -1,7 +1,6 @@
 package game.graphics.background;
 
 import game.Game;
-import game.state.GameState;
 import game.util.Util;
 
 import java.awt.*;

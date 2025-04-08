@@ -1,7 +1,6 @@
 package game.gui.input;
 
 import game.gui.GuiComponent;
-import game.gui.GuiScrollPanel;
 
 import java.awt.event.MouseEvent;
 

@@ -6,9 +6,8 @@ import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
 
 public class GuiScrollPanel extends GuiContainer {
     protected GuiScrollState scrollState = new GuiScrollState();
@@ -164,8 +163,7 @@ public class GuiScrollPanel extends GuiContainer {
         }
 
         // Handle mouse wheel for scrolling
-        if (e.getID() == MouseEvent.MOUSE_WHEEL && e instanceof MouseWheelEvent) {
-            MouseWheelEvent wheelEvent = (MouseWheelEvent) e;
+        if (e.getID() == MouseEvent.MOUSE_WHEEL && e instanceof MouseWheelEvent wheelEvent) {
             float scrollAmount = wheelEvent.getWheelRotation() * 20;
             scrollState.scroll(0, scrollAmount);
             return true;
@@ -173,8 +171,8 @@ public class GuiScrollPanel extends GuiContainer {
 
         // Adjust coordinates for content area
         Point contentPoint = new Point(
-                localPoint.x + (int)scrollState.getScrollXOffset(),
-                localPoint.y + (int)scrollState.getScrollYOffset()
+                localPoint.x + (int) scrollState.getScrollXOffset(),
+                localPoint.y + (int) scrollState.getScrollYOffset()
         );
 
         // Create adjusted event
@@ -214,7 +212,7 @@ public class GuiScrollPanel extends GuiContainer {
                 if (isDraggingVertical) {
                     // Calculate scrolling based on drag delta
                     float trackHeight = scrollState.getVerticalScrollbarBounds(width, height).height;
-                    float contentVisibleRatio = (float)height / scrollState.getContentHeight();
+                    float contentVisibleRatio = (float) height / scrollState.getContentHeight();
                     float scrollFactor = 1 / contentVisibleRatio;
 
                     // Directly set scroll position
@@ -224,7 +222,7 @@ public class GuiScrollPanel extends GuiContainer {
                     );
                 } else if (isDraggingHorizontal) {
                     float trackWidth = scrollState.getHorizontalScrollbarBounds(width, height).width;
-                    float contentVisibleRatio = (float)width / scrollState.getContentWidth();
+                    float contentVisibleRatio = (float) width / scrollState.getContentWidth();
                     float scrollFactor = 1 / contentVisibleRatio;
 
                     scrollState.scrollTo(
@@ -336,20 +334,17 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     public static class GuiScrollState {
+        // Scrollbar constants
+        private static final int SCROLLBAR_SIZE = 10;
+        private static final int MIN_THUMB_SIZE = 20;
         private float scrollX = 0;
         private float scrollY = 0;
-
         @Getter
         private int contentWidth = 0;
         @Getter
         private int contentHeight = 0;
-
         private int viewportWidth = 0;
         private int viewportHeight = 0;
-
-        // Scrollbar constants
-        private static final int SCROLLBAR_SIZE = 10;
-        private static final int MIN_THUMB_SIZE = 20;
 
         public GuiScrollState() {
         }
@@ -433,12 +428,12 @@ public class GuiScrollPanel extends GuiContainer {
             Rectangle track = getVerticalScrollbarBounds(panelWidth, panelHeight);
 
             // Calculate thumb height as a proportion of visible content
-            float ratio = (float)viewportHeight / contentHeight;
-            int thumbHeight = Math.max(MIN_THUMB_SIZE, (int)(track.height * ratio));
+            float ratio = (float) viewportHeight / contentHeight;
+            int thumbHeight = Math.max(MIN_THUMB_SIZE, (int) (track.height * ratio));
 
             // Calculate thumb position
             float scrollRatio = scrollY / getMaxScrollY();
-            int thumbY = track.y + (int)((track.height - thumbHeight) * scrollRatio);
+            int thumbY = track.y + (int) ((track.height - thumbHeight) * scrollRatio);
 
             return new Rectangle(track.x, thumbY, track.width, thumbHeight);
         }
@@ -449,12 +444,12 @@ public class GuiScrollPanel extends GuiContainer {
             Rectangle track = getHorizontalScrollbarBounds(panelWidth, panelHeight);
 
             // Calculate thumb width as a proportion of visible content
-            float ratio = (float)viewportWidth / contentWidth;
-            int thumbWidth = Math.max(MIN_THUMB_SIZE, (int)(track.width * ratio));
+            float ratio = (float) viewportWidth / contentWidth;
+            int thumbWidth = Math.max(MIN_THUMB_SIZE, (int) (track.width * ratio));
 
             // Calculate thumb position
             float scrollRatio = scrollX / getMaxScrollX();
-            int thumbX = track.x + (int)((track.width - thumbWidth) * scrollRatio);
+            int thumbX = track.x + (int) ((track.width - thumbWidth) * scrollRatio);
 
             return new Rectangle(thumbX, track.y, thumbWidth, track.height);
         }

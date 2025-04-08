@@ -7,10 +7,10 @@ import java.awt.image.BufferedImage;
 import java.time.Duration;
 
 public class PixelateTransition extends Transition {
-    private BufferedImage sourceImage;
-    private BufferedImage targetImage;
-    private int maxPixelSize;
-    private boolean isIntro; // true for pixelating in, false for pixelating out
+    private final BufferedImage sourceImage;
+    private final BufferedImage targetImage;
+    private final int maxPixelSize;
+    private final boolean isIntro; // true for pixelating in, false for pixelating out
 
     public PixelateTransition(Duration duration, BufferedImage sourceImage,
                               BufferedImage targetImage, int maxPixelSize, boolean isIntro) {
@@ -19,6 +19,21 @@ public class PixelateTransition extends Transition {
         this.targetImage = targetImage;
         this.maxPixelSize = maxPixelSize;
         this.isIntro = isIntro;
+    }
+
+    // Method to capture the current screen as a source image
+    public static BufferedImage captureScreen(Game game) {
+        BufferedImage image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+
+        // Render the current game state to the image
+        if (!game.getStateStack().isEmpty()) {
+            game.getStateStack().peek().onRender(g);
+        }
+
+        g.dispose();
+        return image;
     }
 
     @Override
@@ -59,20 +74,5 @@ public class PixelateTransition extends Transition {
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         graphics.drawImage(tempImage, 0, 0, width, height, null);
-    }
-
-    // Method to capture the current screen as a source image
-    public static BufferedImage captureScreen(Game game) {
-        BufferedImage image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-
-        // Render the current game state to the image
-        if (!game.getStateManager().getStateStack().isEmpty()) {
-            game.getStateManager().getStateStack().peek().onRender(g);
-        }
-
-        g.dispose();
-        return image;
     }
 }

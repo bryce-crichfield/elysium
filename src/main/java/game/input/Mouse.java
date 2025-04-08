@@ -37,6 +37,17 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
         y = 0;
     }
 
+    public static MouseEvent translateEvent(MouseEvent e, int x, int y) {
+        if (e instanceof MouseWheelEvent) {
+            return new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
+                    x, y, e.getClickCount(), e.isPopupTrigger(), ((MouseWheelEvent) e).getScrollType(),
+                    ((MouseWheelEvent) e).getScrollAmount(), ((MouseWheelEvent) e).getWheelRotation());
+        } else {
+            return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
+                    x, y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
+        }
+    }
+
     // Method to receive transformed coordinates from Window
     public void setTransformedPosition(int gameX, int gameY) {
         this.x = gameX;
@@ -138,16 +149,5 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         wheel.fire(e);
-    }
-
-    public static MouseEvent translateEvent(MouseEvent e, int x, int y) {
-        if (e instanceof MouseWheelEvent) {
-            return new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                    x, y, e.getClickCount(), e.isPopupTrigger(), ((MouseWheelEvent) e).getScrollType(),
-                    ((MouseWheelEvent) e).getScrollAmount(), ((MouseWheelEvent) e).getWheelRotation());
-        } else {
-            return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                    x, y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
-        }
     }
 }

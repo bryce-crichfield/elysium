@@ -1,8 +1,11 @@
 package game.state.overworld;
 
 import game.Game;
-import game.state.GameState;
 import game.graphics.background.StarBackground;
+import game.state.GameState;
+import game.state.overworld.entity.Frame;
+import game.state.overworld.entity.Player;
+import game.state.overworld.entity.Tile;
 import game.util.Camera;
 import game.util.Util;
 
@@ -17,7 +20,7 @@ public class OverworldState extends GameState {
     StarBackground starBackground;
     Camera camera;
     Player player;
-    Map<String, Frame> frames = new HashMap<>();
+    Map<String, game.state.overworld.entity.Frame> frames = new HashMap<>();
     String currentFrame = "f1";
 
     public OverworldState(Game game) {
@@ -25,7 +28,7 @@ public class OverworldState extends GameState {
 
         camera = new Camera(game);
         player = new Player(0, 0, game);
-        var f1 = new Frame(10, 10);
+        var f1 = new game.state.overworld.entity.Frame(10, 10);
         var f2 = new Frame(20, 20);
         frames.put("f1", f1);
         frames.put("f2", f2);
@@ -47,8 +50,8 @@ public class OverworldState extends GameState {
         float dt = Util.perSecond(delta);
 
         // lerp the camera towards the player
-        float cameraX = Util.lerp(camera.getX(), player.getX(), 2*dt);
-        float cameraY = Util.lerp(camera.getY(), player.getY(), 2*dt);
+        float cameraX = Util.lerp(camera.getX(), player.getX(), 2 * dt);
+        float cameraY = Util.lerp(camera.getY(), player.getY(), 2 * dt);
         camera.setX(cameraX);
         camera.setY(cameraY);
 
@@ -68,13 +71,10 @@ public class OverworldState extends GameState {
 //        if (getGame().getKeyboard().pressed(KeyEvent.VK_ESCAPE)) {
 //            getGame().popState();
 //        }
-
     }
 
     @Override
     public void onRender(Graphics2D graphics) {
-
-
         AffineTransform restore = graphics.getTransform();
         AffineTransform cameraTransform = camera.getTransform();
         graphics.transform(cameraTransform);

@@ -1,4 +1,4 @@
-package game.state.overworld;
+package game.state.overworld.entity;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Frame {
-    private Tile[][] tiles;
-    private int width;
-    private int height;
+    private final Tile[][] tiles;
+    private final int width;
+    private final int height;
 
     public Frame(int width, int height) {
         this.width = width;

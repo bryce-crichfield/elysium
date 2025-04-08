@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiTabPane extends GuiContainer {
-    private List<String> tabTitles = new ArrayList<>();
-    private List<GuiContainer> tabContents = new ArrayList<>();
+    private final List<String> tabTitles = new ArrayList<>();
+    private final List<GuiContainer> tabContents = new ArrayList<>();
     private int selectedTabIndex = 0;
-    private int tabHeight = 40;
-    private Color tabBackgroundColor = new Color(50, 50, 80, 200);
-    private Color activeTabBackgroundColor = new Color(70, 70, 120, 220);
-    private Color tabTextColor = Color.WHITE;
-    private Font tabFont = new Font("Arial", Font.BOLD, 16);
+    private final int tabHeight = 40;
+    private final Color tabBackgroundColor = new Color(50, 50, 80, 200);
+    private final Color activeTabBackgroundColor = new Color(70, 70, 120, 220);
+    private final Color tabTextColor = Color.WHITE;
+    private final Font tabFont = new Font("Arial", Font.BOLD, 16);
 
     public GuiTabPane(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -84,8 +84,8 @@ public class GuiTabPane extends GuiContainer {
     }
 
     private class TabHeader extends GuiComponent {
-        private String title;
-        private boolean active;
+        private final String title;
+        private final boolean active;
 
         public TabHeader(int x, int y, int width, int height, String title, boolean active) {
             super(x, y, width, height);

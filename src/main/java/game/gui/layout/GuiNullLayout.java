@@ -2,7 +2,7 @@ package game.gui.layout;
 
 import game.gui.GuiContainer;
 
-public class GuiNullLayout implements GuiLayout{
+public class GuiNullLayout implements GuiLayout {
     @Override
     public void setAlignment(GuiAlignment alignment) {
 

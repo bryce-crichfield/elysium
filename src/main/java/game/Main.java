@@ -1,5 +1,6 @@
 package game;
 
+import game.platform.Window;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -17,11 +18,10 @@ public enum Main {
     public static void main(String[] args) throws Exception {
         Game game = new Game();
         Window window = new Window(640 * 3, 480 * 3, game);
-        game.getStateManager().pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+        game.pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
 
         Instant lastUpdate = Instant.now();
         Instant lastRender = Instant.now();
-
 
         while (true) {
             Instant currentTime = Instant.now();
@@ -34,7 +34,7 @@ public enum Main {
 
             if (dtUpdate > 1f / targetUps) {
                 lastUpdate = currentTime;
-                game.onUpdate(deltaUpdate);
+                game.update(deltaUpdate);
             }
 
             if (dtRender > 1f / targetFps) {

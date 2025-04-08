@@ -1,9 +1,5 @@
-package game.state.battle.state;
+package game.state.battle.model;
 
-import game.state.battle.model.Actor;
-import game.state.battle.model.ColorTile;
-import game.state.battle.model.Raycast;
-import game.state.battle.model.Tile;
 import game.util.Util;
 
 import java.awt.*;

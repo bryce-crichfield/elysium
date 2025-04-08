@@ -17,12 +17,6 @@ public abstract class Tile {
         this.passable = passable;
     }
 
-    public boolean isPassable() {
-        return passable;
-    }
-
-    public abstract void onRender(Graphics2D graphics);
-
     public static void drawOutline(List<Tile> tiles, Graphics2D graphics, Color color) {
         for (Tile tile : tiles) {
             List<Tile> neighbors = tile.getNeighbors(tiles);
@@ -58,23 +52,6 @@ public abstract class Tile {
 
             graphics.setStroke(oldStroke);
         }
-    }
-
-    public List<Tile> getNeighbors(List<Tile> tiles) {
-        Optional<Tile> above = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y - 1).findFirst();
-        Optional<Tile> below = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y + 1).findFirst();
-        Optional<Tile> left = tiles.stream().filter(tile -> tile.getX() == x - 1 && tile.getY() == y).findFirst();
-        Optional<Tile> right = tiles.stream().filter(tile -> tile.getX() == x + 1 && tile.getY() == y).findFirst();
-        return Arrays.asList(above, below, left, right).stream().filter(Optional::isPresent).map(Optional::get).collect(
-                Collectors.toList());
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 
     public static void drawTurtle(List<Tile> tiles, Graphics2D graphics, Color color) {
@@ -123,5 +100,28 @@ public abstract class Tile {
             turtleTileY = tileY;
         }
         graphics.setStroke(stroke);
+    }
+
+    public boolean isPassable() {
+        return passable;
+    }
+
+    public abstract void onRender(Graphics2D graphics);
+
+    public List<Tile> getNeighbors(List<Tile> tiles) {
+        Optional<Tile> above = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y - 1).findFirst();
+        Optional<Tile> below = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y + 1).findFirst();
+        Optional<Tile> left = tiles.stream().filter(tile -> tile.getX() == x - 1 && tile.getY() == y).findFirst();
+        Optional<Tile> right = tiles.stream().filter(tile -> tile.getX() == x + 1 && tile.getY() == y).findFirst();
+        return Arrays.asList(above, below, left, right).stream().filter(Optional::isPresent).map(Optional::get).collect(
+                Collectors.toList());
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

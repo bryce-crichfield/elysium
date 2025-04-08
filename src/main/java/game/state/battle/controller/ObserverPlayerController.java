@@ -1,10 +1,9 @@
 package game.state.battle.controller;
 
 import game.input.Keyboard;
-//import game.state.battle.hud.StatsMenu;
+import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
-import game.state.battle.state.BattleState;
-import game.state.battle.state.Cursor;
+import game.state.battle.model.Cursor;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -117,4 +116,4 @@ public class ObserverPlayerController extends PlayerController {
 //            onChangeHovered.fire(hovered);
         }
     }
- }
+}

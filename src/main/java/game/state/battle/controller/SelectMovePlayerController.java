@@ -1,14 +1,14 @@
 package game.state.battle.controller;
 
+import game.event.Event;
 import game.input.Keyboard;
-import game.state.battle.event.*;
-//import game.state.battle.hud.StatsMenu;
+import game.state.battle.BattleState;
+import game.state.battle.event.ActionActorMoved;
+import game.state.battle.event.CursorMoved;
+import game.state.battle.model.Actor;
+import game.state.battle.model.Cursor;
 import game.state.battle.model.Pathfinder;
 import game.state.battle.model.Tile;
-import game.state.battle.model.Actor;
-import game.event.Event;
-import game.state.battle.state.BattleState;
-import game.state.battle.state.Cursor;
 import game.util.Util;
 
 import java.awt.*;
@@ -152,6 +152,6 @@ public class SelectMovePlayerController extends PlayerController {
 //            }
 //            battleStateMachine.transitionTo(new SelectActionPlayerController(this));
 ////            ControllerTransition.defer.fire(() -> new SelectActionPlayerController(this));
-        }
     }
+}
 

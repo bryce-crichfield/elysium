@@ -1,4 +1,4 @@
-package game.state.battle.state;
+package game.state.battle.model;
 
 import game.Game;
 import game.input.Keyboard;

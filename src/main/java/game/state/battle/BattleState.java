@@ -1,14 +1,17 @@
-package game.state.battle.state;
+package game.state.battle;
 
 import game.Game;
+import game.graphics.background.StarBackground;
 import game.input.Mouse;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
 import game.state.battle.controller.ObserverPlayerController;
 import game.state.battle.model.Actor;
+import game.state.battle.model.Cursor;
+import game.state.battle.model.Selection;
+import game.state.battle.model.World;
 import game.state.title.TitleState;
-import game.graphics.background.StarBackground;
 import game.transition.Transitions;
 import game.util.Camera;
 import game.util.Easing;
@@ -63,8 +66,8 @@ public class BattleState extends GameState {
     @Override
     public void onMouseClicked(MouseEvent event) {
         // translate from screen coordinates to world coordinates
-        int worldX = (int) camera.getWorldX(event.getX());
-        int worldY = (int) camera.getWorldY(event.getY());
+        int worldX = camera.getWorldX(event.getX());
+        int worldY = camera.getWorldY(event.getY());
         var e = Mouse.translateEvent(event, worldX, worldY);
         currentController.ifPresent(c -> c.onMouseClicked(e));
     }
@@ -72,8 +75,8 @@ public class BattleState extends GameState {
     @Override
     public void onMouseWheelMoved(MouseWheelEvent event) {
         // translate from screen coordinates to world coordinates
-        int worldX = (int) camera.getWorldX(event.getX());
-        int worldY = (int) camera.getWorldY(event.getY());
+        int worldX = camera.getWorldX(event.getX());
+        int worldY = camera.getWorldY(event.getY());
         var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
         currentController.ifPresent(c -> c.onMouseWheelMoved(e));
     }
@@ -82,7 +85,7 @@ public class BattleState extends GameState {
         currentController.ifPresent(c -> c.onKeyPressed(keycode));
 
         if (keycode == KeyEvent.VK_ESCAPE) {
-            game.getStateManager().pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+            game.pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
         }
     }
 

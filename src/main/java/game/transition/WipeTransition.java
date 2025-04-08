@@ -5,17 +5,9 @@ import java.awt.image.BufferedImage;
 import java.time.Duration;
 
 public class WipeTransition extends Transition {
-    public enum Direction {
-        LEFT_TO_RIGHT,
-        RIGHT_TO_LEFT,
-        TOP_TO_BOTTOM,
-        BOTTOM_TO_TOP
-    }
-
-    private BufferedImage sourceImage;
-    private BufferedImage targetImage;
-    private Direction direction;
-
+    private final BufferedImage sourceImage;
+    private final BufferedImage targetImage;
+    private final Direction direction;
     public WipeTransition(Duration duration, BufferedImage sourceImage,
                           BufferedImage targetImage, Direction direction) {
         super(duration);
@@ -39,22 +31,22 @@ public class WipeTransition extends Transition {
 
         switch (direction) {
             case LEFT_TO_RIGHT:
-                wipePosition = (int)(width * progress);
+                wipePosition = (int) (width * progress);
                 clipRect.x = 0;
                 clipRect.width = wipePosition;
                 break;
             case RIGHT_TO_LEFT:
-                wipePosition = (int)(width * (1 - progress));
+                wipePosition = (int) (width * (1 - progress));
                 clipRect.x = wipePosition;
                 clipRect.width = width - wipePosition;
                 break;
             case TOP_TO_BOTTOM:
-                wipePosition = (int)(height * progress);
+                wipePosition = (int) (height * progress);
                 clipRect.y = 0;
                 clipRect.height = wipePosition;
                 break;
             case BOTTOM_TO_TOP:
-                wipePosition = (int)(height * (1 - progress));
+                wipePosition = (int) (height * (1 - progress));
                 clipRect.y = wipePosition;
                 clipRect.height = height - wipePosition;
                 break;
@@ -89,5 +81,12 @@ public class WipeTransition extends Transition {
                 graphics.drawLine(0, wipePosition, width, wipePosition);
                 break;
         }
+    }
+
+    public enum Direction {
+        LEFT_TO_RIGHT,
+        RIGHT_TO_LEFT,
+        TOP_TO_BOTTOM,
+        BOTTOM_TO_TOP
     }
 }

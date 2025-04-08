@@ -1,5 +1,6 @@
-package game;
+package game.platform;
 
+import game.Game;
 import game.input.Mouse;
 
 import javax.swing.*;
@@ -29,7 +30,7 @@ public class Window extends JFrame {
         canvas.setFocusable(true);
         canvas.requestFocus();
         canvas.addKeyListener(game.getKeyboard());
-        // In the Window constructor, after adding the mouse listeners
+
         canvas.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -78,16 +79,9 @@ public class Window extends JFrame {
         strategy = canvas.getBufferStrategy();
     }
 
-
-
     public Optional<MouseEvent> transformMouseEvent(MouseEvent event) {
         var point = transformCoordinates(event.getX(), event.getY());
-        if (point.isEmpty()) {
-            return Optional.empty();
-        }
-
-
-        return Optional.of(Mouse.translateEvent(event, (int) point.get().getX(), (int) point.get().getY()));
+        return point.map(value -> Mouse.translateEvent(event, (int) value.getX(), (int) value.getY()));
     }
 
     public Optional<Point> transformCoordinates(int canvasX, int canvasY) {
@@ -129,7 +123,6 @@ public class Window extends JFrame {
         return Optional.of(new Point(gameX, gameY));
     }
 
-
     public void onRender(float updateTime, float renderTime) {
         this.repaint();
 
@@ -139,7 +132,7 @@ public class Window extends JFrame {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        game.onRender(g);
+        game.render(g);
 
         Graphics2D g2 = (Graphics2D) strategy.getDrawGraphics();
         g2.setColor(Color.BLACK);
@@ -198,5 +191,9 @@ public class Window extends JFrame {
         y += textSize;
 
         graphics.setFont(font);
+    }
+
+    public void close() {
+
     }
 }
