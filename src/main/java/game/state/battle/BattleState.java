@@ -61,6 +61,7 @@ public class BattleState extends GameState {
 
     @Override
     public void onEnter() {
+        game.getAudio().loopPlayForever("ambience/ambience_spacecraft_hold_loop", 0.25f);
     }
 
     @Override

@@ -29,7 +29,20 @@ public class GameStateManager {
         return image;
     }
 
+    // Pushes a state without transition
+    public void setState(GameStateFactory factory) {
+        if (!states.isEmpty()) {
+            states.peek().onExit();
+            states.pop();
+        }
+
+        GameState newState = factory.create(game);
+        states.push(newState);
+        newState.onEnter();
+    }
+
     public void pushState(GameStateFactory factory, TransitionFactory transitionFactory) {
+        System.out.println("PUSHING STATE");
         if (states.isEmpty()) {
             // Special case for first state
             GameState newState = factory.create(game);

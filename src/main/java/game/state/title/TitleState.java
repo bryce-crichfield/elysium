@@ -180,7 +180,11 @@ public class TitleState extends GameState {
             }
         };
 
-        var mouseClick = GuiMouseHandler.onClick(onClick);
+        var mouseClick = GuiMouseHandler.onClick(() -> {
+            onClick.run();
+            game.getAudio().play("future_ui/beep");
+
+        });
         button.addMouseHandler(mouseClick);
 
 //        button.setBorder(new GuiBorder(Color.WHITE, 2));

@@ -2,6 +2,7 @@ package game;
 
 import game.platform.ErrorDialog;
 import game.platform.Window;
+import game.state.loading.LoadingState;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -30,7 +31,7 @@ public enum Main {
     }
 
     public static void execute(Game game, Window window) throws Exception {
-        game.pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+        game.setState(LoadingState::new);
 
         Instant lastUpdate = Instant.now();
         Instant lastRender = Instant.now();

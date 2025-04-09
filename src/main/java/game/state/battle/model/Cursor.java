@@ -44,7 +44,7 @@ public class Cursor {
         CursorMoved.event.addListener(event -> {
             cursorX = Util.clamp(cursorX, 0, world.getWidth() - 1);
             cursorY = Util.clamp(cursorY, 0, world.getHeight() - 1);
-            game.getAudio().play("beep.wav");
+            game.getAudio().play("type_preview/swipe");
         });
     }
 
