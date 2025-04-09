@@ -5,6 +5,7 @@ import game.graphics.background.StarBackground;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiScrollPanel;
+import game.gui.control.GuiDropdown;
 import game.gui.input.GuiHoverHandler;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
+import java.util.List;
 
 public class TitleState extends GameState {
     private static final Color BUTTON_COLOR = new Color(50, 50, 100, 200);
@@ -87,8 +89,16 @@ public class TitleState extends GameState {
         }));
 
         container.addChild(createTestScrollPanel( 100, 100));
+        container.addChild(createTestDropdown( 300, 300));
 
         mainMenu = container;
+    }
+
+    public GuiComponent createTestDropdown(int x, int y) {
+        var dropdown = new GuiDropdown<String>(x, y, 100, 20);
+        dropdown.setItems(List.of("Option 1", "Option 2", "Option 3"));
+        dropdown.setSelectedItem("Option 1");
+        return dropdown;
     }
 
     public GuiComponent createTestScrollPanel(int x, int y) {
