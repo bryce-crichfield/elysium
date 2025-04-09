@@ -6,6 +6,7 @@ import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiScrollPanel;
 import game.gui.control.GuiDropdown;
+import game.gui.control.GuiSlider;
 import game.gui.input.GuiHoverHandler;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
@@ -90,6 +91,7 @@ public class TitleState extends GameState {
 
         container.addChild(createTestScrollPanel( 100, 100));
         container.addChild(createTestDropdown( 300, 300));
+        container.addChild(createGuiSlider( 500, 500));
 
         mainMenu = container;
     }
@@ -114,6 +116,28 @@ public class TitleState extends GameState {
         scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
 
         return scrollPane;
+    }
+
+    public GuiComponent createGuiSlider(int x, int y) {
+        var container = new GuiContainer(x, y, 300, 100);
+        container.setLayout(new GuiVerticalLayout());
+
+        for (int i = 0; i < 10; i++) {
+            var slider = new GuiSlider(0, 0, 200, 30);
+            slider.setMinValue(0);
+            slider.setMaxValue(100);
+            slider.setValue(50); // Initial value
+            slider.setOnValueChanged(newValue -> {
+                System.out.println("Slider value changed to: " + newValue);
+                // Update your game/application state here
+            });
+            container.addChild(slider);
+        }
+
+        container.setBackground(new GuiBackground.Fill(Color.BLACK));
+        container.setBorder(new GuiBorder(Color.WHITE, 2));
+
+        return container;
     }
 
     public GuiComponent createMenuButton(int x, int y, String text, Runnable onClick) {

@@ -10,7 +10,7 @@ import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 
-public class TextField extends GuiComponent {
+public class GuiTextField extends GuiComponent {
     private final int blinkInterval = 500; // milliseconds
     private GuiLabel text;
     private GuiBackground background;
@@ -22,7 +22,7 @@ public class TextField extends GuiComponent {
     private boolean cursorVisible = true;
     private Instant lastBlinkTime = Instant.now();
 
-    public TextField(int x, int y, int width, int height) {
+    public GuiTextField(int x, int y, int width, int height) {
         super(x, y, width, height);
     }
 
