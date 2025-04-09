@@ -38,13 +38,13 @@ public class GuiDropdown<T> extends GuiComponent {
     private final int itemHeight = 24;
 
     // The max height of the dropdown list when expanded
-    private int maxDropdownHeight = 150;
+    private final int maxDropdownHeight = 150;
 
     // Selection callback
     private Consumer<T> onSelectionChanged = null;
 
     // Scrolling state for the dropdown list
-    private int scrollOffset = 0;
+    private final int scrollOffset = 0;
 
     // Z-order management - dropdowns should be rendered above other components
     private static GuiDropdown<?> activeDropdown = null;

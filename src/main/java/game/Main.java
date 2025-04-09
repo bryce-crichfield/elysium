@@ -1,5 +1,6 @@
 package game;
 
+import game.platform.ErrorDialog;
 import game.platform.Window;
 import game.state.title.TitleState;
 import game.transition.Transitions;
@@ -18,6 +19,17 @@ public enum Main {
     public static void main(String[] args) throws Exception {
         Game game = new Game();
         Window window = new Window(640 * 3, 480 * 3, game);
+
+        try {
+            execute(game, window);
+        } catch (Exception e) {
+            ErrorDialog.showError("An error occurred", e.getMessage());
+        } finally {
+            window.dispose();
+        }
+    }
+
+    public static void execute(Game game, Window window) throws Exception {
         game.pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
 
         Instant lastUpdate = Instant.now();

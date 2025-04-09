@@ -25,8 +25,7 @@ public class Audio {
     }
 
     public void play(String name) {
-        return;
-//        Clip clip = sounds.get(name);
+        //        Clip clip = sounds.get(name);
 //        if (clip.isRunning()) {
 //            clip.stop();
 //        }

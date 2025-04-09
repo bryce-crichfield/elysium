@@ -324,8 +324,7 @@ public class GuiScrollPanel extends GuiContainer {
         var verticalBounds = scrollState.getVerticalScrollbarBounds(width, height);
         var horizontalBounds = scrollState.getHorizontalScrollbarBounds(width, height);
         if (isVerticalBarVisible && verticalBounds.contains(localPoint)) return true;
-        if (isHorizontalBarVisible && horizontalBounds.contains(localPoint)) return true;
-        return false;
+        return isHorizontalBarVisible && horizontalBounds.contains(localPoint);
     }
 
     public void scrollTo(float x, float y) {
