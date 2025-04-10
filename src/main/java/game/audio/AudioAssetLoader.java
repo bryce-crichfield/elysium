@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AudioAssetLoader extends AssetLoader<String, Clip> {
+public class AudioAssetLoader extends AssetLoader<String, AudioSample> {
     // Statistics counters
     private final AtomicInteger successfullyLoaded = new AtomicInteger(0);
     private final AtomicInteger failedToLoad = new AtomicInteger(0);
@@ -28,7 +28,7 @@ public class AudioAssetLoader extends AssetLoader<String, Clip> {
 
     private final AudioStore audioStore;
 
-    public AudioAssetLoader(AudioStore store, Path assetDirectory) {
+    public AudioAssetLoader(AudioStore store, Path assetDirectory, AudioFormat format) {
         super(store, assetDirectory);
         this.audioStore = store;
     }
@@ -122,40 +122,34 @@ public class AudioAssetLoader extends AssetLoader<String, Clip> {
             Thread.sleep(1);
             // First try to load the audio file directly
             AudioInputStream originalStream = AudioSystem.getAudioInputStream(file);
-            AudioFormat originalFormat = originalStream.getFormat();
+            AudioFormat sourceFormat = originalStream.getFormat();
+            byte[] data;
 
-            try {
-                // Try to create a clip with the original format
-                Clip clip = AudioSystem.getClip();
-                clip.open(originalStream);
+            // Check if conversion is needed
+            if (!isFormatCompatible(sourceFormat, targetFormat)) {
+                System.out.println("Converting audio format for: " + file.getName());
+                System.out.println("Original format: " + sourceFormat);
+                System.out.println("Target format: " + targetFormat);
 
-                // If successful, store the clip
-                audioStore.store(key, clip);
-                successfullyLoaded.incrementAndGet();
-
-                System.out.println("Loaded: " + key + " (" +
-                        processedCount + "/" + fileCount + ")");
-            } catch (LineUnavailableException e) {
-                // Format not supported, try to convert it
-                originalStream.close();
-
-                // Reopen the stream for conversion
-                AudioInputStream newStream = AudioSystem.getAudioInputStream(file);
-                AudioInputStream convertedStream = convertAudioFormat(newStream, targetFormat);
-
-                // Try to create a clip with the converted format
-                Clip clip = AudioSystem.getClip();
-                clip.open(convertedStream);
-
-                // If successful, store the clip
-                audioStore.store(key, clip);
-                successfullyLoaded.incrementAndGet();
-                convertedAssets.incrementAndGet();
-
-                System.out.println("Converted and loaded: " + key + " (" +
-                        processedCount + "/" + fileCount + ")");
+                // Convert to target format
+                AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, originalStream);
+                data = readAllBytes(convertedStream);
+                convertedStream.close();
+            } else {
+                // No conversion needed
+                data = readAllBytes(originalStream);
             }
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            originalStream.close();
+
+            AudioSample sample = new AudioSample(targetFormat, data);
+
+            // If successful, store the clip
+            audioStore.store(key, sample);
+            successfullyLoaded.incrementAndGet();
+
+            System.out.println("Loaded: " + key + " (" +
+                    processedCount + "/" + fileCount + ")");
+        } catch (UnsupportedAudioFileException | IOException e) {
             failedToLoad.incrementAndGet();
             String errorMsg = "Failed to load: " + key + " - " + e.getMessage();
             System.err.println(errorMsg);
@@ -165,35 +159,28 @@ public class AudioAssetLoader extends AssetLoader<String, Clip> {
     }
 
     /**
-     * Convert an audio stream to a new format
+     * Checks if source format is compatible with target format
      */
-    private AudioInputStream convertAudioFormat(AudioInputStream sourceStream, AudioFormat targetFormat)
-            throws IOException {
-        // First convert to the target format
-        AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, sourceStream);
+    private boolean isFormatCompatible(AudioFormat source, AudioFormat target) {
+        return source.getSampleRate() == target.getSampleRate() &&
+                source.getSampleSizeInBits() == target.getSampleSizeInBits() &&
+                source.getChannels() == target.getChannels() &&
+                source.isBigEndian() == target.isBigEndian() &&
+                source.getEncoding().equals(target.getEncoding());
+    }
 
-        // Read the entire audio into a byte array (this allows us to close the original stream)
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[8192];
+    /**
+     * Reads all bytes from an audio input stream
+     */
+    private byte[] readAllBytes(AudioInputStream stream) throws IOException {
+        byte[] buffer = new byte[4096];
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         int bytesRead;
 
-        while ((bytesRead = convertedStream.read(buffer)) != -1) {
-            byteArrayOutputStream.write(buffer, 0, bytesRead);
+        while ((bytesRead = stream.read(buffer)) != -1) {
+            byteStream.write(buffer, 0, bytesRead);
         }
 
-        // Close the original streams
-        convertedStream.close();
-        sourceStream.close();
-
-        // Create a new stream from the byte array
-        byte[] audioBytes = byteArrayOutputStream.toByteArray();
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(audioBytes);
-
-        // Return a new AudioInputStream
-        return new AudioInputStream(
-                byteArrayInputStream,
-                targetFormat,
-                audioBytes.length / targetFormat.getFrameSize()
-        );
+        return byteStream.toByteArray();
     }
 }

@@ -1,11 +1,8 @@
 package game.audio;
 
 import game.audio.processor.AudioProcessor;
-import game.audio.processor.SampleAudioProcessor;
 
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,13 +67,6 @@ public class AudioEngine implements Runnable {
         }
     }
 
-    // Create and trigger a clip
-    public SampleAudioProcessor createClip(String filename) throws UnsupportedAudioFileException, IOException {
-        SampleAudioProcessor sampler = new SampleAudioProcessor(new File(filename), format);
-        addProcessor(sampler);
-        return sampler;
-    }
-
     private long elapsedNanos = 0;
     private int count = 0;
 
@@ -118,13 +108,14 @@ public class AudioEngine implements Runnable {
                 if (++count >= 10) {
                     float averageNanos = (float) elapsedNanos / count;
                     float averageMs = averageNanos / 1_000_000;
+                    System.out.println("Current Active Processors: " + processors.size());
                     System.out.println("Average delay processing time: " + averageMs + " ms");
                     elapsedNanos = 0;
                     count = 0;
                 }
 
                 // Clean up inactive processors
-//                    processors.removeAll(toRemove);
+                processors.removeAll(toRemove);
             }
 
             // Write to output line

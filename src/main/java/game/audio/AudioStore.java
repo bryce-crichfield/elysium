@@ -2,21 +2,20 @@ package game.audio;
 
 import game.asset.AssetStore;
 
-import javax.sound.sampled.Clip;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AudioStore implements AssetStore<String, Clip> {
-    private final Map<String, Clip> loadedClips = new ConcurrentHashMap<>();
+public class AudioStore implements AssetStore<String, AudioSample> {
+    private final Map<String, AudioSample> loadedClips = new ConcurrentHashMap<>();
 
     @Override
-    public void store(String key, Clip asset) {
+    public void store(String key, AudioSample asset) {
         loadedClips.put(key, asset);
     }
 
     @Override
-    public Clip getAssets(String key) {
+    public AudioSample getAssets(String key) {
         return loadedClips.get(key);
     }
 
@@ -27,9 +26,6 @@ public class AudioStore implements AssetStore<String, Clip> {
 
     @Override
     public void release() {
-        for (Clip clip : loadedClips.values()) {
-            clip.close();
-        }
         loadedClips.clear();
         System.out.println("All audio assets released");
     }

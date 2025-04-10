@@ -27,7 +27,7 @@ public class LoadingState extends GameState {
 
     public LoadingState(Game game) {
         super(game);
-        var assetLoader = new AudioAssetLoader(game.getAudio().getAudioStore(), Path.of("resources/audio"));
+        var assetLoader = new AudioAssetLoader(game.getAudio().getAudioStore(), Path.of("resources/audio"), game.getAudio().getFormat());
         assetLoaders.put(assetLoader, false);
         loadQueue.add(assetLoader);
 

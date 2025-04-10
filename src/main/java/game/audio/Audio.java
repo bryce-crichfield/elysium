@@ -1,39 +1,37 @@
 package game.audio;
 
-import javax.sound.sampled.Clip;
+import game.audio.processor.AudioSampler;
+
+import javax.sound.sampled.AudioFormat;
 
 public class Audio {
     private final AudioStore store = new AudioStore();
+    private final AudioEngine engine = new AudioEngine();
+
+    public AudioFormat getFormat() {
+        return engine.getFormat();
+    }
 
     public Audio() {
+        engine.start();
     }
 
     public void play(String name) {
-        Clip clip = store.getAssets(name);
-        if (clip.isRunning()) {
-            clip.stop();
-        }
-        clip.setFramePosition(0);
-        clip.start();
+        play(name, false, 1.0f);
     }
 
-    public void loopPlayForever(String name, float volume) {
-        Clip clip = store.getAssets(name);
-
-        // set volume
-        float gain = volume;
-        if (gain < 0f || gain > 1f) {
-            throw new IllegalArgumentException("Volume not valid: " + gain);
+    public void play(String name, boolean loop, float gain) {
+        AudioSample sample = store.getAssets(name);
+        if (sample == null) {
+            System.err.println("Audio not found: " + name);
+            return;
         }
 
-        // set volume
-        float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-        if (clip.isRunning()) {
-            clip.stop();
-        }
-        clip.setFramePosition(0);
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
-        clip.start();
+        var sampler = new AudioSampler(sample, engine.getFormat());
+        sampler.setLoop(loop);
+        sampler.getGain().setValue(gain);
+        engine.addProcessor(sampler);
+        sampler.play();
     }
 
     public AudioStore getAudioStore() {

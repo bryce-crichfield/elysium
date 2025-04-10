@@ -2,14 +2,14 @@ package game.audio.processor;
 
 import javax.sound.sampled.AudioFormat;
 
-public class DelayAudioProcessor extends AudioProcessor {
+public class AudioDelay extends AudioProcessor {
     private AudioParameter feedback; // 0.0 to 1.0
     private final int delaySamples;
     private final short[] delayBuffer;
     private int writePos = 0;
     private boolean active = true;
 
-    public DelayAudioProcessor(float delayTimeMs, float feedback, AudioFormat format) {
+    public AudioDelay(float delayTimeMs, float feedback, AudioFormat format) {
         super(format);
         this.feedback = new AudioParameter(feedback, format);
         this.delaySamples = (int) (delayTimeMs * format.getSampleRate() / 500); // 500ms is stereo sample
