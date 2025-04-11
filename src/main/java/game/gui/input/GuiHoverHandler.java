@@ -1,6 +1,6 @@
 package game.gui.input;
 
-import java.awt.event.MouseEvent;
+import game.input.MouseEvent;
 
 public interface GuiHoverHandler {
     void onEnter(MouseEvent event);

@@ -17,7 +17,7 @@ public enum Main {
 
     public static void main(String[] args) throws Exception {
         Game game = new Game();
-        Window window = new GlWindow(640 * 3, 480 * 3, game);
+        Window window = new AwtWindow(640 * 3, 480 * 3, game);
 
         try {
             game.setState(LoadingState::new);

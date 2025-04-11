@@ -2,6 +2,7 @@ package game;
 
 import game.audio.Audio;
 import game.audio.AudioEngine;
+import game.input.MouseEvent;
 import game.graphics.postprocessing.EffectsManager;
 import game.graphics.postprocessing.VignetteEffect;
 import game.input.Keyboard;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.experimental.Delegate;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 

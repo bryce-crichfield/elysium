@@ -1,12 +1,11 @@
 package game.state.battle.controller;
 
+import game.input.MouseEvent;
 import game.event.EventContext;
 import game.platform.Renderer;
 import game.state.battle.BattleState;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public abstract class BattleController {
@@ -34,11 +33,11 @@ public abstract class BattleController {
 
     public abstract boolean isDone();
 
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
 
     }
 
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
 
     }
 }

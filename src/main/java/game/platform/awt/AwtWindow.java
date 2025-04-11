@@ -3,12 +3,11 @@ package game.platform.awt;
 import game.Game;
 import game.input.KeyEvent;
 import game.input.Mouse;
+import game.input.MouseEvent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -55,30 +54,55 @@ public class AwtWindow extends Window {
 
         canvas.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mousePressed);
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                var point = transformCoordinates(e.getX(), e.getY());
+                if (point.isEmpty()) {
+                    return; // Ignore events outside the game area
+                }
+                var event = new MouseEvent.Pressed(point.get(), e.getButton(), e.getClickCount(), false);
+                game.getMouse().mousePressed(event);
             }
 
             @Override
-            public void mouseReleased(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseReleased);
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                var point = transformCoordinates(e.getX(), e.getY());
+                if (point.isEmpty()) {
+                    return; // Ignore events outside the game area
+                }
+                var event = new MouseEvent.Released(point.get(), e.getButton(), false);
+                game.getMouse().mouseReleased(event);
             }
 
             @Override
-            public void mouseClicked(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseClicked);
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                var point = transformCoordinates(e.getX(), e.getY());
+                if (point.isEmpty()) {
+                    return; // Ignore events outside the game area
+                }
+                var event = new MouseEvent.Clicked(point.get(), e.getButton(), e.getClickCount(), false);
+                game.getMouse().mouseClicked(event);
             }
         });
 
         canvas.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
-            public void mouseMoved(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseMoved);
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                var point = transformCoordinates(e.getX(), e.getY());
+                if (point.isEmpty()) {
+                    return; // Ignore events outside the game area
+                }
+                var event = new MouseEvent.Moved(point.get(), false);
+                game.getMouse().mouseMoved(event);
             }
 
             @Override
-            public void mouseDragged(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseDragged);
+            public void mouseDragged(java.awt.event.MouseEvent e) {
+                var point = transformCoordinates(e.getX(), e.getY());
+                if (point.isEmpty()) {
+                    return; // Ignore events outside the game area
+                }
+                var event = new MouseEvent.Dragged(point.get(), e.getButton(), false);
+                game.getMouse().mouseDragged(event);
             }
         });
 
@@ -86,9 +110,7 @@ public class AwtWindow extends Window {
                 e -> {
                     Optional<Point> point = transformCoordinates(e.getX(), e.getY());
                     if (point.isPresent()) {
-                        MouseWheelEvent transformedEvent = new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                                (int) point.get().getX(), (int) point.get().getY(), e.getClickCount(), e.isPopupTrigger(),
-                                e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+                        var transformedEvent = new MouseEvent.WheelMoved(point.get(), 0, e.getWheelRotation(), false);
                         game.getMouse().mouseWheelMoved(transformedEvent);
                     }
                 }
@@ -104,11 +126,6 @@ public class AwtWindow extends Window {
     @Override
     public void onInit() {
 
-    }
-
-    private Optional<MouseEvent> transformMouseEvent(MouseEvent event) {
-        var point = transformCoordinates(event.getX(), event.getY());
-        return point.map(value -> Mouse.translateEvent(event, (int) value.getX(), (int) value.getY()));
     }
 
     private Optional<Point> transformCoordinates(int canvasX, int canvasY) {

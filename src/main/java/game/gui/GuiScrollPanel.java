@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
 import game.input.Mouse;
@@ -7,9 +8,6 @@ import game.platform.Renderer;
 import lombok.Getter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
 
 public class GuiScrollPanel extends GuiContainer {
     protected GuiScrollState scrollState = new GuiScrollState();
@@ -155,8 +153,8 @@ public class GuiScrollPanel extends GuiContainer {
         Point localPoint = transformToLocalSpace(e.getPoint());
         boolean isInBounds = containsPoint(localPoint) || isPointOnScrollbar(localPoint);
 
-        boolean mouseEntered = e.getID() == MouseEvent.MOUSE_MOVED && (!isHovered && isInBounds);
-        boolean mouseExited = e.getID() == MouseEvent.MOUSE_MOVED && (isHovered && !isInBounds);
+        boolean mouseEntered = e instanceof MouseEvent.Moved && (!isHovered && isInBounds);
+        boolean mouseExited = e instanceof MouseEvent.Moved && (isHovered && !isInBounds);
         isHovered = isInBounds;
 
         if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
@@ -175,13 +173,14 @@ public class GuiScrollPanel extends GuiContainer {
         // Check to see if there is a scroll bar interaction (click, release or drag).  If there isn't, but we are hovered
         // return true to ensure we consume the event.
         if (isPointOnScrollbar(localPoint) || GuiMouseManager.isCapturedComponent(this)) {
-            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
+//            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
+            var localEvent = e.withPoint(localPoint);
             return handleScrollbarInteraction(localEvent, localPoint) || isHovered;
         }
 
         // Handle mouse wheel for scrolling
-        if (e.getID() == MouseEvent.MOUSE_WHEEL && e instanceof MouseWheelEvent wheelEvent) {
-            float scrollAmount = wheelEvent.getWheelRotation() * 20;
+        if (e instanceof MouseEvent.WheelMoved wheelMoved) {
+            float scrollAmount = wheelMoved.getWheelRotation() * 20;
             scrollState.scroll(0, scrollAmount);
             return true;
         }
@@ -193,7 +192,8 @@ public class GuiScrollPanel extends GuiContainer {
         );
 
         // Create adjusted event
-        var contentEvent = Mouse.translateEvent(e, contentPoint.x, contentPoint.y);
+//        var contentEvent = Mouse.translateEvent(e, contentPoint.x, contentPoint.y);
+        var contentEvent = e.withPoint(contentPoint);
 
         // Let children handle it
         for (int i = children.size() - 1; i >= 0; i--) {
@@ -215,11 +215,9 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     private boolean handleScrollbarInteraction(MouseEvent e, Point localPoint) {
-        int eventId = e.getID();
-
         // Handle ongoing drag events
         if (isDraggingVertical || isDraggingHorizontal) {
-            if (eventId == MouseEvent.MOUSE_DRAGGED) {
+            if (e instanceof MouseEvent.Dragged) {
                 // Always recalculate drag delta from original start point
                 Point dragDelta = new Point(
                         localPoint.x - dragStart.x,
@@ -250,7 +248,7 @@ public class GuiScrollPanel extends GuiContainer {
                 return true;
             }
             // Release from the current drag
-            else if (eventId == MouseEvent.MOUSE_RELEASED) {
+            else if (e instanceof MouseEvent.Released) {
                 isDraggingVertical = false;
                 isDraggingHorizontal = false;
                 dragStart = null;
@@ -260,7 +258,7 @@ public class GuiScrollPanel extends GuiContainer {
         }
 
         // Handle the start of new drag events
-        if (eventId == MouseEvent.MOUSE_PRESSED) {
+        if (e instanceof MouseEvent.Pressed) {
             // Check vertical scrollbar
             if (isVerticalBarVisible) {
                 Rectangle thumbBounds = scrollState.getVerticalThumbBounds(width, height);

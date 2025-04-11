@@ -1,14 +1,14 @@
 package game.state.battle.controller;
 
 import game.input.Keyboard;
+import game.input.MouseEvent;
+import game.input.Mouse;
 import game.platform.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import game.state.battle.model.Cursor;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -22,15 +22,15 @@ public class ObserverPlayerController extends PlayerController {
 
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         state.getCursor().onMouseClicked(event);
-        if (event.getButton() == MouseEvent.BUTTON1) {
+        if (event.getButton() == Mouse.LEFT) {
             this.selectActor();
         }
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         state.getCursor().onMouseWheelMoved(event);
     }
 

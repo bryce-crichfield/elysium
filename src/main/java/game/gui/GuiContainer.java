@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
@@ -9,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

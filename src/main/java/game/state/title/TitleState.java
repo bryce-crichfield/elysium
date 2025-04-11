@@ -2,6 +2,7 @@ package game.state.title;
 
 import game.Game;
 import game.graphics.background.StarBackground;
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiScrollPanel;
@@ -22,8 +23,6 @@ import game.transition.Transitions;
 import game.util.Easing;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.List;
 
@@ -218,7 +217,7 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         mainMenu.processMouseEvent(event);
     }
 
@@ -228,27 +227,27 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseMoved(MouseEvent event) {
+    public void onMouseMoved(MouseEvent.Moved event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseDragged(MouseEvent event) {
+    public void onMouseDragged(MouseEvent.Dragged event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMousePressed(MouseEvent event) {
+    public void onMousePressed(MouseEvent.Pressed event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseReleased(MouseEvent event) {
+    public void onMouseReleased(MouseEvent.Released event) {
         mainMenu.processMouseEvent(event);
     }
 

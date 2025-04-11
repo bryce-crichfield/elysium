@@ -1,5 +1,6 @@
 package game.gui.control;
 
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
 import game.platform.Renderer;
@@ -7,8 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -202,7 +201,7 @@ public class GuiDropdown<T> extends GuiComponent {
     @Override
     public boolean processMouseEvent(MouseEvent e) {
         Point localPoint = transformToLocalSpace(e.getPoint());
-        boolean wasPress = e.getID() == MouseEvent.MOUSE_PRESSED || e.getID() == MouseEvent.MOUSE_CLICKED || e.getID() == MouseEvent.MOUSE_RELEASED;
+        boolean wasPress = e instanceof MouseEvent.Pressed || e instanceof MouseEvent.Clicked || e instanceof MouseEvent.Released;
         boolean wasInSelectionArea = new Rectangle(0, height, width, Math.min(maxDropdownHeight, items.size() * itemHeight)).contains(localPoint);
         boolean wasInToggleArea = new Rectangle(0, 0, width, height).contains(localPoint);
 

@@ -1,14 +1,14 @@
 package game.input;
 
+import game.input.MouseEvent;
 import game.event.Event;
 
-import java.awt.event.*;
 
 public class Mouse  {
     // Button constants
-    public static final int LEFT = MouseEvent.BUTTON1;
-    public static final int MIDDLE = MouseEvent.BUTTON2;
-    public static final int RIGHT = MouseEvent.BUTTON3;
+    public static final int LEFT = 1;
+    public static final int MIDDLE = 2;
+    public static final int RIGHT = 3;
 
     // Events
     public static final Event<MouseEvent> pressed = new Event<>();
@@ -35,33 +35,6 @@ public class Mouse  {
 
         x = 0;
         y = 0;
-    }
-
-    public static MouseEvent translateEvent(MouseEvent e, int x, int y) {
-        if (e instanceof MouseWheelEvent) {
-            return new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                    x, y, e.getClickCount(), e.isPopupTrigger(), ((MouseWheelEvent) e).getScrollType(),
-                    ((MouseWheelEvent) e).getScrollAmount(), ((MouseWheelEvent) e).getWheelRotation());
-        } else {
-            return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                    x, y, e.getClickCount(), e.isPopupTrigger(), e.getButton());
-        }
-    }
-
-    // Method to receive transformed coordinates from Window
-    public void setTransformedPosition(int gameX, int gameY) {
-        this.x = gameX;
-        this.y = gameY;
-    }
-
-    // State query methods
-    public boolean anyPressed(int... buttonCodes) {
-        for (int buttonCode : buttonCodes) {
-            if (pressed(buttonCode)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean pressed(int buttonCode) {
@@ -102,7 +75,7 @@ public class Mouse  {
     }
 
     // MouseListener implementation
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent.Pressed e) {
         int button = e.getButton();
         boolean currentButton = newButtons[button];
         newButtons[button] = true;
@@ -110,7 +83,7 @@ public class Mouse  {
         pressed.fire(e);
     }
 
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent.Released e) {
         int button = e.getButton();
         boolean currentButton = newButtons[button];
         newButtons[button] = false;
@@ -118,28 +91,20 @@ public class Mouse  {
         released.fire(e);
     }
 
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent.Clicked e) {
         clicked.fire(e);
     }
 
-    public void mouseEntered(MouseEvent e) {
-        // No special handling needed
-    }
-
-    public void mouseExited(MouseEvent e) {
-        // No special handling needed
-    }
-
     // MouseMotionListener implementation
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent.Moved e) {
         moved.fire(e);
     }
 
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent.Dragged e) {
         dragged.fire(e);
     }
 
-    public void mouseWheelMoved(MouseWheelEvent e) {
+    public void mouseWheelMoved(MouseEvent.WheelMoved e) {
         wheel.fire(e);
     }
 }

@@ -16,6 +16,8 @@ public class KeyEvent {
     public static final int VK_DOWN = 40;
     public static final int VK_LEFT = 37;
     public static final int VK_RIGHT = 39;
+    public static final int VK_MINUS = 45;
+    public static final int VK_EQUALS = 61;
 
     int keyCode;
     int action;

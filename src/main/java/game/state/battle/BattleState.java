@@ -3,6 +3,7 @@ package game.state.battle;
 import game.Game;
 import game.graphics.background.StarBackground;
 import game.input.Mouse;
+import game.input.MouseEvent;
 import game.platform.Renderer;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
@@ -20,8 +21,6 @@ import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -66,20 +65,22 @@ public class BattleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         // translate from screen coordinates to world coordinates
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
-        var e = Mouse.translateEvent(event, worldX, worldY);
+//        var e = Mouse.translateEvent(event, worldX, worldY);
+        var e = event.withPoint(new Point(worldX, worldY));
         currentController.ifPresent(c -> c.onMouseClicked(e));
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         // translate from screen coordinates to world coordinates
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
-        var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
+        var e = event.withPoint(new Point(worldX, worldY));
+//        var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
         currentController.ifPresent(c -> c.onMouseWheelMoved(e));
     }
 

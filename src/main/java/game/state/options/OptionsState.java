@@ -1,6 +1,7 @@
 package game.state.options;
 
 import game.Game;
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiTabPane;
@@ -14,8 +15,6 @@ import game.transition.Transitions;
 import game.util.Easing;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class OptionsState extends GameState {
@@ -219,7 +218,7 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         mainContainer.processMouseEvent(event);
     }
 
@@ -229,22 +228,22 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseDragged(MouseEvent event) {
+    public void onMouseDragged(MouseEvent.Dragged event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMousePressed(MouseEvent event) {
+    public void onMousePressed(MouseEvent.Pressed event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseReleased(MouseEvent event) {
+    public void onMouseReleased(MouseEvent.Released event) {
         mainContainer.processMouseEvent(event);
     }
 

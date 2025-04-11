@@ -2,15 +2,14 @@ package game.state.battle.model;
 
 import game.Game;
 import game.input.Keyboard;
+import game.input.MouseEvent;
+import game.input.KeyEvent;
 import game.platform.Renderer;
 import game.state.battle.event.CursorMoved;
 import game.util.Camera;
 import game.util.Util;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class Cursor {
@@ -159,8 +158,8 @@ public class Cursor {
         CursorMoved.event.fire(this);
     }
 
-    public void onMouseWheelMoved(MouseWheelEvent event) {
-        int wheelRotation = event.getWheelRotation();
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
+        int wheelRotation = (int) event.getWheelRotation();
         float newZoom = camera.getZoom() + (Math.signum(wheelRotation) * -0.1f);
         newZoom = Util.clamp(newZoom, 0.25f, 4f);
         camera.setZoom(newZoom);
