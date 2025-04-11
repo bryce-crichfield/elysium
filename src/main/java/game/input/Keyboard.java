@@ -2,10 +2,7 @@ package game.input;
 
 import game.event.Event;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-public class Keyboard implements KeyListener {
+public class Keyboard {
     public static final int UP = KeyEvent.VK_W;
     public static final int DOWN = KeyEvent.VK_S;
     public static final int LEFT = KeyEvent.VK_A;
@@ -57,12 +54,10 @@ public class Keyboard implements KeyListener {
         System.arraycopy(newKeys, 0, oldKeys, 0, 256);
     }
 
-    @Override
     public void keyTyped(KeyEvent e) {
         typed.fire(e.getKeyCode());
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
         boolean currentKey = newKeys[e.getKeyCode()];
         newKeys[e.getKeyCode()] = true;
@@ -70,7 +65,6 @@ public class Keyboard implements KeyListener {
         pressed.fire(e.getKeyCode());
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
         boolean currentKey = newKeys[e.getKeyCode()];
         newKeys[e.getKeyCode()] = false;

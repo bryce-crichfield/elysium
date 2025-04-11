@@ -1,7 +1,7 @@
 package game.platform.gl;
 
 import game.Game;
-import game.input.Mouse;
+import game.input.KeyEvent;
 import game.platform.Window;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -41,14 +41,8 @@ public class GlWindow extends Window {
             throw new RuntimeException("Failed to create the GLFW window");
         }
 
-        // Setup keyboard callback
-        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-            // Here you would translate GLFW key events to your game's keyboard system
-            // This is a stub - you'll need to implement proper keyboard handling
-        });
-
         // Setup mouse callbacks
-        setupMouseCallbacks(game);
+        setupInputCallbacks(game);
 
         // Center the window
         try (MemoryStack stack = stackPush()) {
@@ -84,7 +78,24 @@ public class GlWindow extends Window {
 
     }
 
-    private void setupMouseCallbacks(Game game) {
+    private void setupInputCallbacks(Game game) {
+        // Setup keyboard callback
+        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+            // Here you would translate GLFW key events to your game's keyboard system
+            // This is a stub - you'll need to implement proper keyboard handling
+            System.out.println("Key: " + key + ", Action: " + action);
+            KeyEvent event = new KeyEvent(key, action);
+            switch (action) {
+                case GLFW_PRESS -> game.getKeyboard().keyPressed(event);
+                case GLFW_RELEASE -> game.getKeyboard().keyReleased(event);
+//                case GLFW_REPEAT -> game.getKeyboard().keyTyped(event);
+                default -> {
+                    // Handle other actions if necessary
+                }
+            }
+        });
+
+
         // Mouse button callback
         glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> {
             // Get cursor position

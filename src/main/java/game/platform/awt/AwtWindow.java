@@ -1,16 +1,17 @@
 package game.platform.awt;
 
 import game.Game;
+import game.input.KeyEvent;
 import game.input.Mouse;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
-
 import game.platform.Window;
 
 public class AwtWindow extends Window {
@@ -32,7 +33,25 @@ public class AwtWindow extends Window {
         canvas.setSize(width, height);
         canvas.setFocusable(true);
         canvas.requestFocus();
-        canvas.addKeyListener(game.getKeyboard());
+        canvas.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                super.keyTyped(e);
+                game.getKeyboard().keyTyped(KeyEvent.fromAwt(e));
+            }
+
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                super.keyPressed(e);
+                game.getKeyboard().keyPressed(KeyEvent.fromAwt(e));
+            }
+
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                super.keyReleased(e);
+                game.getKeyboard().keyReleased(KeyEvent.fromAwt(e));
+            }
+        });
 
         canvas.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override

@@ -3,6 +3,7 @@ package game;
 import game.platform.ErrorDialog;
 import game.platform.Window;
 import game.platform.awt.AwtWindow;
+import game.platform.gl.GlWindow;
 import game.state.loading.LoadingState;
 import game.util.Util;
 
@@ -16,7 +17,7 @@ public enum Main {
 
     public static void main(String[] args) throws Exception {
         Game game = new Game();
-        Window window = new AwtWindow(640 * 3, 480 * 3, game);
+        Window window = new GlWindow(640 * 3, 480 * 3, game);
 
         try {
             game.setState(LoadingState::new);
