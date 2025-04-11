@@ -1,5 +1,6 @@
 package game.gui.style;
 
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,17 +16,17 @@ public class GuiBorder {
     private final Color color;
     private final int thickness;
 
-    public void render(Graphics2D g, int width, int height, int radius) {
-        g.setColor(color);
-        var oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(thickness));
+    public void render(Renderer renderer, int width, int height, int radius) {
+        renderer.setColor(color);
+        var oldStroke = renderer.getStroke();
+        renderer.setStroke(new BasicStroke(thickness));
 
         if (radius > 0) {
-            g.drawRoundRect(0, 0, width, height, radius, radius);
+            renderer.drawRoundRect(0, 0, width, height, radius, radius);
         } else {
-            g.drawRect(0, 0, width, height);
+            renderer.drawRect(0, 0, width, height);
         }
 
-        g.setStroke(oldStroke);
+        renderer.setStroke(oldStroke);
     }
 }

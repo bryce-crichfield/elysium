@@ -6,6 +6,8 @@ import game.graphics.postprocessing.EffectsManager;
 import game.graphics.postprocessing.VignetteEffect;
 import game.input.Keyboard;
 import game.input.Mouse;
+import game.platform.FrameBuffer;
+import game.platform.Renderer;
 import game.state.GameStateManager;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -76,20 +78,24 @@ public final class Game {
         effects.update(delta);
     }
 
-    public void render(Graphics2D graphics) {
+    public void render(Renderer renderer) {
         // Create a buffer to render the game to
-        BufferedImage gameBuffer = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D bufferGraphics = gameBuffer.createGraphics();
+        FrameBuffer buffer = renderer.createFrameBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+        Renderer bufferRenderer = buffer.createRenderer();
+//        BufferedImage gameBuffer = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+//        Graphics2D bufferGraphics = gameBuffer.createGraphics();
 
         // Render game to buffer
-        stateManager.render(bufferGraphics);
+        stateManager.render(bufferRenderer);
 
-        bufferGraphics.dispose();
+        bufferRenderer.dispose();
+
+        renderer.drawFrameBuffer(buffer, 0, 0);
 
         // Apply post-processing effects
-        BufferedImage processed = effects.process(gameBuffer);
+//        BufferedImage processed = effects.process(gameBuffer);
 
         // Draw the processed result to the screen
-        graphics.drawImage(processed, 0, 0, null);
+//        graphics.drawImage(processed, 0, 0, null);
     }
 }

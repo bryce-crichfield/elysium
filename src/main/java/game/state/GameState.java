@@ -4,6 +4,7 @@ import game.Game;
 import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
 import game.gui.input.GuiMouseManager;
+import game.platform.Renderer;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
@@ -79,21 +80,21 @@ public abstract class GameState {
         onUpdate(delta);
     }
 
-    public final void render(Graphics2D graphics) {
+    public final void render(Renderer renderer) {
         // Clear the screen
-        graphics.setColor(new Color(0, 0, 30));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        renderer.setColor(new Color(0, 0, 30));
+        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
         for (Background background : backgrounds) {
-            background.render(graphics);
+            background.render(renderer);
         }
 
-        onRender(graphics);
+        onRender(renderer);
     }
 
     public abstract void onUpdate(Duration delta);
 
-    public abstract void onRender(Graphics2D graphics);
+    public abstract void onRender(Renderer renderer);
 
     public void onExit() {
     }

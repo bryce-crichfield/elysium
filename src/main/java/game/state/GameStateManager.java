@@ -1,6 +1,7 @@
 package game.state;
 
 import game.Game;
+import game.platform.Renderer;
 import game.transition.Transition;
 import game.transition.TransitionFactory;
 
@@ -24,7 +25,7 @@ public class GameStateManager {
     public static BufferedImage captureScreen(GameState state) {
         var image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         var g = image.createGraphics();
-        state.render(g);
+//        state.render(g);
         g.dispose();
         return image;
     }
@@ -131,16 +132,16 @@ public class GameStateManager {
         }
     }
 
-    public void render(Graphics2D graphics) {
+    public void render(Renderer renderer) {
         // During transition, we let the transition handle rendering
         if (isTransitioning() && hasState()) {
-            transition.render(graphics, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+//            transition.render(graphics, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
             return;
         }
 
         // Normal rendering when not transitioning
         if (!states.isEmpty()) {
-            states.peek().render(graphics);
+            states.peek().render(renderer);
         }
     }
 

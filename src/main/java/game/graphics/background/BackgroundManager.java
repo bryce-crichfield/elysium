@@ -1,5 +1,7 @@
 package game.graphics.background;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class BackgroundManager {
         }
     }
 
-    public void render(Graphics2D bufferGraphics) {
+    public void render(Renderer bufferGraphics) {
         for (Background background : backgrounds) {
             background.render(bufferGraphics);
         }

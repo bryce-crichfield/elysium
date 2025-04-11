@@ -2,6 +2,7 @@ package game.state.overworld.entity;
 
 import game.Game;
 import game.input.Keyboard;
+import game.platform.Renderer;
 
 import java.awt.*;
 import java.time.Duration;
@@ -38,7 +39,7 @@ public class Player extends Entity {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer graphics) {
         graphics.setColor(Color.RED);
         graphics.fillRect((int) x, (int) y, 32, 32);
     }

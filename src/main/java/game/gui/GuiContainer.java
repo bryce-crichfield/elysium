@@ -4,6 +4,7 @@ import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,7 @@ public class GuiContainer extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer g) {
         // Apply clipping based on overflow setting
         Shape originalClip = g.getClip();
         g.setClip(new Rectangle(0, 0, width, height));

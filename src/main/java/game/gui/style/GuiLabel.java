@@ -1,6 +1,7 @@
 package game.gui.style;
 
 import game.gui.GuiComponent;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +36,7 @@ public class GuiLabel extends GuiComponent {
 //    }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer g) {
         g.setColor(color);
         g.setFont(font);
         FontMetrics metrics = g.getFontMetrics(font);

@@ -2,6 +2,7 @@ package game.state.battle.controller;
 
 //import game.state.battle.hud.ItemsMenu;
 
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 
 import java.awt.*;
@@ -31,11 +32,11 @@ public class SelectItemPlayerController extends PlayerController {
     }
 
     @Override
-    public void onWorldRender(Graphics2D graphics) {
+    public void onWorldRender(Renderer renderer) {
     }
 
     @Override
-    public void onGuiRender(Graphics2D graphics) {
+    public void onGuiRender(Renderer renderer) {
 //        itemsMenu.onRender(graphics);
     }
 }

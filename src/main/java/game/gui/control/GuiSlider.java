@@ -2,6 +2,7 @@ package game.gui.control;
 
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -70,7 +71,7 @@ public class GuiSlider extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer g) {
         if (vertical) {
             renderVerticalSlider(g);
         } else {
@@ -78,7 +79,7 @@ public class GuiSlider extends GuiComponent {
         }
     }
 
-    private void renderHorizontalSlider(Graphics2D g) {
+    private void renderHorizontalSlider(Renderer g) {
         // Draw track
         int trackHeight = 6;
         int trackY = (height - trackHeight) / 2;
@@ -105,7 +106,7 @@ public class GuiSlider extends GuiComponent {
         g.drawRect(thumbX - thumbWidth / 2, thumbY, thumbWidth, thumbHeight);
     }
 
-    private void renderVerticalSlider(Graphics2D g) {
+    private void renderVerticalSlider(Renderer g) {
         // Draw track
         int trackWidth = 6;
         int trackX = (width - trackWidth) / 2;

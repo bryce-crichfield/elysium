@@ -1,6 +1,7 @@
 package game.state.battle.controller;
 
 import game.input.Keyboard;
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import game.state.battle.model.Cursor;
@@ -92,13 +93,13 @@ public class ObserverPlayerController extends PlayerController {
     }
 
     @Override
-    public void onWorldRender(Graphics2D graphics) {
-        state.getCursor().onRender(graphics);
+    public void onWorldRender(Renderer renderer) {
+        state.getCursor().onRender(renderer);
     }
 
     @Override
-    public void onGuiRender(Graphics2D graphics) {
-//        hoveredActorStats.onRender(graphics);
+    public void onGuiRender(Renderer renderer) {
+//        hoveredActorStats.onRender(renderer);
     }
 
     private void hoverActor(Cursor cursor) {

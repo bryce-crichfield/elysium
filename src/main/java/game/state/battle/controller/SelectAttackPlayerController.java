@@ -1,6 +1,7 @@
 package game.state.battle.controller;
 
 import game.event.Event;
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import game.state.battle.model.Cursor;
@@ -95,12 +96,12 @@ public class SelectAttackPlayerController extends PlayerController {
     }
 
     @Override
-    public void onWorldRender(Graphics2D graphics) {
+    public void onWorldRender(Renderer renderer) {
 
     }
 
     @Override
-    public void onGuiRender(Graphics2D graphics) {
+    public void onGuiRender(Renderer renderer) {
 
     }
 

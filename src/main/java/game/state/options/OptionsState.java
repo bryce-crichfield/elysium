@@ -8,6 +8,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiLabel;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -173,7 +174,7 @@ public class OptionsState extends GameState {
             private final boolean hovered = false;
 
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 super.onRender(g);
                 g.setColor(hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
                 g.fillRect(0, 0, getWidth(), getHeight());
@@ -253,12 +254,12 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         // Draw background
-        graphics.setColor(new Color(0, 0, 30));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        renderer.setColor(new Color(0, 0, 30));
+        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
         // Render GUI
-        mainContainer.render(graphics);
+        mainContainer.render(renderer);
     }
 }

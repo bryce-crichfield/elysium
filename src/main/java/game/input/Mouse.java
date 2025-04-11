@@ -4,7 +4,7 @@ import game.event.Event;
 
 import java.awt.event.*;
 
-public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class Mouse  {
     // Button constants
     public static final int LEFT = MouseEvent.BUTTON1;
     public static final int MIDDLE = MouseEvent.BUTTON2;
@@ -102,7 +102,6 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
 
     // MouseListener implementation
-    @Override
     public void mousePressed(MouseEvent e) {
         int button = e.getButton();
         boolean currentButton = newButtons[button];
@@ -111,7 +110,6 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
         pressed.fire(e);
     }
 
-    @Override
     public void mouseReleased(MouseEvent e) {
         int button = e.getButton();
         boolean currentButton = newButtons[button];
@@ -120,33 +118,27 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
         released.fire(e);
     }
 
-    @Override
     public void mouseClicked(MouseEvent e) {
         clicked.fire(e);
     }
 
-    @Override
     public void mouseEntered(MouseEvent e) {
         // No special handling needed
     }
 
-    @Override
     public void mouseExited(MouseEvent e) {
         // No special handling needed
     }
 
     // MouseMotionListener implementation
-    @Override
     public void mouseMoved(MouseEvent e) {
         moved.fire(e);
     }
 
-    @Override
     public void mouseDragged(MouseEvent e) {
         dragged.fire(e);
     }
 
-    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         wheel.fire(e);
     }

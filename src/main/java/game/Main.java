@@ -2,13 +2,10 @@ package game;
 
 import game.platform.ErrorDialog;
 import game.platform.Window;
+import game.platform.awt.AwtWindow;
 import game.state.loading.LoadingState;
-import game.state.title.TitleState;
-import game.transition.Transitions;
-import game.util.Easing;
 import game.util.Util;
 
-import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -19,41 +16,38 @@ public enum Main {
 
     public static void main(String[] args) throws Exception {
         Game game = new Game();
-        Window window = new Window(640 * 3, 480 * 3, game);
+        Window window = new AwtWindow(640 * 3, 480 * 3, game);
 
         try {
-            execute(game, window);
+            game.setState(LoadingState::new);
+
+            Instant lastUpdate = Instant.now();
+            Instant lastRender = Instant.now();
+
+            while (true) {
+                Instant currentTime = Instant.now();
+
+                Duration deltaUpdate = Duration.between(lastUpdate, currentTime);
+                Duration deltaRender = Duration.between(lastRender, currentTime);
+
+                float dtUpdate = Util.perSecond(deltaUpdate);
+                float dtRender = Util.perSecond(deltaRender);
+
+                if (dtUpdate > 1f / targetUps) {
+                    lastUpdate = currentTime;
+                    game.update(deltaUpdate);
+                }
+
+                if (dtRender > 1f / targetFps) {
+                    lastRender = currentTime;
+                    window.onRender(dtUpdate, dtRender);
+                }
+            }
         } catch (Exception e) {
             ErrorDialog.showError("An error occurred", e.getMessage());
         } finally {
-            window.dispose();
+            window.onClose();
         }
     }
 
-    public static void execute(Game game, Window window) throws Exception {
-        game.setState(LoadingState::new);
-
-        Instant lastUpdate = Instant.now();
-        Instant lastRender = Instant.now();
-
-        while (true) {
-            Instant currentTime = Instant.now();
-
-            Duration deltaUpdate = Duration.between(lastUpdate, currentTime);
-            Duration deltaRender = Duration.between(lastRender, currentTime);
-
-            float dtUpdate = Util.perSecond(deltaUpdate);
-            float dtRender = Util.perSecond(deltaRender);
-
-            if (dtUpdate > 1f / targetUps) {
-                lastUpdate = currentTime;
-                game.update(deltaUpdate);
-            }
-
-            if (dtRender > 1f / targetFps) {
-                lastRender = currentTime;
-                window.onRender(dtUpdate, dtRender);
-            }
-        }
-    }
 }

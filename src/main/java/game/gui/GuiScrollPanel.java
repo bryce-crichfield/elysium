@@ -3,6 +3,7 @@ package game.gui;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
 import game.input.Mouse;
+import game.platform.Renderer;
 import lombok.Getter;
 
 import java.awt.*;
@@ -53,96 +54,96 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer renderer) {
         // Save the original transform and clip
-        AffineTransform scrollTransform = g.getTransform();
-        Shape originalClip = g.getClip();
+        var scrollTransform = renderer.getTransform();
+        Shape originalClip = renderer.getClip();
 
         // Create new clip that's the intersection of the existing clip and our viewport
         Rectangle viewportRect = new Rectangle(0, 0, width, height);
         // This is critical - must intersect with existing clip
-        g.clip(viewportRect);
+        renderer.clip(viewportRect);
 
         // Render container background
         if (background != null) {
-            background.render(g, width, height, 0);
+            background.render(renderer, width, height, 0);
         }
 
         if (border != null) {
-            border.render(g, width, height, 0);
+            border.render(renderer, width, height, 0);
         }
 
         // Apply scroll translation
-        g.translate(-scrollState.getScrollXOffset(), -scrollState.getScrollYOffset());
+        renderer.translate(-scrollState.getScrollXOffset(), -scrollState.getScrollYOffset());
 
         // Render content (not background)
         for (GuiComponent child : children) {
-            child.render(g);
+            child.render(renderer);
         }
 
         // Restore transform and clip for scrollbar rendering
-        g.setTransform(scrollTransform);
-        g.setClip(originalClip);
+        renderer.setTransform(scrollTransform);
+        renderer.setClip(originalClip);
 
         // Render scrollbars
-        renderScrollbars(g);
+        renderScrollbars(renderer);
     }
 
-    private void renderScrollbars(Graphics2D g) {
+    private void renderScrollbars(Renderer renderer) {
         if (isVerticalBarVisible) {
-            renderVerticalScrollbar(g);
+            renderVerticalScrollbar(renderer);
         }
 
         if (isHorizontalBarVisible) {
-            renderHorizontalScrollbar(g);
+            renderHorizontalScrollbar(renderer);
         }
     }
 
-    private void renderHorizontalScrollbar(Graphics2D g) {
+    private void renderHorizontalScrollbar(Renderer renderer) {
         // Horizontal scrollbar track
         Rectangle trackBounds = scrollState.getHorizontalScrollbarBounds(width, height);
-        g.setColor(new Color(200, 200, 200, 150));
-        g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        renderer.setColor(new Color(200, 200, 200, 150));
+        renderer.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
 
         // Horizontal thumb
         Rectangle thumbBounds = scrollState.getHorizontalThumbBounds(width, height);
         if (thumbBounds != null) {
-            g.setColor(isDraggingHorizontal ?
+            renderer.setColor(isDraggingHorizontal ?
                     new Color(80, 80, 80, 200) :
                     new Color(120, 120, 120, 180));
-            g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
+            renderer.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
 
             // Thumb grip lines
-            g.setColor(new Color(180, 180, 180, 150));
+            renderer.setColor(new Color(180, 180, 180, 150));
             int centerX = thumbBounds.x + thumbBounds.width / 2;
             int lineHeight = thumbBounds.height - 4;
-            g.drawLine(centerX - 3, thumbBounds.y + 2, centerX - 3, thumbBounds.y + 2 + lineHeight);
-            g.drawLine(centerX, thumbBounds.y + 2, centerX, thumbBounds.y + 2 + lineHeight);
-            g.drawLine(centerX + 3, thumbBounds.y + 2, centerX + 3, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX - 3, thumbBounds.y + 2, centerX - 3, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX, thumbBounds.y + 2, centerX, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX + 3, thumbBounds.y + 2, centerX + 3, thumbBounds.y + 2 + lineHeight);
         }
     }
 
-    private void renderVerticalScrollbar(Graphics2D g) {
+    private void renderVerticalScrollbar(Renderer renderer) {
         // Vertical scrollbar track
         Rectangle trackBounds = scrollState.getVerticalScrollbarBounds(width, height);
-        g.setColor(new Color(200, 200, 200, 150));
-        g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        renderer.setColor(new Color(200, 200, 200, 150));
+        renderer.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
 
         // Vertical thumb
         Rectangle thumbBounds = scrollState.getVerticalThumbBounds(width, height);
         if (thumbBounds != null) {
-            g.setColor(isDraggingVertical ?
+            renderer.setColor(isDraggingVertical ?
                     new Color(80, 80, 80, 200) :
                     new Color(120, 120, 120, 180));
-            g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
+            renderer.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
 
             // Thumb grip lines
-            g.setColor(new Color(180, 180, 180, 150));
+            renderer.setColor(new Color(180, 180, 180, 150));
             int centerY = thumbBounds.y + thumbBounds.height / 2;
             int lineWidth = thumbBounds.width - 4;
-            g.drawLine(thumbBounds.x + 2, centerY - 3, thumbBounds.x + 2 + lineWidth, centerY - 3);
-            g.drawLine(thumbBounds.x + 2, centerY, thumbBounds.x + 2 + lineWidth, centerY);
-            g.drawLine(thumbBounds.x + 2, centerY + 3, thumbBounds.x + 2 + lineWidth, centerY + 3);
+            renderer.drawLine(thumbBounds.x + 2, centerY - 3, thumbBounds.x + 2 + lineWidth, centerY - 3);
+            renderer.drawLine(thumbBounds.x + 2, centerY, thumbBounds.x + 2 + lineWidth, centerY);
+            renderer.drawLine(thumbBounds.x + 2, centerY + 3, thumbBounds.x + 2 + lineWidth, centerY + 3);
         }
     }
 

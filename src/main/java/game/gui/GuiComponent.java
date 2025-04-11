@@ -2,6 +2,7 @@ package game.gui;
 
 import game.gui.input.*;
 import game.input.Mouse;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,21 +39,21 @@ public abstract class GuiComponent {
         this.height = height;
     }
 
-    public void render(Graphics2D g) {
+    public void render(Renderer renderer) {
         if (!visible) return;
 
         // Save transform state
-        var originalTransform = g.getTransform();
-        g.translate(x, y);
+        var originalTransform = renderer.getTransform();
+        renderer.translate(x, y);
 
         // Custom rendering in subclasses
-        onRender(g);
+        onRender(renderer);
 
         // Restore transform
-        g.setTransform(originalTransform);
+        renderer.setTransform(originalTransform);
     }
 
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer renderer) {
     }
 
     // Simple inheritance for updates

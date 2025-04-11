@@ -1,5 +1,6 @@
 package game.state.battle.model;
 
+import game.platform.Renderer;
 import game.util.Util;
 
 import java.awt.*;
@@ -50,15 +51,15 @@ public class World {
         }
     }
 
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles[x][y].onRender(graphics);
+                tiles[x][y].onRender(renderer);
             }
         }
 
         for (Actor actor : actors) {
-            actor.onRender(graphics);
+            actor.onRender(renderer);
         }
     }
 

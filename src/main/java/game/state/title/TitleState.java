@@ -14,6 +14,7 @@ import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.battle.BattleState;
 import game.state.options.OptionsState;
@@ -161,7 +162,7 @@ public class TitleState extends GameState {
             }
 
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 super.onRender(g);
                 g.setColor(hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
                 g.fillRect(0, 0, getWidth(), getHeight());
@@ -195,7 +196,7 @@ public class TitleState extends GameState {
     public GuiComponent createTitleLabel(int x, int y) {
         var titleLabel = new GuiLabel(100, 50, "ECHOES OF ELYSIUM") {
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 g.setColor(Color.WHITE);
                 Font titleFont = new Font("Arial", Font.BOLD, 48);
                 g.setFont(titleFont);
@@ -256,7 +257,7 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        mainMenu.render(graphics);
+    public void onRender(Renderer renderer) {
+        mainMenu.render(renderer);
     }
 }

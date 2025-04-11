@@ -2,6 +2,7 @@ package game.state.battle.controller;
 
 import game.event.Event;
 import game.input.Keyboard;
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.event.ActorHovered;
 import game.state.battle.model.Actor;
@@ -61,12 +62,12 @@ public class SelectActionPlayerController extends PlayerController {
     }
 
     @Override
-    public void onWorldRender(Graphics2D graphics) {
+    public void onWorldRender(Renderer renderer) {
 
     }
 
     @Override
-    public void onGuiRender(Graphics2D graphics) {
+    public void onGuiRender(Renderer renderer) {
 //        statsMenu.onRender(graphics);
 //        actionsMenu.onRender(graphics);
     }

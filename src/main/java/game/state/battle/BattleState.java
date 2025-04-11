@@ -3,6 +3,7 @@ package game.state.battle;
 import game.Game;
 import game.graphics.background.StarBackground;
 import game.input.Mouse;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
@@ -102,19 +103,19 @@ public class BattleState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         // Render the star background
 
         // Get the camera worldTransform and render the world
-        var guiTransform = graphics.getTransform();
+        var guiTransform = renderer.getTransform();
         var worldTransform = camera.getTransform();
-        graphics.setTransform(worldTransform);
-        world.onRender(graphics);
-        currentController.ifPresent(c -> c.onWorldRender(graphics));
+        renderer.setTransform(worldTransform);
+        world.onRender(renderer);
+        currentController.ifPresent(c -> c.onWorldRender(renderer));
 
         // Restore the original worldTransform and draw the gui
-        graphics.setTransform(guiTransform);
-        currentController.ifPresent(c -> c.onGuiRender(graphics));
+        renderer.setTransform(guiTransform);
+        currentController.ifPresent(c -> c.onGuiRender(renderer));
 
     }
 

@@ -4,6 +4,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
+import game.platform.Renderer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -94,27 +95,27 @@ public class GuiTabPane extends GuiContainer {
         }
 
         @Override
-        protected void onRender(Graphics2D g) {
-            super.onRender(g);
+        protected void onRender(Renderer renderer) {
+            super.onRender(renderer);
 
             // Draw tab background
-            g.setColor(active ? activeTabBackgroundColor : tabBackgroundColor);
-            g.fillRect(0, 0, getWidth(), getHeight());
+            renderer.setColor(active ? activeTabBackgroundColor : tabBackgroundColor);
+            renderer.fillRect(0, 0, getWidth(), getHeight());
 
             // Draw tab text
-            g.setColor(tabTextColor);
-            g.setFont(tabFont);
+            renderer.setColor(tabTextColor);
+            renderer.setFont(tabFont);
 
-            FontMetrics metrics = g.getFontMetrics();
+            FontMetrics metrics = renderer.getFontMetrics();
             int textWidth = metrics.stringWidth(title);
             int textHeight = metrics.getHeight();
 
-            g.drawString(title, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
+            renderer.drawString(title, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
 
             // Draw bottom border except for active tab
             if (!active) {
-                g.setColor(Color.WHITE);
-                g.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
+                renderer.setColor(Color.WHITE);
+                renderer.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
             }
         }
     }

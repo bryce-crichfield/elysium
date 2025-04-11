@@ -6,6 +6,7 @@ import game.audio.AudioAssetLoader;
 import game.audio.AudioStore;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.title.TitleState;
 import game.transition.Transitions;
@@ -39,7 +40,7 @@ public class LoadingState extends GameState {
         var y = (Game.SCREEN_HEIGHT - (4*height));
         container = new GuiComponent(x, y, width, height) {
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 g.setColor(Color.BLUE);
                 var drawWidth = (int) (width * getTotalLoadingProgress());
                 g.fillRect(0, 0, drawWidth, height);
@@ -82,7 +83,7 @@ public class LoadingState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        container.render(graphics);
+    public void onRender(Renderer renderer) {
+        container.render(renderer);
     }
 }

@@ -1,5 +1,7 @@
 package game.graphics.background;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.time.Duration;
 
@@ -14,5 +16,5 @@ public abstract class Background {
 
     public abstract void update(Duration delta);
 
-    public abstract void render(Graphics2D graphics);
+    public abstract void render(Renderer renderer);
 }

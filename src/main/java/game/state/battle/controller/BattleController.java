@@ -1,6 +1,7 @@
 package game.state.battle.controller;
 
 import game.event.EventContext;
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 
 import java.awt.*;
@@ -22,9 +23,9 @@ public abstract class BattleController {
 
     public abstract void onUpdate(Duration delta);
 
-    public abstract void onWorldRender(Graphics2D graphics);
+    public abstract void onWorldRender(Renderer renderer);
 
-    public abstract void onGuiRender(Graphics2D graphics);
+    public abstract void onGuiRender(Renderer renderer);
 
     public void onExit() {
         events.clear();

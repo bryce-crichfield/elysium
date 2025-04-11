@@ -1,6 +1,7 @@
 package game.graphics.background;
 
 import game.Game;
+import game.platform.Renderer;
 import game.util.Util;
 
 import java.awt.*;
@@ -65,7 +66,7 @@ public class StarBackground extends Background {
         }
     }
 
-    public void render(Graphics2D graphics) {
+    public void render(Renderer graphics) {
         // Draw dark gradient background with black at the bottom and dark dark blue at the top
         Color black = new Color(0x000000);
         Color darkBlue = new Color(0x0A001A);

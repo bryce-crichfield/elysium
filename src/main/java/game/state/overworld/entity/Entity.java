@@ -1,5 +1,6 @@
 package game.state.overworld.entity;
 
+import game.platform.Renderer;
 import game.util.Util;
 
 import java.awt.*;
@@ -42,5 +43,5 @@ public abstract class Entity {
         velocityY *= 0.9f;
     }
 
-    public abstract void onRender(Graphics2D graphics);
+    public abstract void onRender(Renderer graphics);
 }
