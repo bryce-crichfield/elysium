@@ -17,7 +17,8 @@ public enum Main {
 
     public static void main(String[] args) throws Exception {
         Game game = new Game();
-        Window window = new AwtWindow(640 * 3, 480 * 3, game);
+        Window window = new GlWindow(640 * 3, 480 * 3, game);
+        window.onInit();
 
         try {
             game.setState(LoadingState::new);
@@ -25,7 +26,7 @@ public enum Main {
             Instant lastUpdate = Instant.now();
             Instant lastRender = Instant.now();
 
-            while (true) {
+            while (window.isActive()) {
                 Instant currentTime = Instant.now();
 
                 Duration deltaUpdate = Duration.between(lastUpdate, currentTime);

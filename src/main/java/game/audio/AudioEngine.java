@@ -108,8 +108,8 @@ public class AudioEngine implements Runnable {
                 if (++count >= 10) {
                     float averageNanos = (float) elapsedNanos / count;
                     float averageMs = averageNanos / 1_000_000;
-                    System.out.println("Current Active Processors: " + processors.size());
-                    System.out.println("Average delay processing time: " + averageMs + " ms");
+//                    System.out.println("Current Active Processors: " + processors.size());
+//                    System.out.println("Average delay processing time: " + averageMs + " ms");
                     elapsedNanos = 0;
                     count = 0;
                 }

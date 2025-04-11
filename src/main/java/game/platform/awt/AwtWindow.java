@@ -124,6 +124,11 @@ public class AwtWindow extends Window {
     }
 
     @Override
+    public boolean isActive() {
+        return frame.isActive();
+    }
+
+    @Override
     public void onInit() {
 
     }

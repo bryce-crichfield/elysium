@@ -12,7 +12,7 @@ public abstract class Window {
         this.width = width;
         this.height = height;
     }
-
+    public abstract boolean isActive();
     public abstract void onInit();
     public abstract void onRender(float updateTime, float deltaTime);
     public abstract void onClose();
