@@ -89,8 +89,6 @@ public class GuiDropdown<T> extends GuiComponent {
         // Draw dropdown menu if expanded
         if (isExpanded) {
             // We'll need to save the transform since we're breaking out of our bounds
-            var originalTransform = renderer.getTransform();
-            Shape originalClip = renderer.getClip();
 
             // Calculate the dropdown list height
             int dropdownListHeight = Math.min(maxDropdownHeight, items.size() * itemHeight);
@@ -104,7 +102,8 @@ public class GuiDropdown<T> extends GuiComponent {
             renderer.drawRect(0, height, width - 1, dropdownListHeight - 1);
 
             // Set clipping region for dropdown items
-            renderer.clipRect(0, height, width, dropdownListHeight);
+            renderer.pushClip(0, height, width, dropdownListHeight);
+//            renderer.clipRect(0, height, width, dropdownListHeight);
 
             // Draw dropdown items
             int yPos = height - scrollOffset;
@@ -137,13 +136,15 @@ public class GuiDropdown<T> extends GuiComponent {
             }
 
             // Restore original transform and clip
-            renderer.setTransform(originalTransform);
-            renderer.setClip(originalClip);
+            renderer.popTransform();
+            renderer.popClip();
+//            renderer.setTransform(originalTransform);
+//            renderer.setClip(originalClip);
         }
     }
 
     private void drawTextCentered(Renderer g, String text, int x, int y, int width, int height) {
-        FontMetrics fm = g.getFontMetrics();
+        var fm = g.getFontMetrics();
         int textX = x + (width - fm.stringWidth(text)) / 2;
         int textY = y + (height + fm.getAscent() - fm.getDescent()) / 2;
         g.drawString(text, textX, textY);

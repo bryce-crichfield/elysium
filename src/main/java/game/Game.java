@@ -80,17 +80,17 @@ public final class Game {
 
     public void render(Renderer renderer) {
         // Create a buffer to render the game to
-        FrameBuffer buffer = renderer.createFrameBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
-        Renderer bufferRenderer = buffer.createRenderer();
+//        FrameBuffer buffer = renderer.createFrameBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+//        Renderer bufferRenderer = buffer.createRenderer();
 //        BufferedImage gameBuffer = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
 //        Graphics2D bufferGraphics = gameBuffer.createGraphics();
 
         // Render game to buffer
-        stateManager.render(bufferRenderer);
+        stateManager.render(renderer);
 
-        bufferRenderer.dispose();
+//        bufferRenderer.dispose();
 
-        renderer.drawFrameBuffer(buffer, 0, 0);
+//        renderer.drawFrameBuffer(buffer, 0, 0);
 
         // Apply post-processing effects
 //        BufferedImage processed = effects.process(gameBuffer);

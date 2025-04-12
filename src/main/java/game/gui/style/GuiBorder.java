@@ -18,8 +18,8 @@ public class GuiBorder {
 
     public void render(Renderer renderer, int width, int height, int radius) {
         renderer.setColor(color);
-        var oldStroke = renderer.getStroke();
-        renderer.setStroke(new BasicStroke(thickness));
+        var oldStroke = renderer.getLineWidth();
+        renderer.setLineWidth(thickness);
 
         if (radius > 0) {
             renderer.drawRoundRect(0, 0, width, height, radius, radius);
@@ -27,6 +27,6 @@ public class GuiBorder {
             renderer.drawRect(0, 0, width, height);
         }
 
-        renderer.setStroke(oldStroke);
+        renderer.setLineWidth(oldStroke);
     }
 }

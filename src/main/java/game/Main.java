@@ -27,6 +27,7 @@ public enum Main {
             Instant lastRender = Instant.now();
 
             while (window.isActive()) {
+                System.out.println("\n\n\n\n\n\n");
                 Instant currentTime = Instant.now();
 
                 Duration deltaUpdate = Duration.between(lastUpdate, currentTime);

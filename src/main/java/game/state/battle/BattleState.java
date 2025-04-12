@@ -5,6 +5,8 @@ import game.graphics.background.StarBackground;
 import game.input.Mouse;
 import game.input.MouseEvent;
 import game.platform.Renderer;
+import game.platform.gl.GlRenderer;
+import game.platform.gl.GlTransform;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
@@ -108,15 +110,19 @@ public class BattleState extends GameState {
         // Render the star background
 
         // Get the camera worldTransform and render the world
-        var guiTransform = renderer.getTransform();
-        var worldTransform = camera.getTransform();
-        renderer.setTransform(worldTransform);
+        GlTransform worldTransform = (GlTransform) camera.getTransform();
+        GlTransform current = (GlTransform) renderer.getTransform().copy();
+        renderer.pushTransform(current.compose(worldTransform));
+//        renderer.setTransform(worldTransform);
         world.onRender(renderer);
         currentController.ifPresent(c -> c.onWorldRender(renderer));
+        renderer.popTransform();
 
         // Restore the original worldTransform and draw the gui
-        renderer.setTransform(guiTransform);
-        currentController.ifPresent(c -> c.onGuiRender(renderer));
+//        var guiTransform = renderer.getTransform();
+//        renderer.pushTransform(guiTransform);
+//        currentController.ifPresent(c -> c.onGuiRender(renderer));
+//        renderer.popTransform();
 
     }
 

@@ -1,11 +1,11 @@
 package game.platform.awt;
 
+import game.platform.FontInfo;
 import game.platform.FrameBuffer;
 import game.platform.Renderer;
 import game.platform.Transform;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 
 public class AwtRenderer implements Renderer {
     private final Graphics2D graphics;
@@ -31,13 +31,23 @@ public class AwtRenderer implements Renderer {
     }
 
     @Override
-    public Shape getClip() {
-        return graphics.getClip();
+    public void pushTransform(Transform transform) {
+
     }
 
     @Override
-    public void setClip(Shape clip) {
-        graphics.setClip(clip);
+    public Transform popTransform() {
+        return null;
+    }
+
+    @Override
+    public void pushClip(int x, int y, int width, int height) {
+
+    }
+
+    @Override
+    public void popClip() {
+
     }
 
     @Override
@@ -76,13 +86,17 @@ public class AwtRenderer implements Renderer {
     }
 
     @Override
-    public Stroke getStroke() {
-        return graphics.getStroke();
+    public int getLineWidth() {
+        if (graphics.getStroke() instanceof BasicStroke) {
+            return (int) ((BasicStroke) graphics.getStroke()).getLineWidth();
+        }
+        return 1; // Default line width
     }
 
     @Override
-    public void setStroke(Stroke basicStroke) {
-        graphics.setStroke(basicStroke);
+    public void setLineWidth(int width) {
+        var stroke = new BasicStroke(width);
+        graphics.setStroke(stroke);
     }
 
     @Override
@@ -126,23 +140,14 @@ public class AwtRenderer implements Renderer {
     }
 
     @Override
-    public void clip(Rectangle viewportRect) {
-        graphics.clip(viewportRect);
+    public FontInfo getFontMetrics() {
+        return new AwtFontInfo(graphics.getFontMetrics());
     }
 
     @Override
-    public FontMetrics getFontMetrics() {
-        return graphics.getFontMetrics();
-    }
-
-    @Override
-    public FontMetrics getFontMetrics(Font font) {
-        return graphics.getFontMetrics(font);
-    }
-
-    @Override
-    public void clipRect(int x, int y, int width, int height) {
-        graphics.clipRect(x, y, width, height);
+    public FontInfo getFontMetrics(Font font) {
+        graphics.setFont(font);
+        return new AwtFontInfo(graphics.getFontMetrics());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.gui.control.GuiSlider;
 import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
@@ -38,28 +39,24 @@ public class GuiContainer extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Renderer g) {
-        // Apply clipping based on overflow setting
-        Shape originalClip = g.getClip();
-        g.setClip(new Rectangle(0, 0, width, height));
+    protected void onRender(Renderer renderer) {
+        renderer.pushClip(0, 0, width, height);
 
+        // Render background and border
         if (background != null) {
-            background.render(g, width, height, 0);
+            background.render(renderer, width, height, 0);
         }
 
         if (border != null) {
-            border.render(g, width, height, 0);
+            border.render(renderer, width, height, 0);
         }
 
-        // Render all children
+        // Render children
         for (GuiComponent child : children) {
-            child.render(g);
+            child.render(renderer);
         }
 
-        // Restore clip
-        if (originalClip != null) {
-            g.setClip(originalClip);
-        }
+        renderer.popClip();
     }
 
     @Override
@@ -83,6 +80,12 @@ public class GuiContainer extends GuiComponent {
 
     public void setLayout(GuiLayout guiLayout) {
         this.layout = guiLayout;
+        layout.onLayout(this);
+    }
+
+    public void removeChild(GuiComponent child) {
+        children.remove(child);
+        child.parent = null;
         layout.onLayout(this);
     }
 

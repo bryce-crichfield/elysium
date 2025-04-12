@@ -27,8 +27,8 @@ public abstract class Tile {
             boolean hasLeft = neighbors.stream().anyMatch(neighbor -> neighbor.getX() < tile.getX());
             boolean hasRight = neighbors.stream().anyMatch(neighbor -> neighbor.getX() > tile.getX());
 
-            Stroke oldStroke = renderer.getStroke();
-            renderer.setStroke(new BasicStroke(2));
+            var oldStroke = renderer.getLineWidth();
+            renderer.setLineWidth(2);
             renderer.setColor(color);
 
             int tileX = tile.getX() * 32;
@@ -52,7 +52,7 @@ public abstract class Tile {
                 renderer.drawLine(tileX + tileWidth, tileY, tileX + tileWidth, tileY + tileHeight);
             }
 
-            renderer.setStroke(oldStroke);
+            renderer.setLineWidth(oldStroke);
         }
     }
 
@@ -63,9 +63,9 @@ public abstract class Tile {
 
         int tileSize = 32;
         // Draw the path
-        Stroke stroke = renderer.getStroke();
+        var stroke = renderer.getLineWidth();
         renderer.setColor(color);
-        renderer.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        renderer.setLineWidth(4);
 
         Tile start = tiles.get(0);
 
@@ -101,7 +101,7 @@ public abstract class Tile {
             turtleTileX = tileX;
             turtleTileY = tileY;
         }
-        renderer.setStroke(stroke);
+        renderer.setLineWidth(stroke);
     }
 
     public boolean isPassable() {

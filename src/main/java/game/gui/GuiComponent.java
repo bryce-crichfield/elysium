@@ -4,6 +4,7 @@ import game.gui.input.*;
 import game.input.Mouse;
 import game.input.MouseEvent;
 import game.platform.Renderer;
+import game.platform.gl.GlTransform;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,15 +43,9 @@ public abstract class GuiComponent {
     public void render(Renderer renderer) {
         if (!visible) return;
 
-        // Save transform state
-        var originalTransform = renderer.getTransform();
-        renderer.translate(x, y);
-
-        // Custom rendering in subclasses
+        renderer.pushTransform(GlTransform.createTranslate(x, y));
         onRender(renderer);
-
-        // Restore transform
-        renderer.setTransform(originalTransform);
+        renderer.popTransform();
     }
 
     protected void onRender(Renderer renderer) {

@@ -131,11 +131,11 @@ public class Cursor {
         int x = cursorX * tileSize - offset / 2;
         int y = cursorY * tileSize - offset / 2;
 
-        Stroke oldStroke = renderer.getStroke();
+        var oldStroke = renderer.getLineWidth();
         renderer.setColor(Color.BLACK);
-        renderer.setStroke(new BasicStroke(3));
+        renderer.setLineWidth(3);
         renderer.drawRect(x, y, size, size);
-        renderer.setStroke(oldStroke);
+        renderer.setLineWidth(oldStroke);
         renderer.setColor(color);
         renderer.drawRect(x, y, size, size);
     }
@@ -154,7 +154,6 @@ public class Cursor {
 
         cursorX = (x / tileSize);
         cursorY = (y / tileSize);
-
         CursorMoved.event.fire(this);
     }
 

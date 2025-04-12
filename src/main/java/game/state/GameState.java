@@ -90,7 +90,7 @@ public abstract class GameState {
         renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
         for (Background background : backgrounds) {
-            background.render(renderer);
+//            background.render(renderer);
         }
 
         onRender(renderer);

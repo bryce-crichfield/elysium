@@ -5,6 +5,8 @@ import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
 import game.input.Mouse;
 import game.platform.Renderer;
+import game.platform.Transform;
+import game.platform.gl.GlTransform;
 import lombok.Getter;
 
 import java.awt.*;
@@ -53,14 +55,13 @@ public class GuiScrollPanel extends GuiContainer {
 
     @Override
     protected void onRender(Renderer renderer) {
-        // Save the original transform and clip
-        var scrollTransform = renderer.getTransform();
-        Shape originalClip = renderer.getClip();
+        // Save the original clip
+//        Shape originalClip = renderer.getClip();
 
-        // Create new clip that's the intersection of the existing clip and our viewport
-        Rectangle viewportRect = new Rectangle(0, 0, width, height);
-        // This is critical - must intersect with existing clip
-        renderer.clip(viewportRect);
+        // Intersect with our viewport to create a new clip
+//        Rectangle viewportRect = new Rectangle(0, 0, width, height);
+//        renderer.clip(viewportRect);
+        renderer.pushClip(0, 0, width, height);
 
         // Render container background
         if (background != null) {
@@ -71,21 +72,28 @@ public class GuiScrollPanel extends GuiContainer {
             border.render(renderer, width, height, 0);
         }
 
-        // Apply scroll translation
-        renderer.translate(-scrollState.getScrollXOffset(), -scrollState.getScrollYOffset());
+        // Push scroll translation
+//        Transform scrollTransform = renderer.getTransform().copy();
+//        scrollTransform.translate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
+        var scrollTransform = GlTransform.createTranslate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
+        renderer.pushTransform(scrollTransform);
 
-        // Render content (not background)
+        // Render children
         for (GuiComponent child : children) {
             child.render(renderer);
         }
 
-        // Restore transform and clip for scrollbar rendering
-        renderer.setTransform(scrollTransform);
-        renderer.setClip(originalClip);
+        // Pop back to pre-scroll transform
+        renderer.popTransform();
+
+        // Restore clip
+        renderer.popClip();
+//        renderer.setClip(originalClip);
 
         // Render scrollbars
         renderScrollbars(renderer);
     }
+
 
     private void renderScrollbars(Renderer renderer) {
         if (isVerticalBarVisible) {

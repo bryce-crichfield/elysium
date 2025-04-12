@@ -7,7 +7,9 @@ import game.audio.AudioStore;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.platform.Renderer;
+import game.platform.gl.GlTransform;
 import game.state.GameState;
+import game.state.battle.BattleState;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class LoadingState extends GameState {
     private final Queue<AssetLoader> loadQueue = new ConcurrentLinkedQueue<>();
@@ -43,6 +47,7 @@ public class LoadingState extends GameState {
             protected void onRender(Renderer g) {
                 g.setColor(Color.BLUE);
                 var drawWidth = (int) (width * getTotalLoadingProgress());
+                System.out.println("drawWidth = " + drawWidth);
                 g.fillRect(0, 0, drawWidth, height);
                 g.setColor(Color.WHITE);
                 g.drawRect(0, 0, width, height);

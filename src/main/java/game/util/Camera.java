@@ -3,6 +3,7 @@ package game.util;
 import game.Game;
 import game.platform.Transform;
 import game.platform.awt.AwtTransform;
+import game.platform.gl.GlTransform;
 
 import java.awt.geom.AffineTransform;
 
@@ -44,7 +45,7 @@ public class Camera {
     }
 
     public Transform getTransform() {
-        var transform = new AffineTransform();
+        var transform = new GlTransform();
         transform.scale(zoom, zoom);
 
         // center the camera on the screen
@@ -53,14 +54,17 @@ public class Camera {
         int cameraX = (int) (x - (screenWidth / 2));
         int cameraY = (int) (y - (screenHeight / 2));
         transform.translate(-cameraX, -cameraY);
+
         // YO IM WHACK AF
-        return new AwtTransform(transform);
+        return transform;
     }
 
     public int getWorldX(int screenX) {
+        System.out.println("screenX = " + screenX);
         // Convert screen coordinates to world coordinates
         float screenCenterX = Game.SCREEN_WIDTH / 2.0f;
         float worldX = (screenX - screenCenterX) / zoom + x;
+        System.out.println("worldX = " + worldX);
         return Math.round(worldX);
     }
 

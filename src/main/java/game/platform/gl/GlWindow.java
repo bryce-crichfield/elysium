@@ -2,12 +2,15 @@ package game.platform.gl;
 
 import game.Game;
 import game.input.KeyEvent;
+import game.input.MouseEvent;
 import game.platform.Window;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
+import java.awt.*;
 import java.nio.IntBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -91,7 +94,8 @@ public class GlWindow extends Window {
         // Create a texture to attach to the framebuffer
         textureColorBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bufferWidth, bufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        // Try this instead
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -113,23 +117,17 @@ public class GlWindow extends Window {
 
 
     private void setupInputCallbacks(Game game) {
-        // Setup keyboard callback
         glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-            // Here you would translate GLFW key events to your game's keyboard system
-            // This is a stub - you'll need to implement proper keyboard handling
-            System.out.println("Key: " + key + ", Action: " + action);
             KeyEvent event = new KeyEvent(key, action);
             switch (action) {
                 case GLFW_PRESS -> game.getKeyboard().keyPressed(event);
                 case GLFW_RELEASE -> game.getKeyboard().keyReleased(event);
-//                case GLFW_REPEAT -> game.getKeyboard().keyTyped(event);
-                default -> {
-                    // Handle other actions if necessary
-                }
+                case GLFW_REPEAT -> {}
+                default -> {}
             }
         });
 
-
+        boolean[] isDown = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
         // Mouse button callback
         glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> {
             // Get cursor position
@@ -137,29 +135,64 @@ public class GlWindow extends Window {
             double[] ypos = new double[1];
             glfwGetCursorPos(window, xpos, ypos);
 
+            Optional<Point> point = transformWindowPointToViewport((int) xpos[0], (int) ypos[0]);
+            if (point.isEmpty()) {
+                return;
+            }
+
             switch (action) {
                 case GLFW_PRESS -> {
-                    // Handle mouse button press
-                    System.out.println("Mouse Button Pressed: " + button);
-//                    game.getMouse().mousePressed(button, xpos[0], ypos[0]);
+                    var event = new MouseEvent.Pressed(point.get(), button, 1, false);
+                    game.getMouse().mousePressed(event);
+                    isDown[button] = true;
+                }
+                case GLFW_RELEASE -> {
+                    var event = new MouseEvent.Released(point.get(), button, false);
+
+                    // If the button was down, fire a click event
+                    if (isDown[button]) {
+
+                        game.getMouse().mouseClicked(new MouseEvent.Clicked(point.get(), button, 1, false));
+                    }
+                    game.getMouse().mouseReleased(event);
+                    isDown[button] = false;
+                }
+                default -> {
+                    // Handle other actions if necessary
                 }
             }
 
-            // Transform coordinates to game space
-            // This is a stub - you'll need to implement proper coordinate transformation
-            // similar to the transformCoordinates method in AwtWindow
         });
 
-        // Cursor position callback
         glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> {
-            // Transform coordinates to game space and forward to game mouse
-            // This is a stub - implement proper handling
+            double[] xposArray = new double[1];
+            double[] yposArray = new double[1];
+            glfwGetCursorPos(window, xposArray, yposArray);
+
+            Optional<Point> point = transformWindowPointToViewport((int) xposArray[0], (int) yposArray[0]);
+            if (point.isPresent()) {
+                var event = new MouseEvent.Moved(point.get(),  false);
+                game.getMouse().mouseMoved(event);
+
+                // if a button is down, fire a drag event
+                for (int i = 0; i < isDown.length; i++) {
+                    if (isDown[i]) {
+                        var dragEvent = new MouseEvent.Dragged(point.get(), i, false);
+                        game.getMouse().mouseDragged(dragEvent);
+                    }
+                }
+            }
         });
 
-        // Scroll callback
         glfwSetScrollCallback(windowHandle, (window, xoffset, yoffset) -> {
-            // Forward scroll events to game mouse
-            // This is a stub - implement proper handling
+            double[] xpos = new double[1];
+            double[] ypos = new double[1];
+            glfwGetCursorPos(window, xpos, ypos);
+            Optional<Point> point = transformWindowPointToViewport((int) xpos[0], (int) ypos[0]);
+            if (point.isPresent()) {
+                var event = new MouseEvent.WheelMoved(point.get(), xoffset, yoffset, false);
+                game.getMouse().mouseWheelMoved(event);
+            }
         });
 
         // Window resize callback
@@ -180,22 +213,42 @@ public class GlWindow extends Window {
     @Override
     public void onRender(float updateTime, float renderTime) {
         // First render to our framebuffer
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // Dark gray background
+
+
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         glViewport(0, 0, bufferWidth, bufferHeight);
 
         // Clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Render game content to the framebuffer
-        // Your game rendering code goes here
         GlRenderer renderer = new GlRenderer(bufferWidth, bufferHeight);
-//        game.render(renderer);
-        renderer.fillRect(0, 0, 100, 100);
+        game.render(renderer);
+        renderer.dispose();
 
+        glDisable(GL_SCISSOR_TEST);
 
         // Now bind back to the default framebuffer and draw a quad with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        // Set the viewport to the letterboxed dimensions
+        var letterboxViewport = calculateLetterBoxViewport();
+        glViewport(letterboxViewport.x, letterboxViewport.y, letterboxViewport.width, letterboxViewport.height);
+
+        // Clear the main framebuffer (only needed for letterboxing)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Render the framebuffer texture to a fullscreen quad
+        renderFramebufferTexture(textureColorBuffer);
+
+        // Swap buffers
+        glfwSwapBuffers(windowHandle);
+
+        // Poll for window events
+        glfwPollEvents();
+    }
+
+    private Rectangle calculateLetterBoxViewport() {
         // Calculate letterboxing dimensions
         int windowWidth = 0, windowHeight = 0;
         try (MemoryStack stack = stackPush()) {
@@ -226,29 +279,14 @@ public class GlWindow extends Window {
             viewportY = (windowHeight - viewportHeight) / 2;
         }
 
-        // Set the viewport to the letterboxed dimensions
-        glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
-
-        // Clear the main framebuffer (only needed for letterboxing)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Render the framebuffer texture to a fullscreen quad
-        renderFramebufferTexture(textureColorBuffer);
-
-        // Swap buffers
-        glfwSwapBuffers(windowHandle);
-
-        // Poll for window events
-        glfwPollEvents();
+        return new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight);
     }
 
     private void renderFramebufferTexture(int textureId) {
-        // For simplicity, we'll use immediate mode here
-        // In a real implementation, you'd want to use VAOs/VBOs
-
         // Enable texture
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, textureId);
+        glColor4f(1, 1, 1, 1); // Set color to white
 
         // Draw a textured quad that fills the viewport
         glBegin(GL_QUADS);
@@ -282,6 +320,22 @@ public class GlWindow extends Window {
 
     }
 
-    // You'll need to implement coordinate transformation methods similar to
-    // transformCoordinates and transformMouseEvent in the AWT implementation
+    private Optional<Point> transformWindowPointToViewport(int x, int y) {
+        // Get the letterbox viewport dimensions
+        Rectangle viewport = calculateLetterBoxViewport();
+
+        // Check if the point is within the viewport
+        if (x < viewport.x || x >= viewport.x + viewport.width ||
+                y < viewport.y || y >= viewport.y + viewport.height) {
+            // Point is outside the letterboxed viewport
+            return Optional.empty();
+        }
+
+        // Transform the point from window coordinates to viewport coordinates
+        // Map from viewport rectangle to [0, bufferWidth] x [0, bufferHeight]
+        int transformedX = (int)((x - viewport.x) * (float)bufferWidth / viewport.width);
+        int transformedY = (int)((y - viewport.y) * (float)bufferHeight / viewport.height);
+
+        return Optional.of(new Point(transformedX, transformedY));
+    }
 }

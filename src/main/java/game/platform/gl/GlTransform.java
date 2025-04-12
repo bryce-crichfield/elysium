@@ -7,7 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 @Getter
-public class GlTransform extends Transform {
+public class GlTransform implements Transform {
     private final Matrix4f matrix;
 
     public GlTransform() {
@@ -29,39 +29,29 @@ public class GlTransform extends Transform {
         return new GlTransform(result);
     }
 
-    public static GlTransform fromScreenSpace(int screenWidth, int screenHeight) {
-        var screenToNdcMatrix = new Matrix4f();
-
-        // Create identity matrix
-        screenToNdcMatrix.identity();
-
-        // Operations are applied in reverse order of how they're written
-        // So we start with the last operation to be applied
-
-        // 3. Scale to [-1, 1] range (applied first)
-        screenToNdcMatrix.scale(2.0f / screenWidth, 2.0f / screenHeight, 1.0f);
-
-        // 2. Translate origin (applied second)
-        screenToNdcMatrix.translate(-1.0f, -1.0f, 0.0f);
-
-        return new GlTransform(screenToNdcMatrix);
+    public static GlTransform fromScreenSpace(int width, int height) {
+        GlTransform transform = new GlTransform();
+        transform.translate(-1.0f, 1.0f);  // Change Y from -1 to 1
+        transform.scale(2.0f / width, -2.0f / height);  // Negate Y scale
+        return transform;
     }
 
-    public static GlTransform toScreenSpace(int screenWidth, int screenHeight) {
-        // Create a new matrix
-        var ndcToScreenMatrix = new Matrix4f();
+    public static GlTransform toScreenSpace(float screenWidth, float screenHeight) {
+        // Converts from NDC to screen space
+        GlTransform transform = new GlTransform();
+        transform.scale(screenWidth / 2.0f, screenHeight / 2.0f);
+        transform.translate(1.0f, -1.0f);  // Change Y from -1 to 1
+        return transform;
+    }
 
-        // Scale from [-1, 1] to [0, width/height]
-        // First scale by 0.5 to get range [-0.5, 0.5]
-        ndcToScreenMatrix.scale(0.5f);
+    public static GlTransform createTranslate(float x, float y) {
+        GlTransform transform = new GlTransform();
+        transform.translate(x, y);
+        return transform;
+    }
 
-        // Then translate by (0.5, 0.5) to get range [0, 1]
-        ndcToScreenMatrix.translate(new Vector3f(1.0f, 1.0f, 0.0f));
-
-        // Finally scale by screen dimensions
-        ndcToScreenMatrix.scale(new Vector3f(screenWidth, screenHeight, 1.0f));
-
-        return new GlTransform(ndcToScreenMatrix);
+    public void scale(float v, float v1) {
+        matrix.scale(v, v1, 1);
     }
 
     public Vector2f transform(Vector2f point) {
@@ -71,4 +61,20 @@ public class GlTransform extends Transform {
         return new Vector2f(result.x, result.y);
     }
 
+    @Override
+    public Transform copy() {
+        return new GlTransform(new Matrix4f(matrix));
+    }
+
+    @Override
+    public Transform translate(int x, int y) {
+        return new GlTransform(new Matrix4f(matrix).translate(x, y, 0));
+    }
+
+    @Override
+    public Transform inverse() {
+        Matrix4f inverseMatrix = new Matrix4f();
+        matrix.invert(inverseMatrix);
+        return new GlTransform(inverseMatrix);
+    }
 }

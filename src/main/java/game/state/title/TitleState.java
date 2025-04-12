@@ -91,7 +91,7 @@ public class TitleState extends GameState {
 
         container.addChild(createTestScrollPanel( 100, 100));
         container.addChild(createTestDropdown( 300, 300));
-        container.addChild(createGuiSlider( 500, 500));
+        container.addChild(createGuiSlider( 100, 500));
 
         mainMenu = container;
     }
@@ -128,7 +128,6 @@ public class TitleState extends GameState {
             slider.setMaxValue(100);
             slider.setValue(50); // Initial value
             slider.setOnValueChanged(newValue -> {
-                System.out.println("Slider value changed to: " + newValue);
                 // Update your game/application state here
             });
             container.addChild(slider);
@@ -172,7 +171,7 @@ public class TitleState extends GameState {
                 Font buttonFont = new Font("Arial", Font.BOLD, 18);
                 g.setFont(buttonFont);
 
-                FontMetrics metrics = g.getFontMetrics();
+                var metrics = g.getFontMetrics();
                 int textWidth = metrics.stringWidth(text);
                 int textHeight = metrics.getHeight();
 
@@ -200,7 +199,7 @@ public class TitleState extends GameState {
                 Font titleFont = new Font("Arial", Font.BOLD, 48);
                 g.setFont(titleFont);
 
-                FontMetrics metrics = g.getFontMetrics();
+                var metrics = g.getFontMetrics();
                 int textWidth = metrics.stringWidth(getText());
 
                 g.drawString(getText(), -textWidth / 2, 0);
