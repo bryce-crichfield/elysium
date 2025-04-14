@@ -14,8 +14,22 @@ public class AwtFrameBuffer implements FrameBuffer {
     }
 
     @Override
+    public int getWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getHeight() {
+        return 0;
+    }
+
+    @Override
     public Renderer createRenderer() {
         return new AwtRenderer(image.createGraphics());
+    }
+
+    @Override
+    public void dispose() {
     }
 
     public Image getImage() {

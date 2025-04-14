@@ -71,7 +71,6 @@ public class BattleState extends GameState {
         // translate from screen coordinates to world coordinates
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
-//        var e = Mouse.translateEvent(event, worldX, worldY);
         var e = event.withPoint(new Point(worldX, worldY));
         currentController.ifPresent(c -> c.onMouseClicked(e));
     }
@@ -82,7 +81,6 @@ public class BattleState extends GameState {
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
         var e = event.withPoint(new Point(worldX, worldY));
-//        var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
         currentController.ifPresent(c -> c.onMouseWheelMoved(e));
     }
 
@@ -111,9 +109,7 @@ public class BattleState extends GameState {
 
         // Get the camera worldTransform and render the world
         GlTransform worldTransform = (GlTransform) camera.getTransform();
-        GlTransform current = (GlTransform) renderer.getTransform().copy();
-        renderer.pushTransform(current.compose(worldTransform));
-//        renderer.setTransform(worldTransform);
+        renderer.pushTransform(worldTransform);
         world.onRender(renderer);
         currentController.ifPresent(c -> c.onWorldRender(renderer));
         renderer.popTransform();

@@ -27,7 +27,6 @@ public enum Main {
             Instant lastRender = Instant.now();
 
             while (window.isActive()) {
-                System.out.println("\n\n\n\n\n\n");
                 Instant currentTime = Instant.now();
 
                 Duration deltaUpdate = Duration.between(lastUpdate, currentTime);
@@ -43,7 +42,14 @@ public enum Main {
 
                 if (dtRender > 1f / targetFps) {
                     lastRender = currentTime;
+
+                    Instant renderStart = Instant.now();
+
                     window.onRender(dtUpdate, dtRender);
+                    Instant renderEnd = Instant.now();
+                    Duration renderDuration = Duration.between(renderStart, renderEnd);
+                    // print ms as decimal
+                    System.out.println("Render time: " + renderDuration.toMillis() + " ms");
                 }
             }
         } catch (Exception e) {
@@ -51,6 +57,12 @@ public enum Main {
         } finally {
             window.onClose();
         }
+    }
+
+    private static void printDebugInfo(float updateTime, float renderTime) {
+        // Print the ups, fps, update time, and render time
+        System.out.printf("UPS: %.1f, FPS: %.1f, Update Time: %.1f ms, Render Time: %.1f ms%n",
+                1f / updateTime, 1f / renderTime, updateTime * 1000, renderTime * 1000);
     }
 
 }

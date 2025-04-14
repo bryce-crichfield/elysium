@@ -1,7 +1,9 @@
 package game.state;
 
 import game.Game;
+import game.platform.FrameBuffer;
 import game.platform.Renderer;
+import game.platform.gl.GlFrameBuffer;
 import game.transition.Transition;
 import game.transition.TransitionFactory;
 
@@ -22,12 +24,13 @@ public class GameStateManager {
     }
 
     // Method to capture the current screen as a source image
-    public static BufferedImage captureScreen(GameState state) {
-        var image = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        var g = image.createGraphics();
-//        state.render(g);
-        g.dispose();
-        return image;
+    public static FrameBuffer captureScreen(GameState state) {
+        var frameBuffer = new GlFrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        var renderer = frameBuffer.createRenderer();
+        state.render(renderer);
+        frameBuffer.unbind();
+        renderer.dispose();
+        return frameBuffer;
     }
 
     // Pushes a state without transition
@@ -43,7 +46,6 @@ public class GameStateManager {
     }
 
     public void pushState(GameStateFactory factory, TransitionFactory transitionFactory) {
-        System.out.println("PUSHING STATE");
         if (states.isEmpty()) {
             // Special case for first state
             GameState newState = factory.create(game);
@@ -60,8 +62,8 @@ public class GameStateManager {
         target = factory.create(game);
 
         // Capture current and target visuals
-        BufferedImage source = captureScreen(states.peek());
-        BufferedImage target = captureScreen(this.target);
+        FrameBuffer source = captureScreen(states.peek());
+        FrameBuffer target = captureScreen(this.target);
 
         // Set up transition
         transitionType = TransitionType.PUSH;
@@ -83,8 +85,8 @@ public class GameStateManager {
         }
 
         // Set up the transition
-        BufferedImage source = captureScreen(states.peek());
-        BufferedImage target = captureScreen(states.get(states.size() - 2));
+        FrameBuffer source = captureScreen(states.peek());
+        FrameBuffer target = captureScreen(states.get(states.size() - 2));
 
         transitionType = TransitionType.POP;
         transition = transitionFactory.create(source, target, this::completeTransition);
@@ -135,11 +137,11 @@ public class GameStateManager {
     public void render(Renderer renderer) {
         // During transition, we let the transition handle rendering
         if (isTransitioning() && hasState()) {
-//            transition.render(graphics, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+            transition.render(renderer, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
             return;
         }
 
-        // Normal rendering when not transitioning
+        // Normal   rendering when not transitioning
         if (!states.isEmpty()) {
             states.peek().render(renderer);
         }

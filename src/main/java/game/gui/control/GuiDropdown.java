@@ -160,6 +160,7 @@ public class GuiDropdown<T> extends GuiComponent {
             yPoints = new int[]{y - size / 3, y + size / 3, y - size / 3};
         }
 
+        g.setColor(Color.BLACK);
         g.fillPolygon(xPoints, yPoints, 3);
     }
 

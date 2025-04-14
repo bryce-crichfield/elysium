@@ -25,9 +25,8 @@ public class GlWindow extends Window {
     private int bufferWidth;
     private int bufferHeight;
 
-    private int fbo;
-    private int textureColorBuffer;
-    private int rbo;
+    private GlFrameBuffer mainFramebuffer;  // Use GlFrameBuffer instead of raw OpenGL IDs
+
 
     public GlWindow(int width, int height, Game game) {
         super(width, height, game);
@@ -87,32 +86,7 @@ public class GlWindow extends Window {
 
     @Override
     public void onInit() {
-        // Create the framebuffer
-        fbo = glGenFramebuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-        // Create a texture to attach to the framebuffer
-        textureColorBuffer = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-        // Try this instead
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
-
-        // Create a renderbuffer object for depth and stencil attachment
-        rbo = glGenRenderbuffers();
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-        // Check if framebuffer is complete
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            throw new RuntimeException("Framebuffer is not complete!");
-        }
-
-        // Unbind the framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        mainFramebuffer = new GlFrameBuffer(bufferWidth, bufferHeight);
     }
 
 
@@ -212,39 +186,34 @@ public class GlWindow extends Window {
 
     @Override
     public void onRender(float updateTime, float renderTime) {
-        // First render to our framebuffer
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // Dark gray background
+        // Clear background
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
+        // Bind the main framebuffer using the stack management
+        mainFramebuffer.bind();
 
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-        glViewport(0, 0, bufferWidth, bufferHeight);
-
-        // Clear the framebuffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        GlRenderer renderer = new GlRenderer(bufferWidth, bufferHeight);
+        // Create renderer and render the game
+        GlRenderer renderer = new GlRenderer(mainFramebuffer);
         game.render(renderer);
         renderer.dispose();
 
         glDisable(GL_SCISSOR_TEST);
 
-        // Now bind back to the default framebuffer and draw a quad with the attached framebuffer color texture
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Unbind the main framebuffer using stack management
+        mainFramebuffer.unbind();
 
-        // Set the viewport to the letterboxed dimensions
+        // Set the viewport for letterboxing
         var letterboxViewport = calculateLetterBoxViewport();
         glViewport(letterboxViewport.x, letterboxViewport.y, letterboxViewport.width, letterboxViewport.height);
 
-        // Clear the main framebuffer (only needed for letterboxing)
+        // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Render the framebuffer texture to a fullscreen quad
-        renderFramebufferTexture(textureColorBuffer);
+        // Render the framebuffer texture
+        renderFramebufferTexture(mainFramebuffer.getTextureId());
 
         // Swap buffers
         glfwSwapBuffers(windowHandle);
-
-        // Poll for window events
         glfwPollEvents();
     }
 
@@ -303,9 +272,7 @@ public class GlWindow extends Window {
     @Override
     public void onClose() {
         // Clean up the framebuffer and related resources
-        glDeleteFramebuffers(fbo);
-        glDeleteTextures(textureColorBuffer);
-        glDeleteRenderbuffers(rbo);
+        mainFramebuffer.dispose();
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(windowHandle);

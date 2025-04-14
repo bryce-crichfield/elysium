@@ -169,7 +169,27 @@ public class AwtRenderer implements Renderer {
     }
 
     @Override
+    public void drawFrameBuffer(FrameBuffer buffer, int x, int y, int width, int height) {
+
+    }
+
+    @Override
     public void setPaint(Paint gradient) {
         graphics.setPaint(gradient);
+    }
+
+    @Override
+    public Color getColor() {
+        return graphics.getColor();
+    }
+
+    @Override
+    public void clearTransform() {
+
+    }
+
+    @Override
+    public void clearClip() {
+
     }
 }

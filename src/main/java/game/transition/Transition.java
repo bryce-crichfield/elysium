@@ -1,5 +1,7 @@
 package game.transition;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.time.Duration;
 import java.util.function.Consumer;
@@ -24,7 +26,7 @@ public abstract class Transition {
         }
     }
 
-    public abstract void render(Graphics2D graphics, int width, int height);
+    public abstract void render(Renderer graphics, int width, int height);
 
     public void setOnCompleteCallback(Consumer<Boolean> callback) {
         this.onCompleteCallback = callback;

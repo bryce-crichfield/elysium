@@ -9,9 +9,11 @@ public interface Renderer {
 
     void pushTransform(Transform transform);
     Transform popTransform();
+    void clearTransform();
 
     void pushClip(int x, int y, int width, int height);
     void popClip();
+    void clearClip();
 
     void setColor(Color color);
 
@@ -53,6 +55,9 @@ public interface Renderer {
     void fillPolygon(int[] xPoints, int[] yPoints, int i);
 
     void drawFrameBuffer(FrameBuffer buffer, int i, int i1);
+    void drawFrameBuffer(FrameBuffer buffer, int x, int y, int width, int height);
 
     void setPaint(Paint gradient);
+
+    Color getColor();
 }

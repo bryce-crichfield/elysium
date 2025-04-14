@@ -5,28 +5,44 @@ import game.platform.FrameBuffer;
 import game.platform.Renderer;
 import game.platform.Transform;
 import org.joml.Vector2f;
+import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
 import java.util.Stack;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
 public class GlRenderer implements Renderer {
     private final Stack<GlTransform> transformStack = new Stack<>();
+    private final int bufferWidth;
+    private final int bufferHeight;
     private Color color = Color.WHITE;
     private int lineWidth = 1;
     private Composite composite;
-    private final int bufferWidth;
-    private final int bufferHeight;
+    private final GlFontRenderer fontRenderer;
+    private Font currentFont;
 
-    public GlRenderer(int screenWidth, int screenHeight) {
-        // Clear the transform stack before pushing a new one
-        transformStack.clear();
+    private final GlFrameBuffer parentFramebuffer;
+    private int fboId;
+    // Add to your GlRenderer class
+    private final Stack<Rectangle> clipStack = new Stack<>();
+
+    public GlRenderer(GlFrameBuffer frameBuffer) {
+        // Ensure we're bound to the correct FBO before initializing
+        this.parentFramebuffer = frameBuffer;
+//        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+
 
         // Set the viewport to the screen dimensions
-        this.bufferWidth = screenWidth;
-        this.bufferHeight = screenHeight;
-        glViewport(0, 0, screenWidth, screenHeight);
+        this.fboId = frameBuffer.getFboId();
+        this.bufferWidth = frameBuffer.getWidth();
+        this.bufferHeight = frameBuffer.getHeight();
+//        glViewport(0, 0, bufferWidth, screenHeight);
+
+        // Clear the transform stack before pushing a new one
+        transformStack.clear();
 
         // Initialize default state
         color = Color.WHITE;
@@ -35,9 +51,15 @@ public class GlRenderer implements Renderer {
 
         // Apply default state to OpenGL
         glLineWidth(lineWidth);
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
-        // Initialize clipping to the full screen and enable it
+        // Initialize the font renderer
+        fontRenderer = new GlFontRenderer();
+        currentFont = new Font("Arial", Font.PLAIN, 12);
+
+        // Enable blending for transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
@@ -72,8 +94,15 @@ public class GlRenderer implements Renderer {
         return null;
     }
 
-    // Add to your GlRenderer class
-    private Stack<Rectangle> clipStack = new Stack<>();
+    @Override
+    public void clearTransform() {
+        transformStack.clear();
+    }
+
+    @Override
+    public void clearClip() {
+        clipStack.clear();
+    }
 
     public void pushClip(int x, int y, int width, int height) {
         // Store clips in their original untransformed coordinates
@@ -124,7 +153,7 @@ public class GlRenderer implements Renderer {
         float maxX = Math.max(Math.max(topLeft.x, topRight.x), Math.max(bottomLeft.x, bottomRight.x));
         float maxY = Math.max(Math.max(topLeft.y, topRight.y), Math.max(bottomLeft.y, bottomRight.y));
 
-        return new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+        return new Rectangle((int) minX, (int) minY, (int) (maxX - minX), (int) (maxY - minY));
     }
 
     public void popClip() {
@@ -145,12 +174,7 @@ public class GlRenderer implements Renderer {
     private void applyCurrentClip(Rectangle clip) {
         var currentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
         setColor(Color.RED);
-        drawRect(
-                clip.x,
-                clip.y,
-                clip.width,
-                clip.height
-        );
+        drawRect(clip.x, clip.y, clip.width, clip.height);
         setColor(currentColor);
 
         // Apply the transform to the clip rectangle
@@ -167,10 +191,12 @@ public class GlRenderer implements Renderer {
         glScissor(clipX, clipY, clipWidth, clipHeight);
     }
 
-    @Override
-    public void setColor(Color color) {
-        this.color = color;
-        glColor3f(1, 1, 1);
+    private void applyColor(Color color) {
+        float r = color.getRed() / 255f;
+        float g = color.getGreen() / 255f;
+        float b = color.getBlue() / 255f;
+        float a = color.getAlpha() / 255f;
+        glColor4f(r, g, b, a);
     }
 
     @Override
@@ -179,7 +205,19 @@ public class GlRenderer implements Renderer {
     }
 
     @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+        applyColor(color);
+    }
+
+    @Override
     public void drawRect(int x, int y, int width, int height) {
+        ensureCorrectFboBound();
         // Temporarily push a new transform to the stack (fromScreenSpace) to take our screen space coordinates
         // and convert them to NDC space
         pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
@@ -188,7 +226,7 @@ public class GlRenderer implements Renderer {
         var topRight = transformStack.peek().transform(new Vector2f(x + width, y));
         var bottomRight = transformStack.peek().transform(new Vector2f(x + width, y + height));
         var bottomLeft = transformStack.peek().transform(new Vector2f(x, y + height));
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
         glLineWidth(lineWidth);
         glBegin(GL_LINE_LOOP);
@@ -204,6 +242,7 @@ public class GlRenderer implements Renderer {
 
     @Override
     public void fillRect(int x, int y, int width, int height) {
+        ensureCorrectFboBound();
         pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
 
         // Transform all four corners of the rectangle
@@ -211,7 +250,7 @@ public class GlRenderer implements Renderer {
         var topRight = transformStack.peek().transform(new Vector2f(x + width, y));
         var bottomRight = transformStack.peek().transform(new Vector2f(x + width, y + height));
         var bottomLeft = transformStack.peek().transform(new Vector2f(x, y + height));
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
         // Draw using the transformed coordinates directly
         glBegin(GL_QUADS);
@@ -238,15 +277,17 @@ public class GlRenderer implements Renderer {
 
     @Override
     public void drawLine(int startX, int startY, int endX, int endY) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
         var start = transformStack.peek().transform(new Vector2f(startX, startY));
         var end = transformStack.peek().transform(new Vector2f(endX, endY));
 
         glLineWidth(lineWidth);
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
         glBegin(GL_LINES);
         glVertex2f(start.x, start.y);
         glVertex2f(end.x, end.y);
         glEnd();
+        popTransform();
     }
 
     @Override
@@ -260,18 +301,19 @@ public class GlRenderer implements Renderer {
     }
 
     @Override
-    public void fillOval(int x1, int y1, int x2, int y2) {
-        // Convert from bounding box (x1,y1,x2,y2) to (centerX, centerY, radiusX, radiusY)
-        float centerX = x1;
-        float centerY = y1;
-        float radiusX = x2;
-        float radiusY = y2;
+    public void fillOval(int x, int y, int width, int height) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
+        // Convert from rectangle box (x,y,w,h) to (centerX, centerY, radiusX, radiusY)
+        float centerX = x + width / 2.0f;  // Center X is at x plus half the width
+        float centerY = y + height / 2.0f; // Center Y is at y plus half the height
+        float radiusX = width / 2.0f;      // X radius is half the width
+        float radiusY = height / 2.0f;     // Y radius is half the height
 
         // Number of segments to use for the oval approximation
         int segments = 40;
 
         // Set the color
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
         // Draw filled oval using triangle fan
         glBegin(GL_TRIANGLE_FAN);
@@ -292,19 +334,25 @@ public class GlRenderer implements Renderer {
         }
 
         glEnd();
+
+        // Pop the transform stack to restore the previous state
+        popTransform();
     }
 
     @Override
-    public void drawOval(int x1, int y1, int radiusX, int radiusY) {
-        // Calculate center point
-        float centerX = x1;
-        float centerY = y1;
+    public void drawOval(int x, int y, int width, int height) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
+        // Convert from rectangle box (x,y,w,h) to (centerX, centerY, radiusX, radiusY)
+        float centerX = x + width / 2.0f;  // Center X is at x plus half the width
+        float centerY = y + height / 2.0f; // Center Y is at y plus half the height
+        float radiusX = width / 2.0f;      // X radius is half the width
+        float radiusY = height / 2.0f;     // Y radius is half the height
 
         // Number of segments to use for the oval approximation
         int segments = 40;
 
         // Set the color
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
         // Set line width
         glLineWidth(lineWidth);
@@ -324,6 +372,9 @@ public class GlRenderer implements Renderer {
         }
 
         glEnd();
+
+        // Pop the transform stack to restore the previous state
+        popTransform();
     }
 
     @Override
@@ -336,8 +387,9 @@ public class GlRenderer implements Renderer {
 
     @Override
     public void fillRoundRect(int x, int y, int width, int height, int radiusX, int radiusY) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
         var transform = transformStack.peek();
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
 
         // Fill center rectangle
         fillRect(x + radiusX, y, width - 2 * radiusX, height);
@@ -350,6 +402,9 @@ public class GlRenderer implements Renderer {
         drawCorner(transform, x + width - radiusX, y + radiusY, radiusX, radiusY, 270, 360); // top-right
         drawCorner(transform, x + width - radiusX, y + height - radiusY, radiusX, radiusY, 0, 90); // bottom-right
         drawCorner(transform, x + radiusX, y + height - radiusY, radiusX, radiusY, 90, 180); // bottom-left
+
+        // Pop the transform stack to restore the previous state
+        popTransform();
     }
 
     private void drawCorner(GlTransform transform, float cx, float cy, float rx, float ry, int startAngleDeg, int endAngleDeg) {
@@ -371,8 +426,9 @@ public class GlRenderer implements Renderer {
 
     @Override
     public void drawRoundRect(int x, int y, int width, int height, int radiusX, int radiusY) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
         var transform = transformStack.peek();
-        glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        applyColor(color);
         glLineWidth(lineWidth);
 
         glBegin(GL_LINE_STRIP);
@@ -389,6 +445,8 @@ public class GlRenderer implements Renderer {
         glVertex2f(transform.transform(new Vector2f(x, y + height - radiusY)).x, transform.transform(new Vector2f(x, y + height - radiusY)).y);
         glVertex2f(transform.transform(new Vector2f(x, y + radiusY)).x, transform.transform(new Vector2f(x, y + radiusY)).y);
         glEnd();
+
+        popTransform();
     }
 
     private void drawArc(GlTransform transform, float cx, float cy, float rx, float ry, int startAngleDeg, int endAngleDeg) {
@@ -403,55 +461,163 @@ public class GlRenderer implements Renderer {
 
     @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int i) {
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
+        glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         glBegin(GL_POLYGON);
         for (int j = 0; j < i; j++) {
             var point = transformStack.peek().transform(new Vector2f(xPoints[j], yPoints[j]));
             glVertex2f(point.x, point.y);
         }
         glEnd();
-
+        popTransform();
     }
 
     @Override
-    public FrameBuffer createFrameBuffer(int screenWidth, int screenHeight) {
-        var renderer = this;
-        return new FrameBuffer() {
-            @Override
-            public Renderer createRenderer() {
-                return renderer;
+    public FrameBuffer createFrameBuffer(int width, int height) {
+        GlFrameBuffer frameBuffer = new GlFrameBuffer(width, height);
+        return frameBuffer;
+    }
+
+    // Add helper method to ensure the current FBO is bound before drawing operations
+    private void ensureCorrectFboBound() {
+        int[] currentFbo = new int[1];
+        GL30.glGetIntegerv(GL30.GL_FRAMEBUFFER_BINDING, currentFbo);
+        if (currentFbo[0] != fboId) {
+            glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+
+            // Update bound state of parent framebuffer if we have one
+            if (parentFramebuffer != null) {
+                parentFramebuffer.isBound = true;
             }
-        };
+        }
+    }
+
+    // Fix drawFrameBuffer method to properly render the texture
+    @Override
+    public void drawFrameBuffer(FrameBuffer buffer, int x, int y, int width, int height) {
+        if (!(buffer instanceof GlFrameBuffer glFrameBuffer)) {
+            return;
+        }
+
+        // Ensure we're drawing to our framebuffer
+        ensureCorrectFboBound();
+
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
+
+        int textureId = glFrameBuffer.getTextureId();
+        int fbWidth = glFrameBuffer.getWidth();
+        int fbHeight = glFrameBuffer.getHeight();
+
+        // Save texture state
+        int[] currentTexture = new int[1];
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, currentTexture);
+
+        // Enable texturing
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+
+        // Apply a white color to ensure the texture is drawn correctly
+        glColor4f(1, 1, 1, 1);
+
+        // Transform the coordinates - now using width and height parameters instead of fbWidth and fbHeight
+        Vector2f topLeft = transformStack.peek().transform(new Vector2f(x, y));
+        Vector2f topRight = transformStack.peek().transform(new Vector2f(x + width, y));
+        Vector2f bottomRight = transformStack.peek().transform(new Vector2f(x + width, y + height));
+        Vector2f bottomLeft = transformStack.peek().transform(new Vector2f(x, y + height));
+
+        // Draw the quad but inverted so the its flipped over the y axis (I'm not sure why we need to do this, but it works)
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 1);
+        glVertex2f(topLeft.x, topLeft.y);
+        glTexCoord2f(1, 1);
+        glVertex2f(topRight.x, topRight.y);
+        glTexCoord2f(1, 0);
+        glVertex2f(bottomRight.x, bottomRight.y);
+        glTexCoord2f(0, 0);
+        glVertex2f(bottomLeft.x, bottomLeft.y);
+        glEnd();
+
+        // Restore texture state
+        glBindTexture(GL_TEXTURE_2D, currentTexture[0]);
+        glDisable(GL_TEXTURE_2D);
+
+        popTransform();
     }
 
     @Override
     public void drawFrameBuffer(FrameBuffer buffer, int i, int i1) {
-
+        drawFrameBuffer(buffer, i, i1, buffer.getWidth(), buffer.getHeight());
     }
 
     @Override
     public void setFont(Font font) {
-
+        currentFont = font;
+//        fontRenderer.setFont(font);
     }
 
     @Override
     public void drawString(String str, int x, int y) {
+        // Apply transformation
+        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
 
+        // Get the current coordinates after transformation
+//        var point = transformStack.peek().transform(new Vector2f(x, y));
+//        fontRenderer.drawString(str, (int)point.x, (int)point.y, color);
+
+        popTransform();
     }
 
     @Override
     public FontInfo getFontMetrics() {
-        return new GlFontInfo();
+        // create anon implementation of FontInfo
+        return new FontInfo() {
+            @Override
+            public int getLeading() {
+                return 0;
+            }
+
+            @Override
+            public int stringWidth(String text) {
+                return 0;
+            }
+
+
+            public int getAscent() {
+                return 0;
+            }
+
+            @Override
+            public int getDescent() {
+                return 0;
+            }
+
+            @Override
+            public int getHeight() {
+                return 0;
+            }
+
+        };
+//        return fontRenderer.getFontMetrics();
     }
 
     @Override
     public FontInfo getFontMetrics(Font font) {
-        return new GlFontInfo();
+        return getFontMetrics();
+//        return fontRenderer.getFontMetrics(font);
     }
-
 
 
     @Override
     public void dispose() {
 
+    }
+
+    public int getFboId() {
+        return fboId;
+    }
+
+    public void setFboId(int fboId) {
+        this.fboId = fboId;
+        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     }
 }

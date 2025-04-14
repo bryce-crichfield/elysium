@@ -53,7 +53,7 @@ public class Camera {
         float screenHeight = Game.SCREEN_HEIGHT / zoom;
         int cameraX = (int) (x - (screenWidth / 2));
         int cameraY = (int) (y - (screenHeight / 2));
-        transform.translate(-cameraX, -cameraY);
+        transform = (GlTransform) transform.translate(-cameraX, -cameraY);
 
         // YO IM WHACK AF
         return transform;

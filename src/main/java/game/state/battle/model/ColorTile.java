@@ -16,11 +16,11 @@ public class ColorTile extends Tile {
 
     @Override
     public void onRender(Renderer renderer) {
-        renderer.setColor(color);
-        Composite oldComposite = renderer.getComposite();
-        renderer.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.15f));
+        // apply an alpha to the provided color
+        int alpha = (int) (255 * 0.15f);
+        var drawColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        renderer.setColor(drawColor);
         renderer.fillRect(getX() * size, getY() * size, size, size);
-        renderer.setComposite(oldComposite);
         renderer.setColor(color.darker().darker());
         renderer.drawRect(getX() * size, getY() * size, size, size);
 

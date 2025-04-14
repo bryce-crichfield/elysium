@@ -10,6 +10,11 @@ public class AwtFontInfo implements FontInfo {
     private final FontMetrics fontMetrics;
 
     @Override
+    public int getLeading() {
+        return fontMetrics.getLeading();
+    }
+
+    @Override
     public int stringWidth(String text) {
         return fontMetrics.stringWidth(text);
     }

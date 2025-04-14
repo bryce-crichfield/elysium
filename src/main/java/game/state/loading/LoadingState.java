@@ -7,6 +7,7 @@ import game.audio.AudioStore;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.platform.Renderer;
+import game.platform.gl.GlFrameBuffer;
 import game.platform.gl.GlTransform;
 import game.state.GameState;
 import game.state.battle.BattleState;
@@ -90,5 +91,26 @@ public class LoadingState extends GameState {
     @Override
     public void onRender(Renderer renderer) {
         container.render(renderer);
+
+//        var frameBuffer = new GlFrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+//        var r = frameBuffer.createRenderer();
+//        // draw black and white checkers
+//        r.setColor(Color.BLACK);
+//        for (int i = 0; i < Game.SCREEN_WIDTH; i += 10) {
+//            for (int j = 0; j < Game.SCREEN_HEIGHT; j += 10) {
+//                // determine the color based on the position
+//                if ((i / 10 + j / 10) % 2 == 0) {
+//                    r.setColor(Color.WHITE);
+//                } else {
+//                    r.setColor(Color.BLACK);
+//                }
+//                r.fillRect(i, j, 10, 10);
+//            }
+//        }
+//
+//        r.dispose();
+//        frameBuffer.unbind();
+//        renderer.drawFrameBuffer(frameBuffer, 0, 0, 400, 400);
     }
+
 }

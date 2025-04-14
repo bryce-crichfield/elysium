@@ -63,7 +63,7 @@ public class TitleState extends GameState {
         // New Game button
         container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "New Game", () -> {
             System.out.println("New game started");
-            var transition = Transitions.pixelate(Duration.ofMillis(500), 32, true);
+            var transition = Transitions.pixelate(Duration.ofMillis(2000), 32, true);
             game.pushState(BattleState::new, transition);
 //            this.game.pushState(BattleState::new, Transitions.fade(Duration.ofMillis(500), Color.BLACK, Easing.easeIn()));
         }));
