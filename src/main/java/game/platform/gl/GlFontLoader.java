@@ -1,203 +1,158 @@
 package game.platform.gl;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBTTFontinfo;
-import org.lwjgl.stb.STBTTPackContext;
-import org.lwjgl.stb.STBTTPackedchar;
-import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URL;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.stb.STBTruetype.*;
-import static org.lwjgl.system.MemoryStack.stackPush;
-
-// Separate loader class for font creation
 public class GlFontLoader {
-    // Create a font from a TTF file loaded as a resource
-    public static GlFontInfo loadFont(String fontPath, int fontSize) {
-        ByteBuffer ttfData = loadFontData(fontPath);
-        if (ttfData == null) {
-            System.err.println("Failed to load font data from: " + fontPath);
-            return createFallbackFont(fontSize);
+
+    /**
+     * Loads a TrueType font file into memory
+     * @param fontName Font name (file name without extension)
+     * @return ByteBuffer containing the font data
+     */
+    public static ByteBuffer loadFont(String fontName) {
+        // Make sure the font name has .ttf extension
+        String fontPath = fontName;
+        if (!fontPath.toLowerCase().endsWith(".ttf")) {
+            fontPath = fontPath + ".ttf";
         }
 
-        return createFont(ttfData, fontSize);
-    }
+        System.out.println("Attempting to load font: " + fontPath);
 
-    // Create a font from font data
-    public static GlFontInfo createFont(ByteBuffer ttfData, int fontSize) {
-        // Validate font data
-        if (ttfData == null || ttfData.capacity() == 0) {
-            System.err.println("Invalid font data");
-            return createFallbackFont(fontSize);
-        }
-
-        // Reset buffer position
-        ttfData.position(0);
-
-        // Check if this is actually a valid font
-        try (MemoryStack stack = stackPush()) {
-            STBTTFontinfo info = STBTTFontinfo.malloc(stack);
-            if (!stbtt_InitFont(info, ttfData)) {
-                System.err.println("Not a valid font file");
-                return createFallbackFont(fontSize);
-            }
-        } catch (Exception e) {
-            System.err.println("Error validating font: " + e.getMessage());
-            return createFallbackFont(fontSize);
-        }
-
-        // Font is valid, create the bitmap
-        int bitmapW = 512;
-        int bitmapH = 512;
-        ByteBuffer bitmap = null;
-        STBTTPackedchar.Buffer charData = null;
-        int textureId = 0;
-
+        // Try multiple ways to load the font
         try {
-            // Allocate bitmap
-            bitmap = BufferUtils.createByteBuffer(bitmapW * bitmapH);
-            // Allocate character data for ASCII 32-127
-            charData = STBTTPackedchar.malloc(96);
+            // 1. Try direct file access first
+            Path path = Paths.get(fontPath);
+            if (Files.exists(path)) {
+                System.out.println("Loading from file system: " + path.toAbsolutePath());
+                byte[] fontData = Files.readAllBytes(path);
+                ByteBuffer fontBuffer = BufferUtils.createByteBuffer(fontData.length);
+                fontBuffer.put(fontData);
+                fontBuffer.flip();
+                return fontBuffer;
+            }
 
-            // Reset buffer position again
-            ttfData.position(0);
+            // 2. Try from resources with this class's classloader
+            InputStream inputStream = GlFontLoader.class.getResourceAsStream("/" + fontPath);
+            if (inputStream != null) {
+                System.out.println("Loading from class resources: /" + fontPath);
+                return readToByteBuffer(inputStream);
+            }
 
-            try (STBTTPackContext pc = STBTTPackContext.malloc()) {
-                if (!stbtt_PackBegin(pc, bitmap, bitmapW, bitmapH, 0, 1, 0L)) {
-                    throw new RuntimeException("Failed to initialize font packing");
+            // 3. Try from resources without leading slash
+            inputStream = GlFontLoader.class.getResourceAsStream(fontPath);
+            if (inputStream != null) {
+                System.out.println("Loading from class resources (no leading slash): " + fontPath);
+                return readToByteBuffer(inputStream);
+            }
+
+            // 4. Try with Thread's context classloader
+            inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fontPath);
+            if (inputStream != null) {
+                System.out.println("Loading from thread context classloader: " + fontPath);
+                return readToByteBuffer(inputStream);
+            }
+
+            // 5. Try with system classloader
+            inputStream = ClassLoader.getSystemResourceAsStream(fontPath);
+            if (inputStream != null) {
+                System.out.println("Loading from system classloader: " + fontPath);
+                return readToByteBuffer(inputStream);
+            }
+
+            // 6. Try to find URL and convert to file
+            URL url = GlFontLoader.class.getResource("/" + fontPath);
+            if (url != null) {
+                try {
+                    File file = new File(url.toURI());
+                    if (file.exists()) {
+                        System.out.println("Loading from URL: " + url);
+                        try (FileInputStream fis = new FileInputStream(file);
+                             FileChannel channel = fis.getChannel()) {
+
+                            ByteBuffer buffer = BufferUtils.createByteBuffer((int)channel.size());
+                            channel.read(buffer);
+                            buffer.flip();
+                            return buffer;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error loading from URL: " + e.getMessage());
                 }
+            }
 
-                stbtt_PackSetOversampling(pc, 2, 2);
+            // If we get here, we failed to load the font
+            System.err.println("Failed to load font: " + fontPath);
+            System.err.println("Looked in:");
+            System.err.println("  - " + Paths.get(fontPath).toAbsolutePath());
+            System.err.println("  - classpath:/" + fontPath);
+            System.err.println("  - classpath:" + fontPath);
 
-                if (!stbtt_PackFontRange(pc, ttfData, 0, fontSize, 32, charData)) {
-                    throw new RuntimeException("Failed to pack font");
+            // Show what's actually in the resources
+            URL rootURL = GlFontLoader.class.getResource("/");
+            if (rootURL != null) {
+                System.out.println("Root resources URL: " + rootURL);
+                try {
+                    File dir = new File(rootURL.toURI());
+                    System.out.println("Files in resources:");
+                    listFilesRecursively(dir, "  ");
+                } catch (Exception e) {
+                    System.out.println("Error listing resources: " + e.getMessage());
                 }
-
-                stbtt_PackEnd(pc);
+            } else {
+                System.out.println("Couldn't access root resources URL");
             }
 
-            // Create texture
-            textureId = glGenTextures();
-            // In GlFontLoader.createFont()
-            glBindTexture(GL_TEXTURE_2D, textureId);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmapW, bitmapH, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            throw new RuntimeException("Font file not found: " + fontPath);
 
-            // Calculate metrics
-            float scale = 0;
-            float ascent = 0;
-            float descent = 0;
-            float lineGap = 0;
-
-            ttfData.position(0);
-            try (MemoryStack stack = stackPush()) {
-                STBTTFontinfo info = STBTTFontinfo.malloc(stack);
-                stbtt_InitFont(info, ttfData);
-
-                scale = stbtt_ScaleForPixelHeight(info, fontSize);
-
-                IntBuffer ascentBuffer = stack.mallocInt(1);
-                IntBuffer descentBuffer = stack.mallocInt(1);
-                IntBuffer lineGapBuffer = stack.mallocInt(1);
-
-                stbtt_GetFontVMetrics(info, ascentBuffer, descentBuffer, lineGapBuffer);
-
-                ascent = ascentBuffer.get(0) * scale;
-                descent = descentBuffer.get(0) * scale;
-                lineGap = lineGapBuffer.get(0) * scale;
-            }
-
-            return new GlFontInfo(textureId, charData, bitmapW, bitmapH, scale, ascent, descent, lineGap);
-
-        } catch (Exception e) {
-            System.err.println("Error creating font: " + e.getMessage());
-            e.printStackTrace();
-
-            // Clean up resources on failure
-            if (charData != null) {
-                charData.free();
-            }
-            if (textureId != 0) {
-                glDeleteTextures(textureId);
-            }
-
-            return createFallbackFont(fontSize);
-        }
-    }
-
-    // Create a simple fallback font when loading fails
-    private static GlFontInfo createFallbackFont(int fontSize) {
-        System.out.println("Creating fallback font");
-
-        int bitmapW = 128;
-        int bitmapH = 128;
-        ByteBuffer bitmap = BufferUtils.createByteBuffer(bitmapW * bitmapH);
-
-        // Fill with a basic pattern - simple box for each character
-        for (int y = 0; y < bitmapH; y++) {
-            for (int x = 0; x < bitmapW; x++) {
-                // Create border outline
-                boolean isBorder = x < 2 || y < 2 || x >= bitmapW - 2 || y >= bitmapH - 2;
-                bitmap.put(y * bitmapW + x, isBorder ? (byte) 0xFF : 0);
-            }
-        }
-
-        // Create texture
-        int textureId = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmapW, bitmapH, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        // Create simple charData
-        STBTTPackedchar.Buffer charData = STBTTPackedchar.malloc(96);
-
-        // Initialize with simple glyph data
-        for (int i = 0; i < 96; i++) {
-            charData.get(i)
-                    .xoff(0).yoff(0)
-                    .xoff2(1).yoff2(1)
-                    .x0((short)2).y0((short)2)
-                    .x1((short)(bitmapW - 2)).y1((short)(bitmapH - 2))
-                    .xadvance(fontSize * 0.6f);
-        }
-
-        // Use simple metrics
-        float scale = fontSize / 16.0f;
-        float ascent = 12 * scale;
-        float descent = 4 * scale;
-        float lineGap = 2 * scale;
-
-        return new GlFontInfo(textureId, charData, bitmapW, bitmapH, scale, ascent, descent, lineGap);
-    }
-
-    // Load font data from a resource path
-    private static ByteBuffer loadFontData(String fontPath) {
-        try (InputStream is = GlFontLoader.class.getResourceAsStream(fontPath)) {
-            if (is == null) {
-                System.err.println("Font resource not found: " + fontPath);
-                return null;
-            }
-
-            // Read all bytes
-            byte[] data = is.readAllBytes();
-            ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
-            buffer.put(data);
-            buffer.flip();
-            return buffer;
         } catch (IOException e) {
-            System.err.println("Error loading font: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Error loading font: " + fontPath, e);
+        }
+    }
+
+    private static ByteBuffer readToByteBuffer(InputStream inputStream) throws IOException {
+        ReadableByteChannel channel = Channels.newChannel(inputStream);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(8192);
+
+        while (true) {
+            int bytes = channel.read(buffer);
+            if (bytes == -1) {
+                break;
+            }
+            if (buffer.remaining() == 0) {
+                ByteBuffer newBuffer = BufferUtils.createByteBuffer(buffer.capacity() * 2);
+                buffer.flip();
+                newBuffer.put(buffer);
+                buffer = newBuffer;
+            }
+        }
+
+        buffer.flip();
+        return buffer;
+    }
+
+    private static void listFilesRecursively(File dir, String indent) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                System.out.println(indent + file.getName());
+                if (file.isDirectory()) {
+                    listFilesRecursively(file, indent + "  ");
+                }
+            }
         }
     }
 }

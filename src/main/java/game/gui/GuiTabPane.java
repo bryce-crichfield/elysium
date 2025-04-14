@@ -18,7 +18,7 @@ public class GuiTabPane extends GuiContainer {
     private final Color tabBackgroundColor = new Color(50, 50, 80, 200);
     private final Color activeTabBackgroundColor = new Color(70, 70, 120, 220);
     private final Color tabTextColor = Color.WHITE;
-    private final Font tabFont = new Font("Arial", Font.BOLD, 16);
+    private final Font tabFont = new Font("/fonts/arial", Font.BOLD, 16);
 
     public GuiTabPane(int x, int y, int width, int height) {
         super(x, y, width, height);

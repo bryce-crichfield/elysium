@@ -35,7 +35,7 @@ public class OptionsState extends GameState {
         // Create title
         GuiLabel titleLabel = new GuiLabel((Game.SCREEN_WIDTH - 200) / 2, 50, "OPTIONS");
 //        titleLabel.setTextColor(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setFont(new Font("/fonts/arial", Font.BOLD, 36));
         mainContainer.addChild(titleLabel);
 
         // Create tab pane
@@ -179,7 +179,7 @@ public class OptionsState extends GameState {
                 g.fillRect(0, 0, getWidth(), getHeight());
 
                 g.setColor(Color.WHITE);
-                Font buttonFont = new Font("Arial", Font.BOLD, 16);
+                Font buttonFont = new Font("/fonts/arial", Font.BOLD, 16);
                 g.setFont(buttonFont);
 
                 var metrics = g.getFontMetrics();

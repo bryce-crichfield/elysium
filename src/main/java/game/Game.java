@@ -18,8 +18,8 @@ import java.awt.image.BufferedImage;
 import java.time.Duration;
 
 public final class Game {
-    public static final int SCREEN_WIDTH = 480 * 2;
-    public static final int SCREEN_HEIGHT = 320 * 2;
+    public static final int SCREEN_WIDTH = 480 * 3;
+    public static final int SCREEN_HEIGHT = 320 * 3;
     public static final int TILE_SIZE = 32;
 
     @Getter

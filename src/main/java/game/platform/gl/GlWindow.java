@@ -194,6 +194,21 @@ public class GlWindow extends Window {
 
         // Create renderer and render the game
         GlRenderer renderer = new GlRenderer(mainFramebuffer);
+        // fill with dark gray
+//        renderer.setColor(Color.GRAY);
+//        renderer.fillRect(0, 0, bufferWidth, bufferHeight);
+//        // draw green rows every 100 pixels in vertical
+//        for (int i = 0; i < bufferHeight; i += 100) {
+//            renderer.setColor(Color.GREEN);
+//            renderer.fillRect(0, i, bufferWidth, 1);
+//        }
+//        // draw blue columns every 100 pixels in horizontal
+//        for (int i = 0; i < bufferWidth; i += 100) {
+//            renderer.setColor(Color.BLUE);
+//            renderer.fillRect(i, 0, 1, bufferHeight);
+//        }
+//        renderer.setColor(Color.RED);
+//        renderer.drawString("Hello World", 100,100);
         game.render(renderer);
         renderer.dispose();
 

@@ -127,9 +127,9 @@ public class AudioAssetLoader extends AssetLoader<String, AudioSample> {
 
             // Check if conversion is needed
             if (!isFormatCompatible(sourceFormat, targetFormat)) {
-                System.out.println("Converting audio format for: " + file.getName());
-                System.out.println("Original format: " + sourceFormat);
-                System.out.println("Target format: " + targetFormat);
+//                System.out.println("Converting audio format for: " + file.getName());
+//                System.out.println("Original format: " + sourceFormat);
+//                System.out.println("Target format: " + targetFormat);
 
                 // Convert to target format
                 AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, originalStream);
@@ -147,8 +147,8 @@ public class AudioAssetLoader extends AssetLoader<String, AudioSample> {
             audioStore.store(key, sample);
             successfullyLoaded.incrementAndGet();
 
-            System.out.println("Loaded: " + key + " (" +
-                    processedCount + "/" + fileCount + ")");
+//            System.out.println("Loaded: " + key + " (" +
+//                    processedCount + "/" + fileCount + ")");
         } catch (UnsupportedAudioFileException | IOException e) {
             failedToLoad.incrementAndGet();
             String errorMsg = "Failed to load: " + key + " - " + e.getMessage();

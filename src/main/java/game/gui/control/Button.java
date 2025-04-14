@@ -9,7 +9,7 @@
 //
 //public class Button extends GuiComponent {
 //    private String text;
-//    private Font font = new Font("Arial", Font.PLAIN, 14);
+//    private Font font = new Font("arial", Font.PLAIN, 14);
 //    private Color textColor = Color.WHITE;
 //    private Color hoverColor = new Color(255, 0, 0);
 //    private Color normalColor = new Color(70, 70, 70);

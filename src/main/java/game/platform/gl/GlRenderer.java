@@ -5,6 +5,7 @@ import game.platform.FrameBuffer;
 import game.platform.Renderer;
 import game.platform.Transform;
 import org.joml.Vector2f;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
@@ -55,7 +56,7 @@ public class GlRenderer implements Renderer {
 
         // Initialize the font renderer
         fontRenderer = new GlFontRenderer();
-        currentFont = new Font("Arial", Font.PLAIN, 12);
+        currentFont = new Font("/fonts/arial", Font.PLAIN, 12);
 
         // Enable blending for transparency
         glEnable(GL_BLEND);
@@ -549,55 +550,56 @@ public class GlRenderer implements Renderer {
         drawFrameBuffer(buffer, i, i1, buffer.getWidth(), buffer.getHeight());
     }
 
+    private final GlFontRenderer renderer = new GlFontRenderer();
+
     @Override
     public void setFont(Font font) {
         currentFont = font;
+        fontRenderer.setFont(font.getName(), font.getSize());
 //        fontRenderer.setFont(font);
     }
 
     @Override
     public void drawString(String str, int x, int y) {
-        // Apply transformation
-        pushTransform(GlTransform.fromScreenSpace(bufferWidth, bufferHeight));
+        // Ensure we're drawing to our framebuffer
+        ensureCorrectFboBound();
 
-        // Get the current coordinates after transformation
-//        var point = transformStack.peek().transform(new Vector2f(x, y));
-//        fontRenderer.drawString(str, (int)point.x, (int)point.y, color);
+        // Calculate the transformed position
+        Vector2f originalPos = new Vector2f(x, y);
+        Vector2f transformedPos = originalPos;
 
-        popTransform();
+        // Apply the transform stack if it's not empty
+        if (!transformStack.isEmpty()) {
+            transformedPos = transformStack.peek().transform(originalPos);
+        }
+
+        // Debug info
+        System.out.println("Drawing text: '" + str + "' at original: " + x + ", " + y +
+                " transformed: " + transformedPos.x + ", " + transformedPos.y);
+
+        // Setup direct ortho projection for text rendering
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, bufferWidth, bufferHeight, 0, -1, 1);
+
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+
+        // Draw text at the transformed position
+        fontRenderer.drawString(str, (int)transformedPos.x, (int)transformedPos.y, color);
+
+        // Restore matrices
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
     }
 
     @Override
     public FontInfo getFontMetrics() {
-        // create anon implementation of FontInfo
-        return new FontInfo() {
-            @Override
-            public int getLeading() {
-                return 0;
-            }
-
-            @Override
-            public int stringWidth(String text) {
-                return 0;
-            }
-
-
-            public int getAscent() {
-                return 0;
-            }
-
-            @Override
-            public int getDescent() {
-                return 0;
-            }
-
-            @Override
-            public int getHeight() {
-                return 0;
-            }
-
-        };
-//        return fontRenderer.getFontMetrics();
+        return fontRenderer.getFontInfo();
     }
 
     @Override

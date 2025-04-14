@@ -18,7 +18,7 @@ public class GuiLabel extends GuiComponent {
         super(0, 0, width, height);
         this.text = text;
         this.color = Color.WHITE;
-        this.font = new Font("Arial", Font.PLAIN, 12);
+        this.font = new Font("/fonts/arial", Font.PLAIN, 12);
     }
 
 //    public void insert(char c, int index) {

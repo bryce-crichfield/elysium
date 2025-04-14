@@ -92,6 +92,11 @@ public class LoadingState extends GameState {
     public void onRender(Renderer renderer) {
         container.render(renderer);
 
+        // print the contents of the resources root folder
+        renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
+        renderer.setColor(Color.WHITE);
+        renderer.drawString("Loading...", Game.SCREEN_WIDTH / 2 - 50, Game.SCREEN_HEIGHT / 2 - 50);
+
 //        var frameBuffer = new GlFrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 //        var r = frameBuffer.createRenderer();
 //        // draw black and white checkers
