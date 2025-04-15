@@ -53,7 +53,7 @@ public class TextureLoader extends AssetLoader<String, Texture> {
         int channels = channelsBuffer.get(0);
 
         // Create the texture
-        Texture texture = new Texture(imageData, width, height, channels, () -> {
+        Texture texture = new Texture(key, imageData, width, height, channels, () -> {
             // Free the image data when the texture is disposed
             STBImage.stbi_image_free(imageData);
         });

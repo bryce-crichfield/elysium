@@ -24,9 +24,9 @@ public class Pathfinder {
         }
 
         float distance = Util.distance(start.getX(), start.getY(), end.getX(), end.getY());
-        if (distance > entity.getVitals().movementPoints) {
-            return List.of();
-        }
+//        if (distance > entity.getVitals().movementPoints) {
+//            return List.of();
+//        }
 
         open.clear();
         closed.clear();

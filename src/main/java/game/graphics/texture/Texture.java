@@ -9,6 +9,8 @@ import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class Texture {
+    @Getter
+    private String name;
     // Getters
     @Getter
     private int id;
@@ -23,7 +25,8 @@ public class Texture {
     private Optional<ByteBuffer> imageData;
     private Optional<Runnable> freeBuffer;
 
-    public Texture(ByteBuffer imageData, int width, int height, int channels, Runnable freeBuffer) {
+    public Texture(String name, ByteBuffer imageData, int width, int height, int channels, Runnable freeBuffer) {
+        this.name = name;
         this.width = width;
         this.height = height;
         this.channels = channels;

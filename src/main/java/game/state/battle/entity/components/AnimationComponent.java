@@ -1,5 +1,7 @@
 package game.state.battle.entity.components;
 
+import com.google.gson.JsonObject;
+import game.state.battle.entity.component.Component;
 import game.state.battle.world.Tile;
 import game.util.Util;
 
@@ -8,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class AnimationComponent {
+public class AnimationComponent extends Component {
     //    private final Entity entity;
     private final PositionComponent position;
     boolean animationEnabled = false;
@@ -93,4 +95,5 @@ public class AnimationComponent {
     public float getY() {
         return animationY;
     }
+
 }

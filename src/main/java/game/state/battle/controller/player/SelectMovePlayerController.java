@@ -50,13 +50,13 @@ public class SelectMovePlayerController extends PlayerController {
         Util.ensure(state.getSelection().isPresent(), "No actor selected in the select move mode");
 
         // The actor has now moved and can no longer move this turn, it is waiting for the next turn
-        if (state.getSelection().get().getVitals().movementPoints <= 0) {
-            state.getSelection().get().setWaiting(true);
-            state.getSelection().clear();
-            state.transitionTo(ObserverPlayerController::new);
-        } else {
-            state.transitionTo(SelectActionPlayerController::new);
-        }
+//        if (state.getSelection().get().getVitals().movementPoints <= 0) {
+//            state.getSelection().get().setWaiting(true);
+//            state.getSelection().clear();
+//            state.transitionTo(ObserverPlayerController::new);
+//        } else {
+//            state.transitionTo(SelectActionPlayerController::new);
+//        }
     }
 
     private void onCursorMoved(Cursor cursor) {
@@ -94,7 +94,8 @@ public class SelectMovePlayerController extends PlayerController {
 
     @Override
     public void onWorldRender(Renderer renderer) {
-        int distance = state.getSelection().get().getVitals().movementPoints;
+//        int distance = state.getSelection().get().getVitals().movementPoints;
+        int distance = 5;
         int actorX = (int) state.getSelection().get().getX();
         int actorY = (int) state.getSelection().get().getY();
         List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);

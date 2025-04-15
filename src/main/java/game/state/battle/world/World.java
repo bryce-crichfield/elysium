@@ -1,13 +1,19 @@
 package game.state.battle.world;
 
+import com.google.gson.JsonObject;
 import game.graphics.Renderer;
 import game.graphics.texture.SpriteRenderer;
+import game.graphics.texture.TextureStore;
+import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
-import game.state.battle.entity.capabilities.HasSprite;
+import game.state.battle.entity.EntitySerializer;
+import game.state.battle.entity.components.PositionComponent;
+import game.state.battle.entity.components.SpriteComponent;
 import game.util.Util;
 import lombok.Getter;
 
 import java.awt.*;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +26,7 @@ public class World {
     @Getter
     private final int height;
     private final Tile[][] tiles;
-    private final List<Entity> entities = new ArrayList<>();
+    private List<Entity> entities = new ArrayList<>();
 
     public World(int width, int height) {
         this.width = width;
@@ -36,13 +42,21 @@ public class World {
             }
         }
 
-        entities.add(new Entity(3, 0));
-        entities.add(new Entity(5, 0));
 
-        Entity enemy = new Entity(4, 0);
-        enemy.setPlayer(false);
+        var entity = new Entity("test");
+        var position = new PositionComponent(0, 0);
+        entity.addComponent(position);
+        var texture = TextureStore.getInstance().getAssets("sprites/test");
+        entity.addComponent(new SpriteComponent(position, texture));
 
-        entities.add(enemy);
+        entities.add(entity);
+
+        try {
+            EntitySerializer.saveScene("test.json", entities, new JsonObject());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void wall(int x, int y) {
@@ -64,8 +78,8 @@ public class World {
 
         spriteRenderer.begin();
         for (Entity entity : entities) {
-            if (entity instanceof HasSprite) {
-                var spriteComponent = ((HasSprite) entity).getSprite();
+            if (entity.hasComponent(SpriteComponent.class)) {
+                var spriteComponent = entity.getComponent(SpriteComponent.class);
                 spriteComponent.onRender(spriteRenderer);
             }
         }

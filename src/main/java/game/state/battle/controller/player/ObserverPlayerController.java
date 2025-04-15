@@ -53,14 +53,14 @@ public class ObserverPlayerController extends PlayerController {
             return;
         }
 
-        if (hovered.get().isPlayer()) {
+//        if (hovered.get().isPlayer()) {
             if (hovered.get().isWaiting())
                 return;
             state.getSelection().select(hovered.get());
             state.transitionTo(SelectMovePlayerController::new);
 
 //            ActorSelected.event.fire(actor.get());
-        }
+//        }
     }
 
     private void forceHoveredActorStats() {
