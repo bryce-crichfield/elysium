@@ -5,7 +5,6 @@ import game.platform.Renderer;
 import game.util.Easing;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.time.Duration;
 
 public class FadeTransition extends Transition {

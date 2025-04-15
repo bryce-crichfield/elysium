@@ -3,7 +3,6 @@ package game.state.overworld.entity;
 import game.platform.Renderer;
 import game.util.Util;
 
-import java.awt.*;
 import java.time.Duration;
 
 public abstract class Entity {

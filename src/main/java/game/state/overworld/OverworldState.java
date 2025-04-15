@@ -10,8 +10,6 @@ import game.state.overworld.entity.Tile;
 import game.util.Camera;
 import game.util.Util;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,14 +74,11 @@ public class OverworldState extends GameState {
 
     @Override
     public void onRender(Renderer renderer) {
-        // FIXME: temporarily disabled transform composition
-        var restore = renderer.getTransform();
-//        AffineTransform cameraTransform = camera.getTransform();
-//        renderer.transform(cameraTransform);
-
+        // FIXME: temporarily disabled apply composition
+        var cameraTransform = camera.getTransform();
+        renderer.pushTransform(cameraTransform);
         frames.get(currentFrame).onRender(renderer);
         player.onRender(renderer);
-
-        renderer.setTransform(restore);
+        renderer.popTransform();
     }
 }

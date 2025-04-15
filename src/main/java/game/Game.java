@@ -1,25 +1,21 @@
 package game;
 
 import game.audio.Audio;
-import game.audio.AudioEngine;
 import game.input.MouseEvent;
 import game.graphics.postprocessing.EffectsManager;
 import game.graphics.postprocessing.VignetteEffect;
 import game.input.Keyboard;
 import game.input.Mouse;
-import game.platform.FrameBuffer;
 import game.platform.Renderer;
 import game.state.GameStateManager;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.time.Duration;
 
 public final class Game {
-    public static final int SCREEN_WIDTH = 480 * 3;
-    public static final int SCREEN_HEIGHT = 320 * 3;
+    public static final int SCREEN_WIDTH = 480 * 2;
+    public static final int SCREEN_HEIGHT = 320 * 2;
     public static final int TILE_SIZE = 32;
 
     @Getter

@@ -2,7 +2,6 @@ package game.graphics.background;
 
 import game.platform.Renderer;
 
-import java.awt.*;
 import java.time.Duration;
 
 public abstract class Background {

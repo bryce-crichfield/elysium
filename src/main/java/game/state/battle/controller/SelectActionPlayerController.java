@@ -7,7 +7,6 @@ import game.state.battle.BattleState;
 import game.state.battle.event.ActorHovered;
 import game.state.battle.model.Actor;
 
-import java.awt.*;
 import java.time.Duration;
 
 public class SelectActionPlayerController extends PlayerController {

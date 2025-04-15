@@ -39,8 +39,8 @@ public class GuiLabel extends GuiComponent {
     protected void onRender(Renderer g) {
         g.setColor(color);
         g.setFont(font);
-        var metrics = g.getFontMetrics(font);
-        int textWidth = metrics.stringWidth(text);
+        var metrics = g.getFontInfo(font);
+        int textWidth = metrics.getStringWidth(text);
         int textHeight = metrics.getHeight();
         g.drawString(text, (width - textWidth) / 2, (height + textHeight) / 2);
     }

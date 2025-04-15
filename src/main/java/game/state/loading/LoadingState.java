@@ -3,14 +3,10 @@ package game.state.loading;
 import game.Game;
 import game.asset.AssetLoader;
 import game.audio.AudioAssetLoader;
-import game.audio.AudioStore;
 import game.gui.GuiComponent;
-import game.gui.GuiContainer;
+import game.platform.LinearGradientPaint;
 import game.platform.Renderer;
-import game.platform.gl.GlFrameBuffer;
-import game.platform.gl.GlTransform;
 import game.state.GameState;
-import game.state.battle.BattleState;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -22,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class LoadingState extends GameState {
     private final Queue<AssetLoader> loadQueue = new ConcurrentLinkedQueue<>();
@@ -90,32 +84,23 @@ public class LoadingState extends GameState {
 
     @Override
     public void onRender(Renderer renderer) {
-        container.render(renderer);
+//        var gradient = new LinearGradientPaint(
+//                0, 0,
+//                Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
+//                new Color(255, 0, 0, 255),
+//                new Color(0, 42, 255, 255)
+//        );
+//
+//        renderer.setPaint(gradient);
+//        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
-        // print the contents of the resources root folder
+
+        container.render(renderer);
+//
+//        // print the contents of the resources root folder
         renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
         renderer.setColor(Color.WHITE);
         renderer.drawString("Loading...", Game.SCREEN_WIDTH / 2 - 50, Game.SCREEN_HEIGHT / 2 - 50);
-
-//        var frameBuffer = new GlFrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
-//        var r = frameBuffer.createRenderer();
-//        // draw black and white checkers
-//        r.setColor(Color.BLACK);
-//        for (int i = 0; i < Game.SCREEN_WIDTH; i += 10) {
-//            for (int j = 0; j < Game.SCREEN_HEIGHT; j += 10) {
-//                // determine the color based on the position
-//                if ((i / 10 + j / 10) % 2 == 0) {
-//                    r.setColor(Color.WHITE);
-//                } else {
-//                    r.setColor(Color.BLACK);
-//                }
-//                r.fillRect(i, j, 10, 10);
-//            }
-//        }
-//
-//        r.dispose();
-//        frameBuffer.unbind();
-//        renderer.drawFrameBuffer(frameBuffer, 0, 0, 400, 400);
     }
 
 }

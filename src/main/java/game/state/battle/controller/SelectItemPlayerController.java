@@ -5,7 +5,6 @@ package game.state.battle.controller;
 import game.platform.Renderer;
 import game.state.battle.BattleState;
 
-import java.awt.*;
 import java.time.Duration;
 
 public class SelectItemPlayerController extends PlayerController {

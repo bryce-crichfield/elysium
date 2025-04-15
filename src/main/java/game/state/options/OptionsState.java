@@ -182,8 +182,8 @@ public class OptionsState extends GameState {
                 Font buttonFont = new Font("/fonts/arial", Font.BOLD, 16);
                 g.setFont(buttonFont);
 
-                var metrics = g.getFontMetrics();
-                int textWidth = metrics.stringWidth(text);
+                var metrics = g.getFontInfo();
+                int textWidth = metrics.getStringWidth(text);
                 int textHeight = metrics.getHeight();
 
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);

@@ -3,12 +3,9 @@ package game.state;
 import game.Game;
 import game.platform.FrameBuffer;
 import game.platform.Renderer;
-import game.platform.gl.GlFrameBuffer;
 import game.transition.Transition;
 import game.transition.TransitionFactory;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.Stack;
 
@@ -25,7 +22,7 @@ public class GameStateManager {
 
     // Method to capture the current screen as a source image
     public static FrameBuffer captureScreen(GameState state) {
-        var frameBuffer = new GlFrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        var frameBuffer = new FrameBuffer(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
         var renderer = frameBuffer.createRenderer();
         state.render(renderer);
         frameBuffer.unbind();

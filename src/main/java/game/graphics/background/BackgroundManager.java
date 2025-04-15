@@ -2,7 +2,6 @@ package game.graphics.background;
 
 import game.platform.Renderer;
 
-import java.awt.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

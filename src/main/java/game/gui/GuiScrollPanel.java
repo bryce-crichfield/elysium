@@ -3,10 +3,8 @@ package game.gui;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
-import game.input.Mouse;
 import game.platform.Renderer;
 import game.platform.Transform;
-import game.platform.gl.GlTransform;
 import lombok.Getter;
 
 import java.awt.*;
@@ -75,7 +73,7 @@ public class GuiScrollPanel extends GuiContainer {
         // Push scroll translation
 //        Transform scrollTransform = renderer.getTransform().copy();
 //        scrollTransform.translate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
-        var scrollTransform = GlTransform.createTranslate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
+        var scrollTransform = Transform.createTranslate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
         renderer.pushTransform(scrollTransform);
 
         // Render children
@@ -83,7 +81,7 @@ public class GuiScrollPanel extends GuiContainer {
             child.render(renderer);
         }
 
-        // Pop back to pre-scroll transform
+        // Pop back to pre-scroll apply
         renderer.popTransform();
 
         // Restore clip

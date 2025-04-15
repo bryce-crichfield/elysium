@@ -3,7 +3,7 @@ package game.audio.processor;
 import javax.sound.sampled.AudioFormat;
 
 public class AudioDelay extends AudioProcessor {
-    private AudioParameter feedback; // 0.0 to 1.0
+    private final AudioParameter feedback; // 0.0 to 1.0
     private final int delaySamples;
     private final short[] delayBuffer;
     private int writePos = 0;

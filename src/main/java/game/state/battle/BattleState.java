@@ -2,11 +2,9 @@ package game.state.battle;
 
 import game.Game;
 import game.graphics.background.StarBackground;
-import game.input.Mouse;
 import game.input.MouseEvent;
 import game.platform.Renderer;
-import game.platform.gl.GlRenderer;
-import game.platform.gl.GlTransform;
+import game.platform.Transform;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
@@ -108,7 +106,7 @@ public class BattleState extends GameState {
         // Render the star background
 
         // Get the camera worldTransform and render the world
-        GlTransform worldTransform = (GlTransform) camera.getTransform();
+        Transform worldTransform = camera.getTransform();
         renderer.pushTransform(worldTransform);
         world.onRender(renderer);
         currentController.ifPresent(c -> c.onWorldRender(renderer));
@@ -119,7 +117,6 @@ public class BattleState extends GameState {
 //        renderer.pushTransform(guiTransform);
 //        currentController.ifPresent(c -> c.onGuiRender(renderer));
 //        renderer.popTransform();
-
     }
 
     /**

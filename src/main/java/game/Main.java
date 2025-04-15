@@ -2,8 +2,6 @@ package game;
 
 import game.platform.ErrorDialog;
 import game.platform.Window;
-import game.platform.awt.AwtWindow;
-import game.platform.gl.GlWindow;
 import game.state.loading.LoadingState;
 import game.util.Util;
 
@@ -17,7 +15,7 @@ public enum Main {
 
     public static void main(String[] args) throws Exception {
         Game game = new Game();
-        Window window = new GlWindow(640 * 3, 480 * 3, game);
+        Window window = new Window(640 * 3, 480 * 3, game);
         window.onInit();
 
         try {
@@ -42,14 +40,7 @@ public enum Main {
 
                 if (dtRender > 1f / targetFps) {
                     lastRender = currentTime;
-
-                    Instant renderStart = Instant.now();
-
                     window.onRender(dtUpdate, dtRender);
-                    Instant renderEnd = Instant.now();
-                    Duration renderDuration = Duration.between(renderStart, renderEnd);
-                    // print ms as decimal
-                    System.out.println("Render time: " + renderDuration.toMillis() + " ms");
                 }
             }
         } catch (Exception e) {
@@ -58,11 +49,4 @@ public enum Main {
             window.onClose();
         }
     }
-
-    private static void printDebugInfo(float updateTime, float renderTime) {
-        // Print the ups, fps, update time, and render time
-        System.out.printf("UPS: %.1f, FPS: %.1f, Update Time: %.1f ms, Render Time: %.1f ms%n",
-                1f / updateTime, 1f / renderTime, updateTime * 1000, renderTime * 1000);
-    }
-
 }

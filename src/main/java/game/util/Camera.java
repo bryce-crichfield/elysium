@@ -2,10 +2,6 @@ package game.util;
 
 import game.Game;
 import game.platform.Transform;
-import game.platform.awt.AwtTransform;
-import game.platform.gl.GlTransform;
-
-import java.awt.geom.AffineTransform;
 
 public class Camera {
     Game game;
@@ -45,18 +41,15 @@ public class Camera {
     }
 
     public Transform getTransform() {
-        var transform = new GlTransform();
-        transform.scale(zoom, zoom);
-
-        // center the camera on the screen
+        // Center the camera on the screen
         float screenWidth = Game.SCREEN_WIDTH / zoom;
         float screenHeight = Game.SCREEN_HEIGHT / zoom;
         int cameraX = (int) (x - (screenWidth / 2));
         int cameraY = (int) (y - (screenHeight / 2));
-        transform = (GlTransform) transform.translate(-cameraX, -cameraY);
 
-        // YO IM WHACK AF
-        return transform;
+        return new Transform()
+                .scale(zoom, zoom)
+                .translate(-cameraX, -cameraY);
     }
 
     public int getWorldX(int screenX) {

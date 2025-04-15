@@ -21,8 +21,8 @@ public class Mouse  {
     // State tracking
     private final boolean[] oldButtons;
     private final boolean[] newButtons;
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public Mouse() {
         oldButtons = new boolean[4]; // Buttons are 1-indexed in MouseEvent

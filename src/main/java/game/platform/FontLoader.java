@@ -1,7 +1,6 @@
-package game.platform.gl;
+package game.platform;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
 
-public class GlFontLoader {
+public class FontLoader {
 
     /**
      * Loads a TrueType font file into memory
@@ -46,14 +45,14 @@ public class GlFontLoader {
             }
 
             // 2. Try from resources with this class's classloader
-            InputStream inputStream = GlFontLoader.class.getResourceAsStream("/" + fontPath);
+            InputStream inputStream = FontLoader.class.getResourceAsStream("/" + fontPath);
             if (inputStream != null) {
                 System.out.println("Loading from class resources: /" + fontPath);
                 return readToByteBuffer(inputStream);
             }
 
             // 3. Try from resources without leading slash
-            inputStream = GlFontLoader.class.getResourceAsStream(fontPath);
+            inputStream = FontLoader.class.getResourceAsStream(fontPath);
             if (inputStream != null) {
                 System.out.println("Loading from class resources (no leading slash): " + fontPath);
                 return readToByteBuffer(inputStream);
@@ -74,7 +73,7 @@ public class GlFontLoader {
             }
 
             // 6. Try to find URL and convert to file
-            URL url = GlFontLoader.class.getResource("/" + fontPath);
+            URL url = FontLoader.class.getResource("/" + fontPath);
             if (url != null) {
                 try {
                     File file = new File(url.toURI());
@@ -102,7 +101,7 @@ public class GlFontLoader {
             System.err.println("  - classpath:" + fontPath);
 
             // Show what's actually in the resources
-            URL rootURL = GlFontLoader.class.getResource("/");
+            URL rootURL = FontLoader.class.getResource("/");
             if (rootURL != null) {
                 System.out.println("Root resources URL: " + rootURL);
                 try {

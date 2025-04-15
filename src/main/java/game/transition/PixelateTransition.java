@@ -2,12 +2,8 @@ package game.transition;
 
 import game.platform.FrameBuffer;
 import game.platform.Renderer;
-import game.platform.gl.GlFrameBuffer;
-import game.transition.Transition;
 
 import java.time.Duration;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class PixelateTransition extends Transition {
     private final FrameBuffer sourceImage;

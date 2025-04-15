@@ -5,7 +5,6 @@ import game.event.EventContext;
 import game.platform.Renderer;
 import game.state.battle.BattleState;
 
-import java.awt.*;
 import java.time.Duration;
 
 public abstract class BattleController {

@@ -42,8 +42,8 @@
 //
 //        // Draw text centered in the button
 //        g.setFont(font);
-//        FontMetrics metrics = g.getFontMetrics(font);
-//        int textX = (width - metrics.stringWidth(text)) / 2;
+//        FontMetrics metrics = g.getFontInfo(font);
+//        int textX = (width - metrics.getStringWidth(text)) / 2;
 //        int textY = ((height - metrics.getHeight()) / 2) + metrics.getAscent();
 //
 //        g.setColor(textColor);

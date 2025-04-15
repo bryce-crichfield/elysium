@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public class GuiFocusManager {
     @Getter
-    private static GuiFocusManager instance = new GuiFocusManager();
+    private static final GuiFocusManager instance = new GuiFocusManager();
 
     private GuiComponent focusedComponent = null;
 
