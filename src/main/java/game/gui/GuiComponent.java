@@ -1,12 +1,13 @@
 package game.gui;
 
 import game.gui.input.*;
-import game.input.Mouse;
+import game.input.MouseEvent;
+import game.platform.Renderer;
+import game.platform.Transform;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,21 +39,15 @@ public abstract class GuiComponent {
         this.height = height;
     }
 
-    public void render(Graphics2D g) {
+    public void render(Renderer renderer) {
         if (!visible) return;
 
-        // Save transform state
-        var originalTransform = g.getTransform();
-        g.translate(x, y);
-
-        // Custom rendering in subclasses
-        onRender(g);
-
-        // Restore transform
-        g.setTransform(originalTransform);
+        renderer.pushTransform(Transform.createTranslate(x, y));
+        onRender(renderer);
+        renderer.popTransform();
     }
 
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer renderer) {
     }
 
     // Simple inheritance for updates
@@ -82,11 +77,12 @@ public abstract class GuiComponent {
         boolean isInBounds = containsPoint(localPoint);
 
         // Move the event to local coordinates
-        var e = Mouse.translateEvent(event, localPoint.x, localPoint.y);
+//        var e = Mouse.translateEvent(event, localPoint.x, localPoint.y);
+        var e = event.withPoint(localPoint);
 
         // Check for hover events
-        boolean mouseEntered = e.getID() == MouseEvent.MOUSE_MOVED && (!isHovered && isInBounds);
-        boolean mouseExited = e.getID() == MouseEvent.MOUSE_MOVED && (isHovered && !isInBounds);
+        boolean mouseEntered = e instanceof MouseEvent.Moved && (!isHovered && isInBounds);
+        boolean mouseExited = e instanceof MouseEvent.Moved && (isHovered && !isInBounds);
         isHovered = isInBounds;
 
         if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
@@ -103,7 +99,7 @@ public abstract class GuiComponent {
         if (!isInBounds && !GuiMouseManager.isCapturedComponent(this)) return false;
 
         // Set focus on mouse click
-        if (event.getID() == MouseEvent.MOUSE_PRESSED && isInBounds) {
+        if (e instanceof MouseEvent.Pressed && isInBounds) {
             GuiFocusManager.getInstance().setFocus(this);
         }
 

@@ -2,6 +2,7 @@ package game.state.title;
 
 import game.Game;
 import game.graphics.background.StarBackground;
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiScrollPanel;
@@ -14,6 +15,7 @@ import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.battle.BattleState;
 import game.state.options.OptionsState;
@@ -21,8 +23,6 @@ import game.transition.Transitions;
 import game.util.Easing;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.List;
 
@@ -63,9 +63,8 @@ public class TitleState extends GameState {
         // New Game button
         container.addChild(createMenuButton(centerX - BUTTON_WIDTH / 2, currentY, "New Game", () -> {
             System.out.println("New game started");
-            var transition = Transitions.pixelate(Duration.ofMillis(500), 32, true);
+            var transition = Transitions.fade(Duration.ofMillis(2000), Color.BLACK, Easing.cubicEaseIn());
             game.pushState(BattleState::new, transition);
-//            this.game.pushState(BattleState::new, Transitions.fade(Duration.ofMillis(500), Color.BLACK, Easing.easeIn()));
         }));
         currentY += BUTTON_HEIGHT + BUTTON_SPACING;
 
@@ -89,9 +88,9 @@ public class TitleState extends GameState {
             System.exit(0);
         }));
 
-        container.addChild(createTestScrollPanel( 100, 100));
-        container.addChild(createTestDropdown( 300, 300));
-        container.addChild(createGuiSlider( 500, 500));
+//        container.addChild(createTestScrollPanel( 100, 100));
+//        container.addChild(createTestDropdown( 300, 300));
+//        container.addChild(createGuiSlider( 100, 500));
 
         mainMenu = container;
     }
@@ -128,7 +127,6 @@ public class TitleState extends GameState {
             slider.setMaxValue(100);
             slider.setValue(50); // Initial value
             slider.setOnValueChanged(newValue -> {
-                System.out.println("Slider value changed to: " + newValue);
                 // Update your game/application state here
             });
             container.addChild(slider);
@@ -161,7 +159,7 @@ public class TitleState extends GameState {
             }
 
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 super.onRender(g);
                 g.setColor(hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
                 g.fillRect(0, 0, getWidth(), getHeight());
@@ -169,13 +167,13 @@ public class TitleState extends GameState {
                 border.render(g, getWidth(), getHeight(), 0);
 
                 g.setColor(Color.WHITE);
-                Font buttonFont = new Font("Arial", Font.BOLD, 18);
+                Font buttonFont = new Font("fonts/neuropol", Font.BOLD, 18);
                 g.setFont(buttonFont);
 
-                FontMetrics metrics = g.getFontMetrics();
-                int textWidth = metrics.stringWidth(text);
+                var metrics = g.getFontInfo();
+                int textWidth = metrics.getStringWidth(text);
                 int textHeight = metrics.getHeight();
-
+                System.out.println("Text width: " + textWidth + ", Text height: " + textHeight);
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
             }
         };
@@ -195,13 +193,13 @@ public class TitleState extends GameState {
     public GuiComponent createTitleLabel(int x, int y) {
         var titleLabel = new GuiLabel(100, 50, "ECHOES OF ELYSIUM") {
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 g.setColor(Color.WHITE);
-                Font titleFont = new Font("Arial", Font.BOLD, 48);
+                Font titleFont = new Font("/fonts/ethnocentric", Font.BOLD, 48);
                 g.setFont(titleFont);
 
-                FontMetrics metrics = g.getFontMetrics();
-                int textWidth = metrics.stringWidth(getText());
+                var metrics = g.getFontInfo();
+                int textWidth = metrics.getStringWidth(getText());
 
                 g.drawString(getText(), -textWidth / 2, 0);
             }
@@ -217,7 +215,7 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         mainMenu.processMouseEvent(event);
     }
 
@@ -227,27 +225,27 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseMoved(MouseEvent event) {
+    public void onMouseMoved(MouseEvent.Moved event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseDragged(MouseEvent event) {
+    public void onMouseDragged(MouseEvent.Dragged event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMousePressed(MouseEvent event) {
+    public void onMousePressed(MouseEvent.Pressed event) {
         mainMenu.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseReleased(MouseEvent event) {
+    public void onMouseReleased(MouseEvent.Released event) {
         mainMenu.processMouseEvent(event);
     }
 
@@ -256,7 +254,7 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        mainMenu.render(graphics);
+    public void onRender(Renderer renderer) {
+        mainMenu.render(renderer);
     }
 }

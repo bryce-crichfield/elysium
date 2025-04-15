@@ -1,8 +1,7 @@
 package game.gui.input;
 
 import game.gui.GuiComponent;
-
-import java.awt.event.MouseEvent;
+import game.input.MouseEvent;
 
 public class GuiMouseManager {
     private static GuiComponent capturedComponent = null;
@@ -28,13 +27,13 @@ public class GuiMouseManager {
     }
 
     public static boolean dispatchToCapturedComponent(MouseEvent e) {
-        boolean isCapturedEvent = (e.getID() == MouseEvent.MOUSE_DRAGGED || e.getID() == MouseEvent.MOUSE_RELEASED);
+        boolean isCapturedEvent = (e instanceof MouseEvent.Dragged || e instanceof MouseEvent.Released);
         if (capturedComponent != null && isCapturedEvent) {
             // Send directly to captured component
             capturedComponent.processMouseEvent(e);
 
             // Release capture when mouse is released
-            if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+            if (e instanceof MouseEvent.Released) {
                 releaseMouseCapture();
             }
 

@@ -1,7 +1,7 @@
 package game.transition;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import game.platform.Renderer;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,19 +28,19 @@ public class CompositeTransition extends Transition {
     }
 
     @Override
-    public void render(Graphics2D graphics, int width, int height) {
+    public void render(Renderer graphics, int width, int height) {
         // Create a temporary image to render each layer
-        BufferedImage tempImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D tempGraphics = tempImage.createGraphics();
-
-        // Render each transition to the temporary graphics
-        for (Transition transition : transitions) {
-            transition.render(tempGraphics, width, height);
-        }
-
-        tempGraphics.dispose();
-
-        // Draw the combined result to the main graphics
-        graphics.drawImage(tempImage, 0, 0, null);
+//        BufferedImage tempImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//        Graphics2D tempGraphics = tempImage.createGraphics();
+//
+//        // Render each transition to the temporary graphics
+//        for (Transition transition : transitions) {
+//            transition.render(tempGraphics, width, height);
+//        }
+//
+//        tempGraphics.dispose();
+//
+//        // Draw the combined result to the main graphics
+//        graphics.drawImage(tempImage, 0, 0, null);
     }
 }

@@ -1,9 +1,9 @@
 package game.audio.automation;
 
 public class LinearAudioAutomation implements AudioAutomation {
-    private float startValue;
-    private float endValue;
-    private float duration;  // in seconds
+    private final float startValue;
+    private final float endValue;
+    private final float duration;  // in seconds
 
     public LinearAudioAutomation(float startValue, float endValue, float duration) {
         this.startValue = startValue;

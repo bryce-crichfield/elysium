@@ -1,14 +1,13 @@
 package game.gui;
 
+import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
-import game.input.Mouse;
+import game.platform.Renderer;
+import game.platform.Transform;
 import lombok.Getter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
 
 public class GuiScrollPanel extends GuiContainer {
     protected GuiScrollState scrollState = new GuiScrollState();
@@ -53,96 +52,102 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
-        // Save the original transform and clip
-        AffineTransform scrollTransform = g.getTransform();
-        Shape originalClip = g.getClip();
+    protected void onRender(Renderer renderer) {
+        // Save the original clip
+//        Shape originalClip = renderer.getClip();
 
-        // Create new clip that's the intersection of the existing clip and our viewport
-        Rectangle viewportRect = new Rectangle(0, 0, width, height);
-        // This is critical - must intersect with existing clip
-        g.clip(viewportRect);
+        // Intersect with our viewport to create a new clip
+//        Rectangle viewportRect = new Rectangle(0, 0, width, height);
+//        renderer.clip(viewportRect);
+        renderer.pushClip(0, 0, width, height);
 
         // Render container background
         if (background != null) {
-            background.render(g, width, height, 0);
+            background.render(renderer, width, height, 0);
         }
 
         if (border != null) {
-            border.render(g, width, height, 0);
+            border.render(renderer, width, height, 0);
         }
 
-        // Apply scroll translation
-        g.translate(-scrollState.getScrollXOffset(), -scrollState.getScrollYOffset());
+        // Push scroll translation
+//        Transform scrollTransform = renderer.getTransform().copy();
+//        scrollTransform.translate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
+        var scrollTransform = Transform.createTranslate((int) -scrollState.getScrollXOffset(), (int) -scrollState.getScrollYOffset());
+        renderer.pushTransform(scrollTransform);
 
-        // Render content (not background)
+        // Render children
         for (GuiComponent child : children) {
-            child.render(g);
+            child.render(renderer);
         }
 
-        // Restore transform and clip for scrollbar rendering
-        g.setTransform(scrollTransform);
-        g.setClip(originalClip);
+        // Pop back to pre-scroll apply
+        renderer.popTransform();
+
+        // Restore clip
+        renderer.popClip();
+//        renderer.setClip(originalClip);
 
         // Render scrollbars
-        renderScrollbars(g);
+        renderScrollbars(renderer);
     }
 
-    private void renderScrollbars(Graphics2D g) {
+
+    private void renderScrollbars(Renderer renderer) {
         if (isVerticalBarVisible) {
-            renderVerticalScrollbar(g);
+            renderVerticalScrollbar(renderer);
         }
 
         if (isHorizontalBarVisible) {
-            renderHorizontalScrollbar(g);
+            renderHorizontalScrollbar(renderer);
         }
     }
 
-    private void renderHorizontalScrollbar(Graphics2D g) {
+    private void renderHorizontalScrollbar(Renderer renderer) {
         // Horizontal scrollbar track
         Rectangle trackBounds = scrollState.getHorizontalScrollbarBounds(width, height);
-        g.setColor(new Color(200, 200, 200, 150));
-        g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        renderer.setColor(new Color(200, 200, 200, 150));
+        renderer.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
 
         // Horizontal thumb
         Rectangle thumbBounds = scrollState.getHorizontalThumbBounds(width, height);
         if (thumbBounds != null) {
-            g.setColor(isDraggingHorizontal ?
+            renderer.setColor(isDraggingHorizontal ?
                     new Color(80, 80, 80, 200) :
                     new Color(120, 120, 120, 180));
-            g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
+            renderer.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
 
             // Thumb grip lines
-            g.setColor(new Color(180, 180, 180, 150));
+            renderer.setColor(new Color(180, 180, 180, 150));
             int centerX = thumbBounds.x + thumbBounds.width / 2;
             int lineHeight = thumbBounds.height - 4;
-            g.drawLine(centerX - 3, thumbBounds.y + 2, centerX - 3, thumbBounds.y + 2 + lineHeight);
-            g.drawLine(centerX, thumbBounds.y + 2, centerX, thumbBounds.y + 2 + lineHeight);
-            g.drawLine(centerX + 3, thumbBounds.y + 2, centerX + 3, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX - 3, thumbBounds.y + 2, centerX - 3, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX, thumbBounds.y + 2, centerX, thumbBounds.y + 2 + lineHeight);
+            renderer.drawLine(centerX + 3, thumbBounds.y + 2, centerX + 3, thumbBounds.y + 2 + lineHeight);
         }
     }
 
-    private void renderVerticalScrollbar(Graphics2D g) {
+    private void renderVerticalScrollbar(Renderer renderer) {
         // Vertical scrollbar track
         Rectangle trackBounds = scrollState.getVerticalScrollbarBounds(width, height);
-        g.setColor(new Color(200, 200, 200, 150));
-        g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        renderer.setColor(new Color(200, 200, 200, 150));
+        renderer.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
 
         // Vertical thumb
         Rectangle thumbBounds = scrollState.getVerticalThumbBounds(width, height);
         if (thumbBounds != null) {
-            g.setColor(isDraggingVertical ?
+            renderer.setColor(isDraggingVertical ?
                     new Color(80, 80, 80, 200) :
                     new Color(120, 120, 120, 180));
-            g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
+            renderer.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
 
             // Thumb grip lines
-            g.setColor(new Color(180, 180, 180, 150));
+            renderer.setColor(new Color(180, 180, 180, 150));
             int centerY = thumbBounds.y + thumbBounds.height / 2;
             int lineWidth = thumbBounds.width - 4;
-            g.drawLine(thumbBounds.x + 2, centerY - 3, thumbBounds.x + 2 + lineWidth, centerY - 3);
-            g.drawLine(thumbBounds.x + 2, centerY, thumbBounds.x + 2 + lineWidth, centerY);
-            g.drawLine(thumbBounds.x + 2, centerY + 3, thumbBounds.x + 2 + lineWidth, centerY + 3);
+            renderer.drawLine(thumbBounds.x + 2, centerY - 3, thumbBounds.x + 2 + lineWidth, centerY - 3);
+            renderer.drawLine(thumbBounds.x + 2, centerY, thumbBounds.x + 2 + lineWidth, centerY);
+            renderer.drawLine(thumbBounds.x + 2, centerY + 3, thumbBounds.x + 2 + lineWidth, centerY + 3);
         }
     }
 
@@ -154,8 +159,8 @@ public class GuiScrollPanel extends GuiContainer {
         Point localPoint = transformToLocalSpace(e.getPoint());
         boolean isInBounds = containsPoint(localPoint) || isPointOnScrollbar(localPoint);
 
-        boolean mouseEntered = e.getID() == MouseEvent.MOUSE_MOVED && (!isHovered && isInBounds);
-        boolean mouseExited = e.getID() == MouseEvent.MOUSE_MOVED && (isHovered && !isInBounds);
+        boolean mouseEntered = e instanceof MouseEvent.Moved && (!isHovered && isInBounds);
+        boolean mouseExited = e instanceof MouseEvent.Moved && (isHovered && !isInBounds);
         isHovered = isInBounds;
 
         if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
@@ -174,13 +179,14 @@ public class GuiScrollPanel extends GuiContainer {
         // Check to see if there is a scroll bar interaction (click, release or drag).  If there isn't, but we are hovered
         // return true to ensure we consume the event.
         if (isPointOnScrollbar(localPoint) || GuiMouseManager.isCapturedComponent(this)) {
-            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
+//            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
+            var localEvent = e.withPoint(localPoint);
             return handleScrollbarInteraction(localEvent, localPoint) || isHovered;
         }
 
         // Handle mouse wheel for scrolling
-        if (e.getID() == MouseEvent.MOUSE_WHEEL && e instanceof MouseWheelEvent wheelEvent) {
-            float scrollAmount = wheelEvent.getWheelRotation() * 20;
+        if (e instanceof MouseEvent.WheelMoved wheelMoved) {
+            float scrollAmount = wheelMoved.getWheelRotation() * 20;
             scrollState.scroll(0, scrollAmount);
             return true;
         }
@@ -192,7 +198,8 @@ public class GuiScrollPanel extends GuiContainer {
         );
 
         // Create adjusted event
-        var contentEvent = Mouse.translateEvent(e, contentPoint.x, contentPoint.y);
+//        var contentEvent = Mouse.translateEvent(e, contentPoint.x, contentPoint.y);
+        var contentEvent = e.withPoint(contentPoint);
 
         // Let children handle it
         for (int i = children.size() - 1; i >= 0; i--) {
@@ -214,11 +221,9 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     private boolean handleScrollbarInteraction(MouseEvent e, Point localPoint) {
-        int eventId = e.getID();
-
         // Handle ongoing drag events
         if (isDraggingVertical || isDraggingHorizontal) {
-            if (eventId == MouseEvent.MOUSE_DRAGGED) {
+            if (e instanceof MouseEvent.Dragged) {
                 // Always recalculate drag delta from original start point
                 Point dragDelta = new Point(
                         localPoint.x - dragStart.x,
@@ -249,7 +254,7 @@ public class GuiScrollPanel extends GuiContainer {
                 return true;
             }
             // Release from the current drag
-            else if (eventId == MouseEvent.MOUSE_RELEASED) {
+            else if (e instanceof MouseEvent.Released) {
                 isDraggingVertical = false;
                 isDraggingHorizontal = false;
                 dragStart = null;
@@ -259,7 +264,7 @@ public class GuiScrollPanel extends GuiContainer {
         }
 
         // Handle the start of new drag events
-        if (eventId == MouseEvent.MOUSE_PRESSED) {
+        if (e instanceof MouseEvent.Pressed) {
             // Check vertical scrollbar
             if (isVerticalBarVisible) {
                 Rectangle thumbBounds = scrollState.getVerticalThumbBounds(width, height);

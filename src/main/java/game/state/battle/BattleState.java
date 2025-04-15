@@ -2,7 +2,9 @@ package game.state.battle;
 
 import game.Game;
 import game.graphics.background.StarBackground;
-import game.input.Mouse;
+import game.input.MouseEvent;
+import game.platform.Renderer;
+import game.platform.Transform;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
@@ -19,8 +21,6 @@ import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -65,20 +65,20 @@ public class BattleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         // translate from screen coordinates to world coordinates
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
-        var e = Mouse.translateEvent(event, worldX, worldY);
+        var e = event.withPoint(new Point(worldX, worldY));
         currentController.ifPresent(c -> c.onMouseClicked(e));
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         // translate from screen coordinates to world coordinates
         int worldX = camera.getWorldX(event.getX());
         int worldY = camera.getWorldY(event.getY());
-        var e = (MouseWheelEvent) Mouse.translateEvent(event, worldX, worldY);
+        var e = event.withPoint(new Point(worldX, worldY));
         currentController.ifPresent(c -> c.onMouseWheelMoved(e));
     }
 
@@ -102,20 +102,21 @@ public class BattleState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         // Render the star background
 
         // Get the camera worldTransform and render the world
-        var guiTransform = graphics.getTransform();
-        var worldTransform = camera.getTransform();
-        graphics.setTransform(worldTransform);
-        world.onRender(graphics);
-        currentController.ifPresent(c -> c.onWorldRender(graphics));
+        Transform worldTransform = camera.getTransform();
+        renderer.pushTransform(worldTransform);
+        world.onRender(renderer);
+        currentController.ifPresent(c -> c.onWorldRender(renderer));
+        renderer.popTransform();
 
         // Restore the original worldTransform and draw the gui
-        graphics.setTransform(guiTransform);
-        currentController.ifPresent(c -> c.onGuiRender(graphics));
-
+//        var guiTransform = renderer.getTransform();
+//        renderer.pushTransform(guiTransform);
+//        currentController.ifPresent(c -> c.onGuiRender(renderer));
+//        renderer.popTransform();
     }
 
     /**

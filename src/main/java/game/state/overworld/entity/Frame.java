@@ -1,5 +1,7 @@
 package game.state.overworld.entity;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,12 +62,12 @@ public class Frame {
         return tiles[x][y];
     }
 
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Tile tile = tiles[x][y];
                 if (tile != null) {
-                    tile.onRender(graphics);
+                    tile.onRender(renderer);
                 }
             }
         }

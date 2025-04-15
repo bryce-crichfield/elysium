@@ -1,13 +1,13 @@
 package game.gui.control;
 
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -67,44 +67,43 @@ public class GuiDropdown<T> extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer renderer) {
         // Draw the main button
-        g.setColor(isHovered ? hoverColor : backgroundColor);
-        g.fillRect(0, 0, width, height);
+        renderer.setColor(isHovered ? hoverColor : backgroundColor);
+        renderer.fillRect(0, 0, width, height);
 
         // Draw border
-        g.setColor(borderColor);
-        g.drawRect(0, 0, width - 1, height - 1);
+        renderer.setColor(borderColor);
+        renderer.drawRect(0, 0, width - 1, height - 1);
 
         // Draw selected text
-        g.setColor(textColor);
+        renderer.setColor(textColor);
         if (selectedItem != null) {
             String text = selectedItem.toString();
-            drawTextCentered(g, text, 5, 0, width - 20, height);
+            drawTextCentered(renderer, text, 5, 0, width - 20, height);
         }
 
         // Draw dropdown arrow
-        drawDropdownArrow(g, width - 15, height / 2, 8, isExpanded);
+        drawDropdownArrow(renderer, width - 15, height / 2, 8, isExpanded);
 
         // Draw dropdown menu if expanded
         if (isExpanded) {
-            // We'll need to save the transform since we're breaking out of our bounds
-            AffineTransform originalTransform = g.getTransform();
-            Shape originalClip = g.getClip();
+            // We'll need to save the apply since we're breaking out of our bounds
 
             // Calculate the dropdown list height
             int dropdownListHeight = Math.min(maxDropdownHeight, items.size() * itemHeight);
 
             // Draw dropdown background
-            g.setColor(backgroundColor);
-            g.fillRect(0, height, width, dropdownListHeight);
+            renderer.setColor(backgroundColor);
+            renderer.fillRect(0, height, width, dropdownListHeight);
 
             // Draw dropdown border
-            g.setColor(borderColor);
-            g.drawRect(0, height, width - 1, dropdownListHeight - 1);
+            renderer.setColor(borderColor);
+            renderer.drawRect(0, height, width - 1, dropdownListHeight - 1);
 
             // Set clipping region for dropdown items
-            g.clipRect(0, height, width, dropdownListHeight);
+            renderer.pushClip(0, height, width, dropdownListHeight);
+//            renderer.clipRect(0, height, width, dropdownListHeight);
 
             // Draw dropdown items
             int yPos = height - scrollOffset;
@@ -117,39 +116,41 @@ public class GuiDropdown<T> extends GuiComponent {
 
                     // Draw item background
                     if (isItemSelected) {
-                        g.setColor(new Color(180, 200, 255));
+                        renderer.setColor(new Color(180, 200, 255));
                     } else if (isItemHovered) {
-                        g.setColor(hoverColor);
+                        renderer.setColor(hoverColor);
                     } else {
-                        g.setColor(backgroundColor);
+                        renderer.setColor(backgroundColor);
                     }
-                    g.fillRect(0, yPos, width, itemHeight);
+                    renderer.fillRect(0, yPos, width, itemHeight);
 
                     // Draw item text
-                    g.setColor(textColor);
-                    drawTextCentered(g, item.toString(), 5, yPos, width - 10, itemHeight);
+                    renderer.setColor(textColor);
+                    drawTextCentered(renderer, item.toString(), 5, yPos, width - 10, itemHeight);
 
                     // Draw separator
-                    g.setColor(borderColor);
-                    g.drawLine(0, yPos + itemHeight, width, yPos + itemHeight);
+                    renderer.setColor(borderColor);
+                    renderer.drawLine(0, yPos + itemHeight, width, yPos + itemHeight);
                 }
                 yPos += itemHeight;
             }
 
-            // Restore original transform and clip
-            g.setTransform(originalTransform);
-            g.setClip(originalClip);
+            // Restore original apply and clip
+            renderer.popTransform();
+            renderer.popClip();
+//            renderer.setTransform(originalTransform);
+//            renderer.setClip(originalClip);
         }
     }
 
-    private void drawTextCentered(Graphics2D g, String text, int x, int y, int width, int height) {
-        FontMetrics fm = g.getFontMetrics();
-        int textX = x + (width - fm.stringWidth(text)) / 2;
+    private void drawTextCentered(Renderer g, String text, int x, int y, int width, int height) {
+        var fm = g.getFontInfo();
+        int textX = x + (width - fm.getStringWidth(text)) / 2;
         int textY = y + (height + fm.getAscent() - fm.getDescent()) / 2;
         g.drawString(text, textX, textY);
     }
 
-    private void drawDropdownArrow(Graphics2D g, int x, int y, int size, boolean pointUp) {
+    private void drawDropdownArrow(Renderer g, int x, int y, int size, boolean pointUp) {
         int[] xPoints = {x - size / 2, x, x + size / 2};
         int[] yPoints;
 
@@ -159,6 +160,7 @@ public class GuiDropdown<T> extends GuiComponent {
             yPoints = new int[]{y - size / 3, y + size / 3, y - size / 3};
         }
 
+        g.setColor(Color.BLACK);
         g.fillPolygon(xPoints, yPoints, 3);
     }
 
@@ -201,7 +203,7 @@ public class GuiDropdown<T> extends GuiComponent {
     @Override
     public boolean processMouseEvent(MouseEvent e) {
         Point localPoint = transformToLocalSpace(e.getPoint());
-        boolean wasPress = e.getID() == MouseEvent.MOUSE_PRESSED || e.getID() == MouseEvent.MOUSE_CLICKED || e.getID() == MouseEvent.MOUSE_RELEASED;
+        boolean wasPress = e instanceof MouseEvent.Pressed || e instanceof MouseEvent.Clicked || e instanceof MouseEvent.Released;
         boolean wasInSelectionArea = new Rectangle(0, height, width, Math.min(maxDropdownHeight, items.size() * itemHeight)).contains(localPoint);
         boolean wasInToggleArea = new Rectangle(0, 0, width, height).contains(localPoint);
 

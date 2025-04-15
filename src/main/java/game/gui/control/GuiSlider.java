@@ -1,12 +1,13 @@
 package game.gui.control;
 
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
 public class GuiSlider extends GuiComponent {
@@ -70,7 +71,7 @@ public class GuiSlider extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer g) {
         if (vertical) {
             renderVerticalSlider(g);
         } else {
@@ -78,7 +79,7 @@ public class GuiSlider extends GuiComponent {
         }
     }
 
-    private void renderHorizontalSlider(Graphics2D g) {
+    private void renderHorizontalSlider(Renderer g) {
         // Draw track
         int trackHeight = 6;
         int trackY = (height - trackHeight) / 2;
@@ -105,7 +106,7 @@ public class GuiSlider extends GuiComponent {
         g.drawRect(thumbX - thumbWidth / 2, thumbY, thumbWidth, thumbHeight);
     }
 
-    private void renderVerticalSlider(Graphics2D g) {
+    private void renderVerticalSlider(Renderer g) {
         // Draw track
         int trackWidth = 6;
         int trackX = (width - trackWidth) / 2;
@@ -188,7 +189,7 @@ public class GuiSlider extends GuiComponent {
         boolean containsPoint = containsPoint(localPoint);
 
         // Update hover state
-        if (e.getID() == MouseEvent.MOUSE_MOVED) {
+        if (e instanceof MouseEvent.Pressed) {
             isHovered = containsPoint;
         }
 
@@ -197,7 +198,7 @@ public class GuiSlider extends GuiComponent {
 
         // Handle ongoing drag operation
         if (isDragging && GuiMouseManager.isCapturedComponent(this)) {
-            if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
+            if (e instanceof MouseEvent.Dragged) {
                 // Calculate new value based on drag position
                 double newValue;
 
@@ -221,7 +222,7 @@ public class GuiSlider extends GuiComponent {
 
                 return true;
             }
-            else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+            else if (e instanceof MouseEvent.Released) {
                 // End dragging operation
                 isDragging = false;
                 dragStart = null;
@@ -231,7 +232,7 @@ public class GuiSlider extends GuiComponent {
         }
 
         // Start new drag operation
-        if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+        if (e instanceof MouseEvent.Pressed) {
             // Check if the click is directly on the thumb
             boolean onThumb = isPointOnThumb(localPoint);
 
@@ -266,7 +267,7 @@ public class GuiSlider extends GuiComponent {
         }
 
         // Pass to mouseMoved handlers if it's a move event
-        if (e.getID() == MouseEvent.MOUSE_MOVED && containsPoint) {
+        if (e instanceof MouseEvent.Moved && containsPoint) {
             return super.processMouseEvent(e);
         }
 

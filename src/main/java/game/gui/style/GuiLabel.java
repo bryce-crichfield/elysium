@@ -1,6 +1,7 @@
 package game.gui.style;
 
 import game.gui.GuiComponent;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +18,7 @@ public class GuiLabel extends GuiComponent {
         super(0, 0, width, height);
         this.text = text;
         this.color = Color.WHITE;
-        this.font = new Font("Arial", Font.PLAIN, 12);
+        this.font = new Font("/fonts/arial", Font.PLAIN, 12);
     }
 
 //    public void insert(char c, int index) {
@@ -35,11 +36,11 @@ public class GuiLabel extends GuiComponent {
 //    }
 
     @Override
-    protected void onRender(Graphics2D g) {
+    protected void onRender(Renderer g) {
         g.setColor(color);
         g.setFont(font);
-        FontMetrics metrics = g.getFontMetrics(font);
-        int textWidth = metrics.stringWidth(text);
+        var metrics = g.getFontInfo(font);
+        int textWidth = metrics.getStringWidth(text);
         int textHeight = metrics.getHeight();
         g.drawString(text, (width - textWidth) / 2, (height + textHeight) / 2);
     }

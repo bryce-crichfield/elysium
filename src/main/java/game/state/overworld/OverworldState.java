@@ -2,6 +2,7 @@ package game.state.overworld;
 
 import game.Game;
 import game.graphics.background.StarBackground;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.overworld.entity.Frame;
 import game.state.overworld.entity.Player;
@@ -9,8 +10,6 @@ import game.state.overworld.entity.Tile;
 import game.util.Camera;
 import game.util.Util;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,14 +73,12 @@ public class OverworldState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        AffineTransform restore = graphics.getTransform();
-        AffineTransform cameraTransform = camera.getTransform();
-        graphics.transform(cameraTransform);
-
-        frames.get(currentFrame).onRender(graphics);
-        player.onRender(graphics);
-
-        graphics.setTransform(restore);
+    public void onRender(Renderer renderer) {
+        // FIXME: temporarily disabled apply composition
+        var cameraTransform = camera.getTransform();
+        renderer.pushTransform(cameraTransform);
+        frames.get(currentFrame).onRender(renderer);
+        player.onRender(renderer);
+        renderer.popTransform();
     }
 }

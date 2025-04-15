@@ -1,49 +1,49 @@
 package game.gui.input;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import game.input.MouseEvent;
 
 public interface GuiMouseHandler {
     static GuiMouseHandler onClick(Runnable action) {
         return new GuiMouseHandler() {
             @Override
-            public void onMouseClicked(MouseEvent e) {
+            public void onMouseClicked(MouseEvent.Clicked e) {
                 action.run();
             }
         };
     }
 
-    default void onMousePressed(MouseEvent e) {
+    default void onMousePressed(MouseEvent.Pressed e) {
     }
 
-    default void onMouseReleased(MouseEvent e) {
+    default void onMouseReleased(MouseEvent.Released e) {
     }
 
-    default void onMouseClicked(MouseEvent e) {
+    default void onMouseClicked(MouseEvent.Clicked e) {
     }
 
-    default void onMouseDragged(MouseEvent e) {
+    default void onMouseDragged(MouseEvent.Dragged e) {
     }
 
-    default void onMouseMoved(MouseEvent e) {
+    default void onMouseMoved(MouseEvent.Moved e) {
     }
 
-    default void onMouseWheelMoved(MouseWheelEvent e) {
+    default void onMouseWheelMoved(MouseEvent.WheelMoved e) {
     }
 
-    default void dispatchMouseEvent(MouseEvent e) {
-        if (e.getID() == MouseEvent.MOUSE_PRESSED) {
-            onMousePressed(e);
-        } else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-            onMouseReleased(e);
-        } else if (e.getID() == MouseEvent.MOUSE_CLICKED) {
-            onMouseClicked(e);
-        } else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
-            onMouseDragged(e);
-        } else if (e.getID() == MouseEvent.MOUSE_MOVED) {
-            onMouseMoved(e);
-        } else if (e.getID() == MouseEvent.MOUSE_WHEEL) {
-            onMouseWheelMoved((MouseWheelEvent) e);
+    default void dispatchMouseEvent(MouseEvent event) {
+        // Type-safe dispatch using instanceof
+        if (event instanceof MouseEvent.Moved moved) {
+            onMouseMoved(moved);
+        } else if (event instanceof MouseEvent.Dragged dragged) {
+            onMouseDragged(dragged);
+        } else if (event instanceof MouseEvent.Clicked clicked) {
+            onMouseClicked(clicked);
+        } else if (event instanceof MouseEvent.Pressed pressed) {
+            onMousePressed(pressed);
+        } else if (event instanceof MouseEvent.Released released) {
+            onMouseReleased(released);
+        } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
+            onMouseWheelMoved(wheelMoved);
         }
     }
 }

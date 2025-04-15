@@ -3,7 +3,7 @@ package game.gui.input;
 import game.gui.GuiComponent;
 import lombok.Getter;
 
-import java.awt.event.MouseEvent;
+import game.input.MouseEvent;
 
 public class GuiHoverManager {
     @Getter

@@ -1,200 +1,305 @@
 package game.platform;
 
 import game.Game;
-import game.input.Mouse;
+import game.input.KeyEvent;
+import game.input.MouseEvent;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
+import java.nio.IntBuffer;
 import java.util.Optional;
 
-public class Window extends JFrame {
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
+public class Window {
     private final Game game;
-    private final BufferedImage buffer;
-    private final Canvas canvas = new Canvas();
-    private final BufferStrategy strategy;
+    private final long windowHandle;
+    private final int bufferWidth;
+    private final int bufferHeight;
+
+    private FrameBuffer mainFramebuffer;  // Use GlFrameBuffer instead of raw OpenGL IDs
+    private boolean isActive = true;
 
     public Window(int width, int height, Game game) {
         this.game = game;
-        this.buffer = new BufferedImage(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(width, height);
-        this.setVisible(true);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null);
+        this.bufferWidth = Game.SCREEN_WIDTH;
+        this.bufferHeight = Game.SCREEN_HEIGHT;
 
-        canvas.setSize(width, height);
-        canvas.setFocusable(true);
-        canvas.requestFocus();
-        canvas.addKeyListener(game.getKeyboard());
+        // Initialize GLFW
+        if (!glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
 
-        canvas.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mousePressed);
-            }
+        // Configure window
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseReleased);
-            }
+        // Create window
+        windowHandle = glfwCreateWindow(width, height, "Game", NULL, NULL);
+        if (windowHandle == NULL) {
+            throw new RuntimeException("Failed to create the GLFW window");
+        }
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseClicked);
+        // Setup mouse callbacks
+        setupInputCallbacks(game);
+
+        // Center the window
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            glfwGetWindowSize(windowHandle, pWidth, pHeight);
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            glfwSetWindowPos(windowHandle, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
+        }
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(windowHandle);
+        // Enable v-sync
+        glfwSwapInterval(1);
+        // Make the window visible
+        glfwShowWindow(windowHandle);
+
+        // Initialize OpenGL
+        GL.createCapabilities();
+
+        // Set the clear color
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // Create the framebuffer that will be used for rendering
+        glViewport(0, 0, width, height);
+    }
+
+    private static void renderDebugStats(float updateTime, float renderTime, Renderer renderer) {
+        renderer.setColor(Color.GREEN);
+        renderer.setFont(new Font("/fonts/arial", Font.BOLD, 8));
+        renderer.drawString("FPS: " + (int) (1.0f / renderTime), 10, 10);
+        renderer.drawString("UPS: " + (int) (1.0f / updateTime), 10, 20);
+        renderer.dispose();
+    }
+
+    public void onInit() {
+        mainFramebuffer = new FrameBuffer(bufferWidth, bufferHeight);
+    }
+
+    private void setupInputCallbacks(Game game) {
+        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+            KeyEvent event = new KeyEvent(key, action);
+            switch (action) {
+                case GLFW_PRESS -> game.getKeyboard().keyPressed(event);
+                case GLFW_RELEASE -> game.getKeyboard().keyReleased(event);
+                default -> {
+                }
             }
         });
 
-        canvas.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseMoved);
+        boolean[] isDown = new boolean[GLFW_MOUSE_BUTTON_LAST + 1];
+        // Mouse button callback
+        glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> {
+            // Get cursor position
+            double[] xpos = new double[1];
+            double[] ypos = new double[1];
+            glfwGetCursorPos(window, xpos, ypos);
+
+            Optional<Point> point = transformWindowPointToViewport((int) xpos[0], (int) ypos[0]);
+            if (point.isEmpty()) {
+                return;
             }
 
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                transformMouseEvent(e).ifPresent(game.getMouse()::mouseDragged);
+            switch (action) {
+                case GLFW_PRESS -> {
+                    var event = new MouseEvent.Pressed(point.get(), button, 1, false);
+                    game.getMouse().mousePressed(event);
+                    isDown[button] = true;
+                }
+                case GLFW_RELEASE -> {
+                    var event = new MouseEvent.Released(point.get(), button, false);
+
+                    // If the button was down, fire a click event
+                    if (isDown[button]) {
+
+                        game.getMouse().mouseClicked(new MouseEvent.Clicked(point.get(), button, 1, false));
+                    }
+                    game.getMouse().mouseReleased(event);
+                    isDown[button] = false;
+                }
+                default -> {
+                    // Handle other actions if necessary
+                }
             }
+
         });
 
-        canvas.addMouseWheelListener(
-                e -> {
-                    Optional<Point> point = transformCoordinates(e.getX(), e.getY());
-                    if (point.isPresent()) {
-                        MouseWheelEvent transformedEvent = new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                                (int) point.get().getX(), (int) point.get().getY(), e.getClickCount(), e.isPopupTrigger(),
-                                e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
-                        game.getMouse().mouseWheelMoved(transformedEvent);
+        glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> {
+            double[] xposArray = new double[1];
+            double[] yposArray = new double[1];
+            glfwGetCursorPos(window, xposArray, yposArray);
+
+            Optional<Point> point = transformWindowPointToViewport((int) xposArray[0], (int) yposArray[0]);
+            if (point.isPresent()) {
+                var event = new MouseEvent.Moved(point.get(), false);
+                game.getMouse().mouseMoved(event);
+
+                // if a button is down, fire a drag event
+                for (int i = 0; i < isDown.length; i++) {
+                    if (isDown[i]) {
+                        var dragEvent = new MouseEvent.Dragged(point.get(), i, false);
+                        game.getMouse().mouseDragged(dragEvent);
                     }
                 }
-        );
+            }
+        });
 
-        this.add(canvas);
-        this.pack();
+        glfwSetScrollCallback(windowHandle, (window, xoffset, yoffset) -> {
+            double[] xpos = new double[1];
+            double[] ypos = new double[1];
+            glfwGetCursorPos(window, xpos, ypos);
+            Optional<Point> point = transformWindowPointToViewport((int) xpos[0], (int) ypos[0]);
+            if (point.isPresent()) {
+                var event = new MouseEvent.WheelMoved(point.get(), xoffset, -yoffset, false);
+                game.getMouse().mouseWheelMoved(event);
+            }
+        });
 
-        canvas.createBufferStrategy(4);
-        strategy = canvas.getBufferStrategy();
+        // Window resize callback
+        glfwSetWindowCloseCallback(windowHandle, window -> {
+            // Signal that the window should close
+            glfwSetWindowShouldClose(window, true);
+            isActive = false;
+        });
     }
 
-    public Optional<MouseEvent> transformMouseEvent(MouseEvent event) {
-        var point = transformCoordinates(event.getX(), event.getY());
-        return point.map(value -> Mouse.translateEvent(event, (int) value.getX(), (int) value.getY()));
-    }
-
-    public Optional<Point> transformCoordinates(int canvasX, int canvasY) {
-        float canvasAspectRatio = (float) canvas.getWidth() / (float) canvas.getHeight();
-        float bufferAspectRatio = (float) buffer.getWidth() / (float) buffer.getHeight();
-
-        int displayWidth;
-        int displayHeight;
-
-        if (bufferAspectRatio > canvasAspectRatio) {
-            displayWidth = canvas.getWidth();
-            displayHeight = (int) (canvas.getWidth() / bufferAspectRatio);
-        } else {
-            displayHeight = canvas.getHeight();
-            displayWidth = (int) (canvas.getHeight() * bufferAspectRatio);
-        }
-
-        int centerX = (canvas.getWidth() - displayWidth) / 2;
-        int centerY = (canvas.getHeight() - displayHeight) / 2;
-
-        // Check if coordinates are outside the game area (in letterbox space)
-        if (canvasX < centerX || canvasX > centerX + displayWidth ||
-                canvasY < centerY || canvasY > centerY + displayHeight) {
-            // Coordinates are in letterbox space
-            return Optional.empty();
-        }
-
-        // Convert canvas coordinates to game buffer coordinates
-        // Use ratio method to preserve precision
-        float xRatio = (canvasX - centerX) / (float) displayWidth;
-        float yRatio = (canvasY - centerY) / (float) displayHeight;
-        int gameX = (int) (xRatio * buffer.getWidth());
-        int gameY = (int) (yRatio * buffer.getHeight());
-
-        // Clamp to game boundaries
-        gameX = Math.max(0, Math.min(gameX, buffer.getWidth() - 1));
-        gameY = Math.max(0, Math.min(gameY, buffer.getHeight() - 1));
-
-        return Optional.of(new Point(gameX, gameY));
+    public boolean isActive() {
+        return isActive;
     }
 
     public void onRender(float updateTime, float renderTime) {
-        this.repaint();
+        // Clear background
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-        Graphics2D g = (Graphics2D) buffer.getGraphics();
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        // Bind the main frame buffer using the stack management
+        mainFramebuffer.bind();
 
-        game.render(g);
+        // Create renderer and render the game
+        var renderer = new Renderer(mainFramebuffer);
+        game.render(renderer);
+        renderDebugStats(updateTime, renderTime, renderer);
 
-        Graphics2D g2 = (Graphics2D) strategy.getDrawGraphics();
-        g2.setColor(Color.BLACK);
+        glDisable(GL_SCISSOR_TEST);
 
-        g2.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        // Unbind the main framebuffer using stack management
+        mainFramebuffer.unbind();
 
-        float canvasAspectRatio = (float) canvas.getWidth() / (float) canvas.getHeight();
-        float bufferAspectRatio = (float) buffer.getWidth() / (float) buffer.getHeight();
+        // Set the viewport for letterboxing
+        var letterboxViewport = calculateLetterBoxViewport();
+        glViewport(letterboxViewport.x, letterboxViewport.y, letterboxViewport.width, letterboxViewport.height);
 
-        int displayWidth = 0;
-        int displayHeight = 0;
+        // Clear the screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (bufferAspectRatio > canvasAspectRatio) {
-            displayWidth = canvas.getWidth();
-            displayHeight = (int) (canvas.getWidth() / bufferAspectRatio);
-        } else {
-            displayHeight = canvas.getHeight();
-            displayWidth = (int) (canvas.getHeight() * bufferAspectRatio);
+        // Render the frame buffer texture
+        renderFramebufferTexture(mainFramebuffer.getTextureId());
+
+        // Swap buffers
+        glfwSwapBuffers(windowHandle);
+        glfwPollEvents();
+    }
+
+    private Rectangle calculateLetterBoxViewport() {
+        // Calculate letterboxing dimensions
+        int windowWidth = 0, windowHeight = 0;
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer widthBuffer = stack.mallocInt(1);
+            IntBuffer heightBuffer = stack.mallocInt(1);
+            glfwGetFramebufferSize(windowHandle, widthBuffer, heightBuffer);
+            windowWidth = widthBuffer.get(0);
+            windowHeight = heightBuffer.get(0);
         }
 
-        int centerX = (canvas.getWidth() - displayWidth) / 2;
-        int centerY = (canvas.getHeight() - displayHeight) / 2;
-        g2.drawImage(buffer, centerX, centerY, displayWidth, displayHeight, null);
-        drawDebugStats(g2, updateTime, renderTime);
-        g2.dispose();
+        // Calculate letterbox dimensions to maintain aspect ratio
+        float targetAspectRatio = (float) bufferWidth / bufferHeight;
+        float windowAspectRatio = (float) windowWidth / windowHeight;
 
-        strategy.show();
+        int viewportX, viewportY, viewportWidth, viewportHeight;
+
+        if (windowAspectRatio > targetAspectRatio) {
+            // Window is wider than target, letterbox left and right
+            viewportHeight = windowHeight;
+            viewportWidth = (int) (windowHeight * targetAspectRatio);
+            viewportX = (windowWidth - viewportWidth) / 2;
+            viewportY = 0;
+        } else {
+            // Window is taller than target, letterbox top and bottom
+            viewportWidth = windowWidth;
+            viewportHeight = (int) (windowWidth / targetAspectRatio);
+            viewportX = 0;
+            viewportY = (windowHeight - viewportHeight) / 2;
+        }
+
+        return new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight);
     }
 
-    private void drawDebugStats(Graphics2D graphics, float updateTime, float renderTime) {
-        graphics.setColor(Color.WHITE);
+    private void renderFramebufferTexture(int textureId) {
+        // Enable texture
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glColor4f(1, 1, 1, 1); // Set color to white
 
-        String upsString = String.format("%.1f ups", 1f / updateTime);
-        String fpsString = String.format("%.1f fps", 1f / renderTime);
+        // Draw a textured quad that fills the viewport
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0);
+        glVertex2f(-1, -1);
+        glTexCoord2f(1, 0);
+        glVertex2f(1, -1);
+        glTexCoord2f(1, 1);
+        glVertex2f(1, 1);
+        glTexCoord2f(0, 1);
+        glVertex2f(-1, 1);
+        glEnd();
 
-        String updateTimeString = String.format("%.1f ms", updateTime * 1000);
-        String renderTimeString = String.format("%.1f ms", renderTime * 1000);
-
-        final int textSize = 12;
-        int y = 20;
-
-        Font font = graphics.getFont();
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(new Font(font.getName(), Font.PLAIN, textSize));
-
-        graphics.drawString("UPS: " + upsString, 10, y);
-        y += textSize;
-
-        graphics.drawString("FPS: " + fpsString, 10, y);
-        y += textSize;
-
-        graphics.drawString("Update Time: " + updateTimeString, 10, y);
-        y += textSize;
-
-        graphics.drawString("Render Time: " + renderTimeString, 10, y);
-        y += textSize;
-
-        graphics.setFont(font);
+        // Disable texture
+        glDisable(GL_TEXTURE_2D);
     }
 
-    public void close() {
+    public void onClose() {
+        // Clean up the frame buffer and related resources
+        mainFramebuffer.dispose();
 
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(windowHandle);
+        glfwDestroyWindow(windowHandle);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        var errorCallback = glfwSetErrorCallback(null);
+        if (errorCallback != null) {
+            errorCallback.free();
+        }
+    }
+
+    private Optional<Point> transformWindowPointToViewport(int x, int y) {
+        // Get the letterbox viewport dimensions
+        Rectangle viewport = calculateLetterBoxViewport();
+
+        // Check if the point is within the viewport
+        if (x < viewport.x || x >= viewport.x + viewport.width || y < viewport.y || y >= viewport.y + viewport.height) {
+            // Point is outside the letterboxed viewport
+            return Optional.empty();
+        }
+
+        // Transform the point from window coordinates to viewport coordinates
+        // Map from viewport rectangle to [0, bufferWidth] x [0, bufferHeight]
+        int transformedX = (int) ((x - viewport.x) * (float) bufferWidth / viewport.width);
+        int transformedY = (int) ((y - viewport.y) * (float) bufferHeight / viewport.height);
+
+        return Optional.of(new Point(transformedX, transformedY));
     }
 }

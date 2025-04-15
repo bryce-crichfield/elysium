@@ -1,6 +1,7 @@
 package game.state.options;
 
 import game.Game;
+import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiTabPane;
@@ -8,13 +9,12 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiLabel;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.transition.Transitions;
 import game.util.Easing;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class OptionsState extends GameState {
@@ -35,7 +35,7 @@ public class OptionsState extends GameState {
         // Create title
         GuiLabel titleLabel = new GuiLabel((Game.SCREEN_WIDTH - 200) / 2, 50, "OPTIONS");
 //        titleLabel.setTextColor(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setFont(new Font("/fonts/arial", Font.BOLD, 36));
         mainContainer.addChild(titleLabel);
 
         // Create tab pane
@@ -173,17 +173,17 @@ public class OptionsState extends GameState {
             private final boolean hovered = false;
 
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 super.onRender(g);
                 g.setColor(hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
                 g.fillRect(0, 0, getWidth(), getHeight());
 
                 g.setColor(Color.WHITE);
-                Font buttonFont = new Font("Arial", Font.BOLD, 16);
+                Font buttonFont = new Font("/fonts/arial", Font.BOLD, 16);
                 g.setFont(buttonFont);
 
-                FontMetrics metrics = g.getFontMetrics();
-                int textWidth = metrics.stringWidth(text);
+                var metrics = g.getFontInfo();
+                int textWidth = metrics.getStringWidth(text);
                 int textHeight = metrics.getHeight();
 
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
@@ -218,7 +218,7 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         mainContainer.processMouseEvent(event);
     }
 
@@ -228,22 +228,22 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseDragged(MouseEvent event) {
+    public void onMouseDragged(MouseEvent.Dragged event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMousePressed(MouseEvent event) {
+    public void onMousePressed(MouseEvent.Pressed event) {
         mainContainer.processMouseEvent(event);
     }
 
     @Override
-    public void onMouseReleased(MouseEvent event) {
+    public void onMouseReleased(MouseEvent.Released event) {
         mainContainer.processMouseEvent(event);
     }
 
@@ -253,12 +253,12 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         // Draw background
-        graphics.setColor(new Color(0, 0, 30));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        renderer.setColor(new Color(0, 0, 30));
+        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
         // Render GUI
-        mainContainer.render(graphics);
+        mainContainer.render(renderer);
     }
 }

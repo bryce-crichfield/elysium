@@ -9,7 +9,7 @@
 //
 //public class Button extends GuiComponent {
 //    private String text;
-//    private Font font = new Font("Arial", Font.PLAIN, 14);
+//    private Font font = new Font("arial", Font.PLAIN, 14);
 //    private Color textColor = Color.WHITE;
 //    private Color hoverColor = new Color(255, 0, 0);
 //    private Color normalColor = new Color(70, 70, 70);
@@ -42,8 +42,8 @@
 //
 //        // Draw text centered in the button
 //        g.setFont(font);
-//        FontMetrics metrics = g.getFontMetrics(font);
-//        int textX = (width - metrics.stringWidth(text)) / 2;
+//        FontMetrics metrics = g.getFontInfo(font);
+//        int textX = (width - metrics.getStringWidth(text)) / 2;
 //        int textY = ((height - metrics.getHeight()) / 2) + metrics.getAscent();
 //
 //        g.setColor(textColor);

@@ -1,8 +1,7 @@
 package game.util;
 
 import game.Game;
-
-import java.awt.geom.AffineTransform;
+import game.platform.Transform;
 
 public class Camera {
     Game game;
@@ -41,23 +40,24 @@ public class Camera {
         this.zoom = zoom;
     }
 
-    public AffineTransform getTransform() {
-        AffineTransform transform = new AffineTransform();
-        transform.scale(zoom, zoom);
-
-        // center the camera on the screen
+    public Transform getTransform() {
+        // Center the camera on the screen
         float screenWidth = Game.SCREEN_WIDTH / zoom;
         float screenHeight = Game.SCREEN_HEIGHT / zoom;
         int cameraX = (int) (x - (screenWidth / 2));
         int cameraY = (int) (y - (screenHeight / 2));
-        transform.translate(-cameraX, -cameraY);
-        return transform;
+
+        return new Transform()
+                .scale(zoom, zoom)
+                .translate(-cameraX, -cameraY);
     }
 
     public int getWorldX(int screenX) {
+        System.out.println("screenX = " + screenX);
         // Convert screen coordinates to world coordinates
         float screenCenterX = Game.SCREEN_WIDTH / 2.0f;
         float worldX = (screenX - screenCenterX) / zoom + x;
+        System.out.println("worldX = " + worldX);
         return Math.round(worldX);
     }
 

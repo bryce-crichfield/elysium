@@ -1,9 +1,11 @@
 package game.gui.style;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 
 public interface GuiBackground {
-    void render(Graphics2D g, int width, int height, int radius);
+    void render(Renderer renderer, int width, int height, int radius);
 
     class Fill implements GuiBackground {
         private final Color color;
@@ -13,12 +15,12 @@ public interface GuiBackground {
         }
 
         @Override
-        public void render(Graphics2D g, int width, int height, int radius) {
-            g.setColor(color);
+        public void render(Renderer renderer, int width, int height, int radius) {
+            renderer.setColor(color);
             if (radius > 0) {
-                g.fillRoundRect(0, 0, width, height, radius, radius);
+                renderer.fillRoundRect(0, 0, width, height, radius, radius);
             } else {
-                g.fillRect(0, 0, width, height);
+                renderer.fillRect(0, 0, width, height);
             }
         }
     }

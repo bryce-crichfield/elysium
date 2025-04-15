@@ -3,9 +3,9 @@ package game.state.loading;
 import game.Game;
 import game.asset.AssetLoader;
 import game.audio.AudioAssetLoader;
-import game.audio.AudioStore;
 import game.gui.GuiComponent;
-import game.gui.GuiContainer;
+import game.platform.LinearGradientPaint;
+import game.platform.Renderer;
 import game.state.GameState;
 import game.state.title.TitleState;
 import game.transition.Transitions;
@@ -39,9 +39,10 @@ public class LoadingState extends GameState {
         var y = (Game.SCREEN_HEIGHT - (4*height));
         container = new GuiComponent(x, y, width, height) {
             @Override
-            protected void onRender(Graphics2D g) {
+            protected void onRender(Renderer g) {
                 g.setColor(Color.BLUE);
                 var drawWidth = (int) (width * getTotalLoadingProgress());
+                System.out.println("drawWidth = " + drawWidth);
                 g.fillRect(0, 0, drawWidth, height);
                 g.setColor(Color.WHITE);
                 g.drawRect(0, 0, width, height);
@@ -82,7 +83,24 @@ public class LoadingState extends GameState {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        container.render(graphics);
+    public void onRender(Renderer renderer) {
+//        var gradient = new LinearGradientPaint(
+//                0, 0,
+//                Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
+//                new Color(255, 0, 0, 255),
+//                new Color(0, 42, 255, 255)
+//        );
+//
+//        renderer.setPaint(gradient);
+//        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+
+
+        container.render(renderer);
+//
+//        // print the contents of the resources root folder
+        renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
+        renderer.setColor(Color.WHITE);
+        renderer.drawString("Loading...", Game.SCREEN_WIDTH / 2 - 50, Game.SCREEN_HEIGHT / 2 - 50);
     }
+
 }

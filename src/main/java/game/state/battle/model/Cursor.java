@@ -2,14 +2,14 @@ package game.state.battle.model;
 
 import game.Game;
 import game.input.Keyboard;
+import game.input.MouseEvent;
+import game.input.KeyEvent;
+import game.platform.Renderer;
 import game.state.battle.event.CursorMoved;
 import game.util.Camera;
 import game.util.Util;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.time.Duration;
 
 public class Cursor {
@@ -121,7 +121,7 @@ public class Cursor {
         velocityY *= 0.9;
     }
 
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         int offset = 0;
         if ((mode == Mode.BLINKING || mode == Mode.DILATED) && timer < timerMax / 2) {
             offset = 5;
@@ -131,13 +131,13 @@ public class Cursor {
         int x = cursorX * tileSize - offset / 2;
         int y = cursorY * tileSize - offset / 2;
 
-        Stroke oldStroke = graphics.getStroke();
-        graphics.setColor(Color.BLACK);
-        graphics.setStroke(new BasicStroke(3));
-        graphics.drawRect(x, y, size, size);
-        graphics.setStroke(oldStroke);
-        graphics.setColor(color);
-        graphics.drawRect(x, y, size, size);
+        var oldStroke = renderer.getLineWidth();
+        renderer.setColor(Color.BLACK);
+        renderer.setLineWidth(3);
+        renderer.drawRect(x, y, size, size);
+        renderer.setLineWidth(oldStroke);
+        renderer.setColor(color);
+        renderer.drawRect(x, y, size, size);
     }
 
     public int getCursorX() {
@@ -154,12 +154,11 @@ public class Cursor {
 
         cursorX = (x / tileSize);
         cursorY = (y / tileSize);
-
         CursorMoved.event.fire(this);
     }
 
-    public void onMouseWheelMoved(MouseWheelEvent event) {
-        int wheelRotation = event.getWheelRotation();
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
+        int wheelRotation = (int) event.getWheelRotation();
         float newZoom = camera.getZoom() + (Math.signum(wheelRotation) * -0.1f);
         newZoom = Util.clamp(newZoom, 0.25f, 4f);
         camera.setZoom(newZoom);

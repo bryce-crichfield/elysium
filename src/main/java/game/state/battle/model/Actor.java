@@ -2,6 +2,7 @@ package game.state.battle.model;
 
 import game.character.GameCharacter;
 import game.character.StarTrooper;
+import game.platform.Renderer;
 import game.state.battle.event.*;
 
 import java.awt.*;
@@ -132,32 +133,32 @@ public class Actor {
         tileY = (int) animation.getY();
     }
 
-    public void onRender(Graphics2D graphics) {
+    public void onRender(Renderer renderer) {
         // Draw the actor
         Color color = selected ? Color.GREEN : waiting ? Color.GRAY : this.color;
         color = !isPlayer ? Color.RED : color;
         float x = animation.getX();
         float y = animation.getY();
-        graphics.setColor(color);
-        graphics.fillOval((int) (x * 32), (int) (y * 32), 32, 32);
-        graphics.setColor(Color.BLACK);
-        graphics.drawOval((int) (x * 32), (int) (y * 32), 32, 32);
+        renderer.setColor(color);
+        renderer.fillOval((int) (x * 32), (int) (y * 32), 32, 32);
+        renderer.setColor(Color.BLACK);
+        renderer.drawOval((int) (x * 32), (int) (y * 32), 32, 32);
 
         // Draw the health bar
         float healthPercentage = currentHealthPoints / character.getStats().getHealth();
         Color healthColor = healthPercentage > 0.5 ? Color.GREEN : healthPercentage > 0.25 ? Color.YELLOW : Color.RED;
-        graphics.setColor(healthColor);
+        renderer.setColor(healthColor);
         int healthWidth = (int) ((32 - 10) * healthPercentage);
         int healthHeight = 5;
         int healthX = (int) ((x * 32) + 5);
         int healthY = (int) ((y * 32) + 32 - 5);
 
-        graphics.setColor(Color.BLACK);
-        graphics.fillRect(healthX, healthY, 32 - 10, healthHeight);
-        graphics.setColor(healthColor);
-        graphics.fillRect(healthX, healthY, healthWidth, healthHeight);
-        graphics.setColor(Color.BLACK);
-        graphics.drawRect(healthX, healthY, 32 - 10, healthHeight);
+        renderer.setColor(Color.BLACK);
+        renderer.fillRect(healthX, healthY, 32 - 10, healthHeight);
+        renderer.setColor(healthColor);
+        renderer.fillRect(healthX, healthY, healthWidth, healthHeight);
+        renderer.setColor(Color.BLACK);
+        renderer.drawRect(healthX, healthY, 32 - 10, healthHeight);
     }
 
     public int getMovementPoints() {

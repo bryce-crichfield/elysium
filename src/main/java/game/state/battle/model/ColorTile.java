@@ -1,5 +1,7 @@
 package game.state.battle.model;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 
 public class ColorTile extends Tile {
@@ -13,14 +15,14 @@ public class ColorTile extends Tile {
     }
 
     @Override
-    public void onRender(Graphics2D graphics) {
-        graphics.setColor(color);
-        Composite oldComposite = graphics.getComposite();
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.15f));
-        graphics.fillRect(getX() * size, getY() * size, size, size);
-        graphics.setComposite(oldComposite);
-        graphics.setColor(color.darker().darker());
-        graphics.drawRect(getX() * size, getY() * size, size, size);
+    public void onRender(Renderer renderer) {
+        // apply an alpha to the provided color
+        int alpha = (int) (255 * 0.15f);
+        var drawColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        renderer.setColor(drawColor);
+        renderer.fillRect(getX() * size, getY() * size, size, size);
+        renderer.setColor(color.darker().darker());
+        renderer.drawRect(getX() * size, getY() * size, size, size);
 
     }
 }

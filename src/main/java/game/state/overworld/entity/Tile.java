@@ -1,5 +1,7 @@
 package game.state.overworld.entity;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.util.Optional;
 
@@ -25,14 +27,14 @@ public class Tile {
         return exitId.orElseThrow(() -> new IllegalStateException("Tile is not an exit"));
     }
 
-    public void onRender(Graphics2D graphics) {
-        graphics.setColor(Color.GREEN);
+    public void onRender(Renderer renderer) {
+        renderer.setColor(Color.GREEN);
         if (isExit()) {
-            graphics.setColor(Color.YELLOW);
+            renderer.setColor(Color.YELLOW);
         }
-        graphics.fillRect(x, y, 32, 32);
-        graphics.setColor(Color.BLACK);
-        graphics.drawRect(x, y, 32, 32);
+        renderer.fillRect(x, y, 32, 32);
+        renderer.setColor(Color.BLACK);
+        renderer.drawRect(x, y, 32, 32);
     }
 
     public int getWorldX() {

@@ -1,14 +1,14 @@
 package game.gui;
 
+import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
+import game.platform.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,28 +37,24 @@ public class GuiContainer extends GuiComponent {
     }
 
     @Override
-    protected void onRender(Graphics2D g) {
-        // Apply clipping based on overflow setting
-        Shape originalClip = g.getClip();
-        g.setClip(new Rectangle(0, 0, width, height));
+    protected void onRender(Renderer renderer) {
+        renderer.pushClip(0, 0, width, height);
 
+        // Render background and border
         if (background != null) {
-            background.render(g, width, height, 0);
+            background.render(renderer, width, height, 0);
         }
 
         if (border != null) {
-            border.render(g, width, height, 0);
+            border.render(renderer, width, height, 0);
         }
 
-        // Render all children
+        // Render children
         for (GuiComponent child : children) {
-            child.render(g);
+            child.render(renderer);
         }
 
-        // Restore clip
-        if (originalClip != null) {
-            g.setClip(originalClip);
-        }
+        renderer.popClip();
     }
 
     @Override
@@ -82,6 +78,12 @@ public class GuiContainer extends GuiComponent {
 
     public void setLayout(GuiLayout guiLayout) {
         this.layout = guiLayout;
+        layout.onLayout(this);
+    }
+
+    public void removeChild(GuiComponent child) {
+        children.remove(child);
+        child.parent = null;
         layout.onLayout(this);
     }
 

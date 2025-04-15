@@ -1,5 +1,7 @@
 package game.state.battle.model;
 
+import game.platform.Renderer;
+
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +19,7 @@ public abstract class Tile {
         this.passable = passable;
     }
 
-    public static void drawOutline(List<Tile> tiles, Graphics2D graphics, Color color) {
+    public static void drawOutline(List<Tile> tiles, Renderer renderer, Color color) {
         for (Tile tile : tiles) {
             List<Tile> neighbors = tile.getNeighbors(tiles);
             boolean hasAbove = neighbors.stream().anyMatch(neighbor -> neighbor.getY() < tile.getY());
@@ -25,9 +27,9 @@ public abstract class Tile {
             boolean hasLeft = neighbors.stream().anyMatch(neighbor -> neighbor.getX() < tile.getX());
             boolean hasRight = neighbors.stream().anyMatch(neighbor -> neighbor.getX() > tile.getX());
 
-            Stroke oldStroke = graphics.getStroke();
-            graphics.setStroke(new BasicStroke(2));
-            graphics.setColor(color);
+            var oldStroke = renderer.getLineWidth();
+            renderer.setLineWidth(2);
+            renderer.setColor(color);
 
             int tileX = tile.getX() * 32;
             int tileY = tile.getY() * 32;
@@ -35,35 +37,35 @@ public abstract class Tile {
             int tileHeight = 32;
 
             if (!hasAbove) {
-                graphics.drawLine(tileX, tileY, tileX + tileWidth, tileY);
+                renderer.drawLine(tileX, tileY, tileX + tileWidth, tileY);
             }
 
             if (!hasBelow) {
-                graphics.drawLine(tileX, tileY + tileHeight, tileX + tileWidth, tileY + tileHeight);
+                renderer.drawLine(tileX, tileY + tileHeight, tileX + tileWidth, tileY + tileHeight);
             }
 
             if (!hasLeft) {
-                graphics.drawLine(tileX, tileY, tileX, tileY + tileHeight);
+                renderer.drawLine(tileX, tileY, tileX, tileY + tileHeight);
             }
 
             if (!hasRight) {
-                graphics.drawLine(tileX + tileWidth, tileY, tileX + tileWidth, tileY + tileHeight);
+                renderer.drawLine(tileX + tileWidth, tileY, tileX + tileWidth, tileY + tileHeight);
             }
 
-            graphics.setStroke(oldStroke);
+            renderer.setLineWidth(oldStroke);
         }
     }
 
-    public static void drawTurtle(List<Tile> tiles, Graphics2D graphics, Color color) {
+    public static void drawTurtle(List<Tile> tiles, Renderer renderer, Color color) {
         if (tiles.isEmpty()) {
             return;
         }
 
         int tileSize = 32;
         // Draw the path
-        Stroke stroke = graphics.getStroke();
-        graphics.setColor(color);
-        graphics.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        var stroke = renderer.getLineWidth();
+        renderer.setColor(color);
+        renderer.setLineWidth(4);
 
         Tile start = tiles.get(0);
 
@@ -85,7 +87,7 @@ public abstract class Tile {
                 int startY = turtleY + (tileSize / 2);
                 int endY = (tileY * tileSize) + (tileSize / 2);
 
-                graphics.drawLine(centerX, startY, centerX, endY);
+                renderer.drawLine(centerX, startY, centerX, endY);
             }
 
             if (isHorizontal) {
@@ -93,20 +95,20 @@ public abstract class Tile {
                 int startX = turtleX + (tileSize / 2);
                 int endX = (tileX * tileSize) + (tileSize / 2);
 
-                graphics.drawLine(startX, centerY, endX, centerY);
+                renderer.drawLine(startX, centerY, endX, centerY);
             }
 
             turtleTileX = tileX;
             turtleTileY = tileY;
         }
-        graphics.setStroke(stroke);
+        renderer.setLineWidth(stroke);
     }
 
     public boolean isPassable() {
         return passable;
     }
 
-    public abstract void onRender(Graphics2D graphics);
+    public abstract void onRender(Renderer renderer);
 
     public List<Tile> getNeighbors(List<Tile> tiles) {
         Optional<Tile> above = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y - 1).findFirst();

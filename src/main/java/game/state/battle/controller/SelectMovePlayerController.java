@@ -2,6 +2,7 @@ package game.state.battle.controller;
 
 import game.event.Event;
 import game.input.Keyboard;
+import game.platform.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.event.ActionActorMoved;
 import game.state.battle.event.CursorMoved;
@@ -96,7 +97,7 @@ public class SelectMovePlayerController extends PlayerController {
     }
 
     @Override
-    public void onWorldRender(Graphics2D graphics) {
+    public void onWorldRender(Renderer renderer) {
 //        selectedActorStats.onRender(graphics);
 //        hoveredActorStats.onRender(graphics);
 
@@ -105,24 +106,21 @@ public class SelectMovePlayerController extends PlayerController {
         int actorY = (int) state.getSelection().get().getY();
         List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);
 
-        Composite originalComposite = graphics.getComposite();
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+        Composite originalComposite = renderer.getComposite();
+        renderer.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
         for (Tile tile : inRange) {
-            graphics.setColor(Color.ORANGE.darker().darker());
-            graphics.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
+            renderer.setColor(Color.ORANGE.darker().darker());
+            renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
         }
-        graphics.setComposite(originalComposite);
+        renderer.setComposite(originalComposite);
 
-        Tile.drawOutline(inRange, graphics, Color.ORANGE);
-
-
-        Tile.drawTurtle(possiblePath, graphics, Color.ORANGE);
-
-        state.getCursor().onRender(graphics);
+        Tile.drawOutline(inRange, renderer, Color.ORANGE);
+        Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
+        state.getCursor().onRender(renderer);
     }
 
     @Override
-    public void onGuiRender(Graphics2D graphics) {
+    public void onGuiRender(Renderer renderer) {
 
     }
 

@@ -4,11 +4,11 @@ import game.Game;
 import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
 import game.gui.input.GuiMouseManager;
+import game.platform.Renderer;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import game.input.MouseEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,33 +33,38 @@ public abstract class GameState {
             return; // event was handled by the captured component
         }
 
-        // Handle mouse event in this state
-        switch (event.getID()) {
-            case MouseEvent.MOUSE_MOVED -> onMouseMoved(event);
-            case MouseEvent.MOUSE_DRAGGED -> onMouseDragged(event);
-            case MouseEvent.MOUSE_CLICKED -> onMouseClicked(event);
-            case MouseEvent.MOUSE_PRESSED -> onMousePressed(event);
-            case MouseEvent.MOUSE_RELEASED -> onMouseReleased(event);
-            case MouseEvent.MOUSE_WHEEL -> onMouseWheelMoved((MouseWheelEvent) event);
+        // Type-safe dispatch using instanceof
+        if (event instanceof MouseEvent.Moved moved) {
+            onMouseMoved(moved);
+        } else if (event instanceof MouseEvent.Dragged dragged) {
+            onMouseDragged(dragged);
+        } else if (event instanceof MouseEvent.Clicked clicked) {
+            onMouseClicked(clicked);
+        } else if (event instanceof MouseEvent.Pressed pressed) {
+            onMousePressed(pressed);
+        } else if (event instanceof MouseEvent.Released released) {
+            onMouseReleased(released);
+        } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
+            onMouseWheelMoved(wheelMoved);
         }
     }
 
-    public void onMouseMoved(MouseEvent event) {
+    public void onMouseMoved(MouseEvent.Moved moved) {
     }
 
-    public void onMouseDragged(MouseEvent event) {
+    public void onMouseDragged(MouseEvent.Dragged dragged) {
     }
 
-    public void onMouseClicked(MouseEvent event) {
+    public void onMouseClicked(MouseEvent.Clicked clicked) {
     }
 
-    public void onMousePressed(MouseEvent event) {
+    public void onMousePressed(MouseEvent.Pressed pressed) {
     }
 
-    public void onMouseReleased(MouseEvent event) {
+    public void onMouseReleased(MouseEvent.Released released) {
     }
 
-    public void onMouseWheelMoved(MouseWheelEvent event) {
+    public void onMouseWheelMoved(MouseEvent.WheelMoved released) {
     }
 
     public void onKeyPressed(int keyCode) {
@@ -79,21 +84,21 @@ public abstract class GameState {
         onUpdate(delta);
     }
 
-    public final void render(Graphics2D graphics) {
+    public final void render(Renderer renderer) {
         // Clear the screen
-        graphics.setColor(new Color(0, 0, 30));
-        graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        renderer.setColor(new Color(0, 0, 30));
+        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
         for (Background background : backgrounds) {
-            background.render(graphics);
+            background.render(renderer);
         }
 
-        onRender(graphics);
+        onRender(renderer);
     }
 
     public abstract void onUpdate(Duration delta);
 
-    public abstract void onRender(Graphics2D graphics);
+    public abstract void onRender(Renderer renderer);
 
     public void onExit() {
     }

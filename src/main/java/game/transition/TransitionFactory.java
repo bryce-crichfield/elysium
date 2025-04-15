@@ -1,8 +1,8 @@
 package game.transition;
 
-import java.awt.image.BufferedImage;
+import game.platform.FrameBuffer;
 
 @FunctionalInterface
 public interface TransitionFactory {
-    Transition create(BufferedImage source, BufferedImage target, Runnable onComplete);
+    Transition create(FrameBuffer source, FrameBuffer target, Runnable onComplete);
 }
