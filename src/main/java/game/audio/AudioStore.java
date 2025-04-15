@@ -1,13 +1,19 @@
 package game.audio;
 
 import game.asset.AssetStore;
+import lombok.Getter;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AudioStore implements AssetStore<String, AudioSample> {
+    @Getter
+    private static final AudioStore instance = new AudioStore();
     private final Map<String, AudioSample> loadedClips = new ConcurrentHashMap<>();
+
+    private AudioStore() {
+    }
 
     @Override
     public void store(String key, AudioSample asset) {

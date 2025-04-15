@@ -5,15 +5,16 @@ import game.audio.processor.AudioSampler;
 import javax.sound.sampled.AudioFormat;
 
 public class Audio {
-    private final AudioStore store = new AudioStore();
+    private final AudioStore store;
     private final AudioEngine engine = new AudioEngine();
 
     public AudioFormat getFormat() {
         return engine.getFormat();
     }
 
-    public Audio() {
+    public Audio(AudioStore store) {
         engine.start();
+        this.store = store;
     }
 
     public void play(String name) {
@@ -32,9 +33,5 @@ public class Audio {
         sampler.getGain().setValue(gain);
         engine.addProcessor(sampler);
         sampler.play();
-    }
-
-    public AudioStore getAudioStore() {
-        return store;
     }
 }

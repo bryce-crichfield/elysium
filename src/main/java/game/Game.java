@@ -1,12 +1,14 @@
 package game;
 
 import game.audio.Audio;
+import game.audio.AudioStore;
 import game.input.MouseEvent;
 import game.graphics.postprocessing.EffectsManager;
 import game.graphics.postprocessing.VignetteEffect;
 import game.input.Keyboard;
 import game.input.Mouse;
 import game.platform.Renderer;
+import game.platform.texture.TextureStore;
 import game.state.GameStateManager;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -25,7 +27,7 @@ public final class Game {
     private final Mouse mouse = new Mouse();
 
     @Getter
-    private final Audio audio = new Audio();
+    private final Audio audio = new Audio(AudioStore.getInstance());
 
     @Delegate
     private final EffectsManager effects;

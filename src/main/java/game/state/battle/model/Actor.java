@@ -3,31 +3,45 @@ package game.state.battle.model;
 import game.character.GameCharacter;
 import game.character.StarTrooper;
 import game.platform.Renderer;
+import game.platform.texture.TextureStore;
 import game.state.battle.event.*;
+import game.state.battle.model.capabilities.HasSprite;
+import game.state.battle.model.components.PositionComponent;
+import game.state.battle.model.components.SpriteComponent;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.swing.text.Position;
 import java.awt.*;
 import java.time.Duration;
 
-public class Actor {
-    int tileX;
-    int tileY;
+public class Actor implements HasSprite {
+    PositionComponent position;
+
+    @Getter
+    SpriteComponent spriteComponent ;
 
     ActorAnimation animation;
     GameCharacter character = StarTrooper.create();
     float currentHealthPoints = character.getStats().getHealth();
     float currentMovementPoints = character.getStats().getSpeed();
     Color color;
+
+    @Setter
     private boolean selected = false;
     private boolean hovered = false;
     private boolean isPlayer = true;
+    @Getter
+    @Setter
     private boolean waiting = false;
 
     public Actor(int x, int y, Color color) {
-        this.tileX = x;
-        this.tileY = y;
+        this.position = new PositionComponent(x, y);
         this.color = color;
 
         animation = new ActorAnimation(this);
+
+        spriteComponent = new SpriteComponent(position, TextureStore.getInstance().getAssets("sprites/test"));
     }
 
     public boolean isPlayer() {
@@ -36,18 +50,6 @@ public class Actor {
 
     public void setPlayer(boolean player) {
         isPlayer = player;
-    }
-
-    public boolean isWaiting() {
-        return waiting;
-    }
-
-    public void setWaiting(boolean waiting) {
-        this.waiting = waiting;
-    }
-
-    public void setSelected(boolean isSelected) {
-        this.selected = isSelected;
     }
 
     public int getAttackDistance() {
@@ -75,7 +77,7 @@ public class Actor {
     }
 
     public void onCursorMoved(Cursor cursor) {
-        boolean cursorHovers = cursor.getCursorX() == this.tileX && cursor.getCursorY() == this.tileY;
+        boolean cursorHovers = cursor.getCursorX() == this.position.getX() && cursor.getCursorY() == this.position.getY();
 
         if (hovered && !cursorHovers) {
             hovered = true;
@@ -104,7 +106,7 @@ public class Actor {
         }
 
         for (Tile tile : attack.getTargets()) {
-            if (tile.getX() == tileX && tile.getY() == tileY) {
+            if (tile.getX() == position.getX() && tile.getY() == position.getY()) {
                 currentHealthPoints -= attack.getAttacker().getAttack();
                 ActorDamaged.event.fire(this);
 
@@ -120,17 +122,17 @@ public class Actor {
     }
 
     public float getX() {
-        return tileX;
+        return position.getX();
     }
 
     public float getY() {
-        return tileY;
+        return position.getY();
     }
 
     public void onUpdate(Duration duration) {
         animation.onUpdate(duration);
-        tileX = (int) animation.getX();
-        tileY = (int) animation.getY();
+        position.setX((int)animation.getX());
+        position.setY((int)animation.getY());
     }
 
     public void onRender(Renderer renderer) {
@@ -139,10 +141,10 @@ public class Actor {
         color = !isPlayer ? Color.RED : color;
         float x = animation.getX();
         float y = animation.getY();
-        renderer.setColor(color);
-        renderer.fillOval((int) (x * 32), (int) (y * 32), 32, 32);
-        renderer.setColor(Color.BLACK);
-        renderer.drawOval((int) (x * 32), (int) (y * 32), 32, 32);
+//        renderer.setColor(color);
+//        renderer.fillOval((int) (x * 32), (int) (y * 32), 32, 32);
+//        renderer.setColor(Color.BLACK);
+//        renderer.drawOval((int) (x * 32), (int) (y * 32), 32, 32);
 
         // Draw the health bar
         float healthPercentage = currentHealthPoints / character.getStats().getHealth();

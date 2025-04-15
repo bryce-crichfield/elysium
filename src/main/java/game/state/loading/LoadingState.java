@@ -2,18 +2,21 @@ package game.state.loading;
 
 import game.Game;
 import game.asset.AssetLoader;
-import game.audio.AudioAssetLoader;
+import game.audio.AudioLoader;
+import game.audio.AudioStore;
 import game.gui.GuiComponent;
-import game.platform.LinearGradientPaint;
 import game.platform.Renderer;
+import game.platform.texture.TextureLoader;
+import game.platform.texture.TextureStore;
 import game.state.GameState;
-import game.state.title.TitleState;
+import game.state.battle.BattleState;
 import game.transition.Transitions;
 import game.util.Easing;
 
 import java.awt.*;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -21,86 +24,88 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LoadingState extends GameState {
     private final Queue<AssetLoader> loadQueue = new ConcurrentLinkedQueue<>();
-    private final Map<AssetLoader, Boolean> assetLoaders = new HashMap<>();
+    private final Map<AssetLoader, Boolean> completedAssetLoaders = new HashMap<>();
 
-    private final GuiComponent container;
+    private final GuiComponent progressBar;
 
     public LoadingState(Game game) {
         super(game);
-        var assetLoader = new AudioAssetLoader(game.getAudio().getAudioStore(), Path.of("resources/audio"), game.getAudio().getFormat());
-        assetLoaders.put(assetLoader, false);
-        loadQueue.add(assetLoader);
+        var audioLoader = new AudioLoader(AudioStore.getInstance(), Path.of("resources/audio"), game.getAudio().getFormat());
+        completedAssetLoaders.put(audioLoader, false);
+        loadQueue.add(audioLoader);
 
+        var textureLoader = new TextureLoader(TextureStore.getInstance(), Path.of("resources/texture"));
+        completedAssetLoaders.put(textureLoader, false);
+        loadQueue.add(textureLoader);
 
-        // create a progress bar component
-        var width = (int)(Game.SCREEN_WIDTH * 0.75f);
+        progressBar = createProgressBar(loadQueue);
+    }
+
+    private static GuiComponent createProgressBar(Collection<AssetLoader> loaders) {
+        final GuiComponent progressBar;
+        var width = (int) (Game.SCREEN_WIDTH * 0.75f);
         var height = 25;
         var x = (Game.SCREEN_WIDTH - width) / 2;
-        var y = (Game.SCREEN_HEIGHT - (4*height));
-        container = new GuiComponent(x, y, width, height) {
+        var y = (Game.SCREEN_HEIGHT - (4 * height));
+        progressBar = new GuiComponent(x, y, width, height) {
             @Override
             protected void onRender(Renderer g) {
                 g.setColor(Color.BLUE);
-                var drawWidth = (int) (width * getTotalLoadingProgress());
-                System.out.println("drawWidth = " + drawWidth);
+                // Average the progress of all loaders
+                float totalProgress = 0;
+                for (var loader : loaders) {
+                    totalProgress += loader.getProgress();
+                }
+                var drawWidth = (int) (width * (totalProgress / loaders.size()));
                 g.fillRect(0, 0, drawWidth, height);
                 g.setColor(Color.WHITE);
                 g.drawRect(0, 0, width, height);
             }
         };
-    }
-
-    private float getTotalLoadingProgress() {
-        // each loader returns 0-1
-        // and we can average them
-        float totalProgress = 0;
-        for (var loader : assetLoaders.keySet()) {
-            totalProgress += loader.getProgress();
-        }
-        return totalProgress / assetLoaders.size();
+        return progressBar;
     }
 
     @Override
     public void onUpdate(Duration delta) {
-        // peek the top of the queue and if its not started loading, load it, once its complete mark it as complete and
-        // pop it from the queue
+        progressBar.update(delta);
+
+        // Handle case when there are still loaders in the queue
         if (!loadQueue.isEmpty()) {
             var loader = loadQueue.peek();
-            if (!assetLoaders.get(loader)) {
-                assetLoaders.put(loader, true);
-                //                    assetLoaders.put(loader, false);
+            if (!completedAssetLoaders.get(loader)) {
+                completedAssetLoaders.put(loader, true);
+                // The loader will remove itself from the queue when it is done
                 loader.load(loadQueue::poll);
             }
+            return;
         }
 
-        if (loadQueue.isEmpty()) {
-            // all loaders are done, we can move to the next state
-            game.pushState(TitleState::new, Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+        // All loaders are done, initialize textures
+        for (var key : TextureStore.getInstance().getAssets()) {
+            var texture = TextureStore.getInstance().getAssets(key);
+            texture.initialize();
         }
 
-
-        container.update(delta);
+        // Transition to the next state
+        game.pushState(BattleState::new,
+                Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
     }
 
     @Override
     public void onRender(Renderer renderer) {
-//        var gradient = new LinearGradientPaint(
-//                0, 0,
-//                Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT,
-//                new Color(255, 0, 0, 255),
-//                new Color(0, 42, 255, 255)
-//        );
-//
-//        renderer.setPaint(gradient);
-//        renderer.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        progressBar.render(renderer);
 
+        // Draw the Message String
+        if (!loadQueue.isEmpty() && loadQueue.peek() != null) {
+            renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
+            renderer.setColor(Color.WHITE);
 
-        container.render(renderer);
-//
-//        // print the contents of the resources root folder
-        renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
-        renderer.setColor(Color.WHITE);
-        renderer.drawString("Loading...", Game.SCREEN_WIDTH / 2 - 50, Game.SCREEN_HEIGHT / 2 - 50);
+            var message = loadQueue.peek().getDebugMessage();
+            var fontInfo = renderer.getFontInfo();
+            var textWidth = fontInfo.getStringWidth(message);
+            var textX = (Game.SCREEN_WIDTH - textWidth) / 2;
+            var textY = progressBar.getY() - fontInfo.getHeight() - 5;
+            renderer.drawString(message, textX, textY);
+        }
     }
-
 }

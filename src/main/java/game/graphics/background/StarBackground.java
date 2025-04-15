@@ -1,8 +1,8 @@
 package game.graphics.background;
 
 import game.Game;
-import game.platform.LinearGradientPaint;
-import game.platform.Paint;
+import game.platform.paint.LinearGradientPaint;
+import game.platform.paint.Paint;
 import game.platform.Renderer;
 import game.util.Util;
 

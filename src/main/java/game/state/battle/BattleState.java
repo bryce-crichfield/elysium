@@ -5,14 +5,13 @@ import game.graphics.background.StarBackground;
 import game.input.MouseEvent;
 import game.platform.Renderer;
 import game.platform.Transform;
+import game.platform.texture.SpriteRenderer;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
 import game.state.battle.controller.ObserverPlayerController;
-import game.state.battle.model.Actor;
+import game.state.battle.model.*;
 import game.state.battle.model.Cursor;
-import game.state.battle.model.Selection;
-import game.state.battle.model.World;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Camera;
@@ -28,6 +27,8 @@ public class BattleState extends GameState {
     private final Camera camera;
     private final World world;
     private final Cursor cursor;
+
+    private final SpriteRenderer spriteRenderer = new SpriteRenderer("shaders/sprite/SpriteVertex.glsl", "shaders/sprite/SpriteFragment.glsl");
 
     @Getter
     private final Selection selection = new Selection();
@@ -57,6 +58,9 @@ public class BattleState extends GameState {
         }
 
         transitionTo(ObserverPlayerController::new);
+
+        var transform = Transform.orthographic(0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, 0, -1, 1);
+        spriteRenderer.setProjection(transform);
     }
 
     @Override
@@ -103,20 +107,16 @@ public class BattleState extends GameState {
 
     @Override
     public void onRender(Renderer renderer) {
-        // Render the star background
-
         // Get the camera worldTransform and render the world
         Transform worldTransform = camera.getTransform();
         renderer.pushTransform(worldTransform);
-        world.onRender(renderer);
+        spriteRenderer.setView(worldTransform);
+        world.onRender(renderer, spriteRenderer);
         currentController.ifPresent(c -> c.onWorldRender(renderer));
         renderer.popTransform();
 
         // Restore the original worldTransform and draw the gui
-//        var guiTransform = renderer.getTransform();
-//        renderer.pushTransform(guiTransform);
-//        currentController.ifPresent(c -> c.onGuiRender(renderer));
-//        renderer.popTransform();
+        currentController.ifPresent(c -> c.onGuiRender(renderer));
     }
 
     /**

@@ -1,7 +1,11 @@
 package game.state.battle.model;
 
+import game.Game;
 import game.platform.Renderer;
+import game.platform.texture.SpriteRenderer;
+import game.state.battle.model.capabilities.HasSprite;
 import game.util.Util;
+import lombok.Getter;
 
 import java.awt.*;
 import java.time.Duration;
@@ -11,7 +15,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class World {
+    @Getter
     private final int width;
+    @Getter
     private final int height;
     private final Tile[][] tiles;
     private final List<Actor> actors = new ArrayList<>();
@@ -32,13 +38,11 @@ public class World {
 
         actors.add(new Actor(3, 0, Color.ORANGE));
         actors.add(new Actor(5, 0, Color.BLUE));
-        actors.add(new Actor(6, 0, Color.MAGENTA));
 
         Actor enemy = new Actor(4, 0, Color.GREEN);
         enemy.setPlayer(false);
 
         actors.add(enemy);
-
     }
 
     public void wall(int x, int y) {
@@ -51,12 +55,21 @@ public class World {
         }
     }
 
-    public void onRender(Renderer renderer) {
+    public void onRender(Renderer renderer, SpriteRenderer spriteRenderer) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 tiles[x][y].onRender(renderer);
             }
         }
+
+        spriteRenderer.begin();
+        for (Actor actor : actors) {
+            if (actor instanceof HasSprite) {
+                var spriteComponent = ((HasSprite) actor).getSpriteComponent();
+                spriteComponent.onRender(spriteRenderer);
+            }
+        }
+        spriteRenderer.end();
 
         for (Actor actor : actors) {
             actor.onRender(renderer);
@@ -65,14 +78,6 @@ public class World {
 
     public Tile getTile(int x, int y) {
         return tiles[x][y];
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public Tile[] getNeighbors(int x, int y) {
