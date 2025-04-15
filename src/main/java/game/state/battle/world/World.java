@@ -1,8 +1,9 @@
-package game.state.battle.model;
+package game.state.battle.world;
 
 import game.graphics.Renderer;
 import game.graphics.texture.SpriteRenderer;
-import game.state.battle.model.capabilities.HasSprite;
+import game.state.battle.entity.Entity;
+import game.state.battle.entity.capabilities.HasSprite;
 import game.util.Util;
 import lombok.Getter;
 
@@ -19,7 +20,7 @@ public class World {
     @Getter
     private final int height;
     private final Tile[][] tiles;
-    private final List<Actor> actors = new ArrayList<>();
+    private final List<Entity> entities = new ArrayList<>();
 
     public World(int width, int height) {
         this.width = width;
@@ -35,13 +36,13 @@ public class World {
             }
         }
 
-        actors.add(new Actor(3, 0, Color.ORANGE));
-        actors.add(new Actor(5, 0, Color.BLUE));
+        entities.add(new Entity(3, 0));
+        entities.add(new Entity(5, 0));
 
-        Actor enemy = new Actor(4, 0, Color.GREEN);
+        Entity enemy = new Entity(4, 0);
         enemy.setPlayer(false);
 
-        actors.add(enemy);
+        entities.add(enemy);
     }
 
     public void wall(int x, int y) {
@@ -49,8 +50,8 @@ public class World {
     }
 
     public void onUpdate(Duration duration) {
-        for (Actor actor : actors) {
-            actor.onUpdate(duration);
+        for (Entity entity : entities) {
+            entity.onUpdate(duration);
         }
     }
 
@@ -62,16 +63,16 @@ public class World {
         }
 
         spriteRenderer.begin();
-        for (Actor actor : actors) {
-            if (actor instanceof HasSprite) {
-                var spriteComponent = ((HasSprite) actor).getSpriteComponent();
+        for (Entity entity : entities) {
+            if (entity instanceof HasSprite) {
+                var spriteComponent = ((HasSprite) entity).getSprite();
                 spriteComponent.onRender(spriteRenderer);
             }
         }
         spriteRenderer.end();
 
-        for (Actor actor : actors) {
-            actor.onRender(renderer);
+        for (Entity entity : entities) {
+            entity.onRender(renderer);
         }
     }
 
@@ -108,32 +109,32 @@ public class World {
         return neighbors.toArray(new Tile[0]);
     }
 
-    public Optional<Actor> getActorByPosition(int x, int y) {
-        for (Actor actor : actors) {
-            if (actor.getX() == x && actor.getY() == y) {
-                return Optional.of(actor);
+    public Optional<Entity> getActorByPosition(int x, int y) {
+        for (Entity entity : entities) {
+            if (entity.getX() == x && entity.getY() == y) {
+                return Optional.of(entity);
             }
         }
 
         return Optional.empty();
     }
 
-    public void addActor(Actor actor) {
-        actors.add(actor);
+    public void addActor(Entity entity) {
+        entities.add(entity);
     }
 
-    public void removeActor(Actor actor) {
-        actors.remove(actor);
+    public void removeActor(Entity entity) {
+        entities.remove(entity);
     }
 
-    public List<Actor> getActors() {
-        return actors;
+    public List<Entity> getEntities() {
+        return entities;
     }
 
-    public Optional<Actor> findActor(Predicate<Actor> predicate) {
-        for (Actor actor : actors) {
-            if (predicate.test(actor)) {
-                return Optional.of(actor);
+    public Optional<Entity> findActor(Predicate<Entity> predicate) {
+        for (Entity entity : entities) {
+            if (predicate.test(entity)) {
+                return Optional.of(entity);
             }
         }
 

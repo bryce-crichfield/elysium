@@ -1,4 +1,4 @@
-package game.state.battle.model.components;
+package game.state.battle.entity.components;
 
 import lombok.Getter;
 import lombok.Setter;

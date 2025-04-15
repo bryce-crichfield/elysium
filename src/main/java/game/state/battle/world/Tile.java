@@ -1,6 +1,7 @@
-package game.state.battle.model;
+package game.state.battle.world;
 
 import game.graphics.Renderer;
+import lombok.Getter;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -9,14 +10,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class Tile {
+    @Getter
     private final int x;
+    @Getter
     private final int y;
-    private final boolean passable;
+    @Getter
+    private final boolean isPassable;
 
-    public Tile(int x, int y, boolean passable) {
+    public Tile(int x, int y, boolean isPassable) {
         this.x = x;
         this.y = y;
-        this.passable = passable;
+        this.isPassable = isPassable;
     }
 
     public static void drawOutline(List<Tile> tiles, Renderer renderer, Color color) {
@@ -104,26 +108,14 @@ public abstract class Tile {
         renderer.setLineWidth(stroke);
     }
 
-    public boolean isPassable() {
-        return passable;
-    }
-
     public abstract void onRender(Renderer renderer);
 
     public List<Tile> getNeighbors(List<Tile> tiles) {
-        Optional<Tile> above = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y - 1).findFirst();
-        Optional<Tile> below = tiles.stream().filter(tile -> tile.getX() == x && tile.getY() == y + 1).findFirst();
-        Optional<Tile> left = tiles.stream().filter(tile -> tile.getX() == x - 1 && tile.getY() == y).findFirst();
-        Optional<Tile> right = tiles.stream().filter(tile -> tile.getX() == x + 1 && tile.getY() == y).findFirst();
+        Optional<Tile> above = tiles.stream().filter(tile -> tile.x == x && tile.y == y - 1).findFirst();
+        Optional<Tile> below = tiles.stream().filter(tile -> tile.x == x && tile.y == y + 1).findFirst();
+        Optional<Tile> left = tiles.stream().filter(tile -> tile.x == x - 1 && tile.y == y).findFirst();
+        Optional<Tile> right = tiles.stream().filter(tile -> tile.x == x + 1 && tile.y == y).findFirst();
         return Arrays.asList(above, below, left, right).stream().filter(Optional::isPresent).map(Optional::get).collect(
                 Collectors.toList());
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 }

@@ -1,9 +1,11 @@
-package game.state.battle.model;
+package game.state.battle.util;
+
+import game.state.battle.entity.Entity;
 
 import java.util.Optional;
 
 public class Selection {
-    private Optional<Actor> selectedActor;
+    private Optional<Entity> selectedActor;
 
     public Selection() {
         selectedActor = Optional.empty();
@@ -13,7 +15,7 @@ public class Selection {
         return selectedActor.isPresent();
     }
 
-    public Actor get() {
+    public Entity get() {
         if (selectedActor.isEmpty()) {
             throw new IllegalStateException("No actor selected");
         }
@@ -21,8 +23,8 @@ public class Selection {
         return selectedActor.get();
     }
 
-    public void select(Actor actor) {
-        selectedActor = Optional.of(actor);
+    public void select(Entity entity) {
+        selectedActor = Optional.of(entity);
     }
 
     public void clear() {

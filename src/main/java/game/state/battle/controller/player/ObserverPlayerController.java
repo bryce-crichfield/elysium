@@ -1,12 +1,12 @@
-package game.state.battle.controller;
+package game.state.battle.controller.player;
 
-import game.input.Keyboard;
-import game.input.MouseEvent;
-import game.input.Mouse;
 import game.graphics.Renderer;
+import game.input.Keyboard;
+import game.input.Mouse;
+import game.input.MouseEvent;
 import game.state.battle.BattleState;
-import game.state.battle.model.Actor;
-import game.state.battle.model.Cursor;
+import game.state.battle.entity.Entity;
+import game.state.battle.util.Cursor;
 
 import java.awt.*;
 import java.time.Duration;
@@ -47,7 +47,7 @@ public class ObserverPlayerController extends PlayerController {
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
-        Optional<Actor> hovered = state.getWorld().getActorByPosition(cursorX, cursorY);
+        Optional<Entity> hovered = state.getWorld().getActorByPosition(cursorX, cursorY);
 
         if (hovered.isEmpty()) {
             return;
@@ -66,7 +66,7 @@ public class ObserverPlayerController extends PlayerController {
     private void forceHoveredActorStats() {
         int cx = state.getCursor().getCursorX();
         int cy = state.getCursor().getCursorY();
-        Optional<Actor> hov = state.getWorld().getActorByPosition(cx, cy);
+        Optional<Entity> hov = state.getWorld().getActorByPosition(cx, cy);
         hov.ifPresent(actor -> {
 //            onChangeHovered.fire(actor);
 //            hoveredActorStats.setVisible(true);
@@ -107,13 +107,13 @@ public class ObserverPlayerController extends PlayerController {
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
-        Optional<Actor> actor = state.getWorld().getActorByPosition(cursorX, cursorY);
+        Optional<Entity> actor = state.getWorld().getActorByPosition(cursorX, cursorY);
         if (actor.isEmpty()) {
 //            hoveredActorStats.setVisible(false);
         }
 
         if (actor.isPresent()) {
-            Actor hovered = actor.get();
+            Entity hovered = actor.get();
 //            hoveredActorStats.setVisible(true);
 //            onChangeHovered.fire(hovered);
         }

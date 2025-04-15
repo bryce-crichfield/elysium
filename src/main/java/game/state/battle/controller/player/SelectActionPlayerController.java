@@ -1,11 +1,11 @@
-package game.state.battle.controller;
+package game.state.battle.controller.player;
 
 import game.event.Event;
-import game.input.Keyboard;
 import game.graphics.Renderer;
+import game.input.Keyboard;
 import game.state.battle.BattleState;
+import game.state.battle.entity.Entity;
 import game.state.battle.event.ActorHovered;
-import game.state.battle.model.Actor;
 
 import java.time.Duration;
 
@@ -16,7 +16,7 @@ public class SelectActionPlayerController extends PlayerController {
     public SelectActionPlayerController(BattleState state) {
         super(state);
 
-        Event<Actor> onChange = new Event<>();
+        Event<Entity> onChange = new Event<>();
 //        statsMenu = new StatsMenu(20, 20, onChange);
 //        statsMenu.setVisible(true);
 //        onChange.fire(actor.get());

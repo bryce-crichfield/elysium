@@ -1,6 +1,6 @@
-package game.state.battle.model;
+package game.state.battle.entity.components;
 
-import game.state.battle.event.ActorAnimated;
+import game.state.battle.world.Tile;
 import game.util.Util;
 
 import java.time.Duration;
@@ -8,8 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class ActorAnimation {
-    private final Actor actor;
+public class AnimationComponent {
+    //    private final Entity entity;
+    private final PositionComponent position;
     boolean animationEnabled = false;
     float animationPeriod = 0.35f;
     float animationX = 0;
@@ -19,18 +20,23 @@ public class ActorAnimation {
     float animationAccumulator = 0;
     Queue<Tile> animationPath = new LinkedList<>();
 
-    public ActorAnimation(Actor actor) {
-        this.actor = actor;
+    public AnimationComponent(PositionComponent position) {
+//        this.entity = entity;
+        this.position = position;
 
-        animationX = actor.getX();
-        animationY = actor.getY();
+//        animationX = entity.getX();
+//        animationY = entity.getY();
+        animationX = position.getX();
+        animationY = position.getY();
     }
 
     public void start(List<Tile> path) {
         animationAccumulator = 0;
 
-        animationX = actor.getX();
-        animationY = actor.getY();
+        animationX = position.getX();
+        animationY = position.getY();
+//        animationX = entity.getX();
+//        animationY = entity.getY();
 
         animationPath = new LinkedList<>(path);
 
@@ -77,7 +83,7 @@ public class ActorAnimation {
             animationY = animationTargetY;
         }
 
-        ActorAnimated.event.fire(actor);
+//        ActorAnimated.event.fire(entity);
     }
 
     public float getX() {

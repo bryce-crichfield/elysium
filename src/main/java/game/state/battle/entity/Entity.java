@@ -1,13 +1,14 @@
-package game.state.battle.model;
+package game.state.battle.entity;
 
-import game.state.character.GameCharacter;
-import game.state.character.StarTrooper;
 import game.graphics.Renderer;
 import game.graphics.texture.TextureStore;
+import game.state.battle.entity.capabilities.HasSprite;
+import game.state.battle.entity.components.*;
 import game.state.battle.event.*;
-import game.state.battle.model.capabilities.HasSprite;
-import game.state.battle.model.components.PositionComponent;
-import game.state.battle.model.components.SpriteComponent;
+import game.state.battle.util.Cursor;
+import game.state.battle.world.Tile;
+import game.state.character.GameCharacter;
+import game.state.character.StarTrooper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,33 +16,33 @@ import java.awt.*;
 import java.time.Duration;
 import java.util.List;
 
-public class Actor implements HasSprite {
-    PositionComponent position;
-
+public class Entity implements HasSprite {
     @Getter
-    SpriteComponent spriteComponent ;
-
-    ActorAnimation animation;
-    GameCharacter character = StarTrooper.create();
-    float currentHealthPoints = character.getStats().getHealth();
-    float currentMovementPoints = character.getStats().getSpeed();
-    Color color;
+    PositionComponent position;
+    @Getter
+    SpriteComponent sprite;
+    @Getter
+    AnimationComponent animation;
+    @Getter
+    CharacterComponent character;
+    @Getter
+    VitalsComponent vitals;
 
     @Setter
     private boolean selected = false;
     private boolean hovered = false;
     private boolean isPlayer = true;
+
     @Getter
     @Setter
     private boolean waiting = false;
 
-    public Actor(int x, int y, Color color) {
+    public Entity(int x, int y) {
         this.position = new PositionComponent(x, y);
-        this.color = color;
-
-        animation = new ActorAnimation(this);
-
-        spriteComponent = new SpriteComponent(position, TextureStore.getInstance().getAssets("sprites/test"));
+        animation = new AnimationComponent(position);
+        vitals = new VitalsComponent();
+        character = new CharacterComponent(StarTrooper.create());
+        sprite = new SpriteComponent(position, TextureStore.getInstance().getAssets("sprites/test"));
     }
 
     public boolean isPlayer() {
@@ -52,18 +53,6 @@ public class Actor implements HasSprite {
         isPlayer = player;
     }
 
-    public int getAttackDistance() {
-        return character.getStats().getRange();
-    }
-
-    public String getName() {
-        return character.getName();
-    }
-
-    public float getHealth() {
-        return currentHealthPoints;
-    }
-
     public void move(List<Tile> movePath) {
         if (movePath.isEmpty()) return;
 
@@ -72,7 +61,7 @@ public class Actor implements HasSprite {
             movePath.remove(0);
         }
 
-        currentMovementPoints -= movePath.size();
+        vitals.movementPoints -= movePath.size();
         animation.start(movePath);
     }
 
@@ -88,14 +77,14 @@ public class Actor implements HasSprite {
         }
     }
 
-//    public void onActorSelected(Actor actor) {
-//        if (actor.equals(this)) {
-//            selected = true;
-//        }
-//    }
+    public void onActorSelected(Entity entity) {
+        if (entity.equals(this)) {
+            selected = true;
+        }
+    }
 
-    public void onActorDeselected(Actor actor) {
-        if (actor.equals(this)) {
+    public void onActorDeselected(Entity entity) {
+        if (entity.equals(this)) {
             selected = false;
         }
     }
@@ -107,10 +96,10 @@ public class Actor implements HasSprite {
 
         for (Tile tile : attack.getTargets()) {
             if (tile.getX() == position.getX() && tile.getY() == position.getY()) {
-                currentHealthPoints -= attack.getAttacker().getAttack();
+                vitals.health -= attack.getAttacker().getAttack();
                 ActorDamaged.event.fire(this);
 
-                if (currentHealthPoints <= 0) {
+                if (vitals.health <= 0) {
                     ActorKilled.event.fire(this);
                 }
             }
@@ -118,7 +107,8 @@ public class Actor implements HasSprite {
     }
 
     public float getAttack() {
-        return character.getStats().getPhysical();
+        return 0;
+//        return character.getStats().getPhysical();
     }
 
     public float getX() {
@@ -131,23 +121,17 @@ public class Actor implements HasSprite {
 
     public void onUpdate(Duration duration) {
         animation.onUpdate(duration);
-        position.setX((int)animation.getX());
-        position.setY((int)animation.getY());
+        position.setX((int) animation.getX());
+        position.setY((int) animation.getY());
     }
 
     public void onRender(Renderer renderer) {
         // Draw the actor
-        Color color = selected ? Color.GREEN : waiting ? Color.GRAY : this.color;
-        color = !isPlayer ? Color.RED : color;
         float x = animation.getX();
         float y = animation.getY();
-//        renderer.setColor(color);
-//        renderer.fillOval((int) (x * 32), (int) (y * 32), 32, 32);
-//        renderer.setColor(Color.BLACK);
-//        renderer.drawOval((int) (x * 32), (int) (y * 32), 32, 32);
 
         // Draw the health bar
-        float healthPercentage = currentHealthPoints / character.getStats().getHealth();
+        float healthPercentage = vitals.health / character.getHealth();
         Color healthColor = healthPercentage > 0.5 ? Color.GREEN : healthPercentage > 0.25 ? Color.YELLOW : Color.RED;
         renderer.setColor(healthColor);
         int healthWidth = (int) ((32 - 10) * healthPercentage);
@@ -161,9 +145,5 @@ public class Actor implements HasSprite {
         renderer.fillRect(healthX, healthY, healthWidth, healthHeight);
         renderer.setColor(Color.BLACK);
         renderer.drawRect(healthX, healthY, 32 - 10, healthHeight);
-    }
-
-    public int getMovementPoints() {
-        return (int) currentMovementPoints;
     }
 }

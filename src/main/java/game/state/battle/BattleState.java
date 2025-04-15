@@ -1,21 +1,22 @@
 package game.state.battle;
 
 import game.Game;
-import game.graphics.background.StarBackground;
-import game.input.Mouse;
-import game.input.MouseEvent;
 import game.graphics.Renderer;
 import game.graphics.Transform;
+import game.graphics.background.StarBackground;
 import game.graphics.texture.SpriteRenderer;
+import game.input.MouseEvent;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
-import game.state.battle.controller.ObserverPlayerController;
-import game.state.battle.model.*;
-import game.state.battle.model.Cursor;
+import game.state.battle.controller.player.ObserverPlayerController;
+import game.state.battle.entity.Entity;
+import game.state.battle.util.Camera;
+import game.state.battle.util.Cursor;
+import game.state.battle.util.Selection;
+import game.state.battle.world.World;
 import game.state.title.TitleState;
 import game.transition.Transitions;
-import game.util.Camera;
 import game.util.Easing;
 import lombok.Getter;
 
@@ -46,7 +47,7 @@ public class BattleState extends GameState {
         cursor = new Cursor(camera, game, world);
         addBackground(StarBackground::new);
 
-        for (Actor actor : world.getActors()) {
+        for (Entity entity : world.getEntities()) {
 //            getSubscriptions().on(ActionActorMoved.event).run(actor::onActorMoved);
 //            getSubscriptions().on(ActorSelected.event).run(a -> {
 //                if (a.equals(actor)) {

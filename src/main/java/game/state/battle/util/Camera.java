@@ -1,4 +1,4 @@
-package game.util;
+package game.state.battle.util;
 
 import game.Game;
 import game.graphics.Transform;

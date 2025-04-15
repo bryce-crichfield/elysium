@@ -1,7 +1,7 @@
 package game.state.battle.event;
 
 import game.event.Event;
-import game.state.battle.model.Cursor;
+import game.state.battle.util.Cursor;
 
 public enum CursorMoved {
     ;

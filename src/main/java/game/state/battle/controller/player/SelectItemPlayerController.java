@@ -1,4 +1,4 @@
-package game.state.battle.controller;
+package game.state.battle.controller.player;
 
 //import game.state.battle.hud.ItemsMenu;
 

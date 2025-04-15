@@ -7,7 +7,7 @@ import game.state.GameState;
 import game.state.overworld.entity.Frame;
 import game.state.overworld.entity.Player;
 import game.state.overworld.entity.Tile;
-import game.util.Camera;
+import game.state.battle.util.Camera;
 import game.util.Util;
 
 import java.time.Duration;

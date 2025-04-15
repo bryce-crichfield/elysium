@@ -1,8 +1,8 @@
 package game.state.battle.controller;
 
-import game.input.MouseEvent;
 import game.event.EventContext;
 import game.graphics.Renderer;
+import game.input.MouseEvent;
 import game.state.battle.BattleState;
 
 import java.time.Duration;

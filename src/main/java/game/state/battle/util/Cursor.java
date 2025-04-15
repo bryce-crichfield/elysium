@@ -1,12 +1,12 @@
-package game.state.battle.model;
+package game.state.battle.util;
 
 import game.Game;
+import game.graphics.Renderer;
+import game.input.KeyEvent;
 import game.input.Keyboard;
 import game.input.MouseEvent;
-import game.input.KeyEvent;
-import game.graphics.Renderer;
 import game.state.battle.event.CursorMoved;
-import game.util.Camera;
+import game.state.battle.world.World;
 import game.util.Util;
 
 import java.awt.*;

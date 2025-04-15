@@ -10,6 +10,7 @@ public class ActionsMenu {
     private static final int WIDTH = 160;
     private static final int HEIGHT = 95;
     private BattleState state;
+
     public ActionsMenu(int x, int y, BattleState state) {
         this(x, y);
         this.state = state;

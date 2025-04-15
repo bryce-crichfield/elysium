@@ -1,19 +1,19 @@
 package game.state.battle.event;
 
 import game.event.Event;
-import game.state.battle.model.Actor;
-import game.state.battle.model.Tile;
+import game.state.battle.entity.Entity;
+import game.state.battle.world.Tile;
 
 import java.util.List;
 
 public class ActionActorMoved {
     public static final Event<ActionActorMoved> event = new Event<>();
 
-    public final Actor actor;
+    public final Entity entity;
     public final List<Tile> movePath;
 
-    public ActionActorMoved(Actor actor, List<Tile> movePath) {
-        this.actor = actor;
+    public ActionActorMoved(Entity entity, List<Tile> movePath) {
+        this.entity = entity;
         this.movePath = movePath;
     }
 }

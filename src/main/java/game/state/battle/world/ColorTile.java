@@ -1,4 +1,4 @@
-package game.state.battle.model;
+package game.state.battle.world;
 
 import game.graphics.Renderer;
 

@@ -1,8 +1,8 @@
-package game.state.battle.controller;
+package game.state.battle.controller.player;
 
-import game.input.MouseEvent;
 import game.state.battle.BattleState;
-import game.state.battle.model.Actor;
+import game.state.battle.controller.BattleController;
+import game.state.battle.entity.Entity;
 import lombok.Getter;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public abstract class PlayerController extends BattleController {
 
     @Override
     public final boolean isDone() {
-        List<Actor> playerActorsNotWaiting = state.getWorld().getActors().stream()
-                .filter(Actor::isPlayer)
+        List<Entity> playerActorsNotWaiting = state.getWorld().getEntities().stream()
+                .filter(Entity::isPlayer)
                 .filter(actor -> !actor.isWaiting())
                 .toList();
 

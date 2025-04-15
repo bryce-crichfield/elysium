@@ -1,5 +1,6 @@
-package game.state.battle.model;
+package game.state.battle.world;
 
+import game.state.battle.entity.Entity;
 import game.util.Util;
 
 import java.util.*;
@@ -8,11 +9,11 @@ public class Pathfinder {
     World world;
     Queue<Node> open;
     Set<Node> closed;
-    Actor actor;
+    Entity entity;
 
-    public Pathfinder(World world, Actor actor) {
+    public Pathfinder(World world, Entity entity) {
         this.world = world;
-        this.actor = actor;
+        this.entity = entity;
         open = new PriorityQueue<>(Comparator.comparingInt(n -> n.gScore + n.hScore));
         closed = new HashSet<>();
     }
@@ -23,7 +24,7 @@ public class Pathfinder {
         }
 
         float distance = Util.distance(start.getX(), start.getY(), end.getX(), end.getY());
-        if (distance > actor.getMovementPoints()) {
+        if (distance > entity.getVitals().movementPoints) {
             return List.of();
         }
 
