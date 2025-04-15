@@ -5,7 +5,7 @@ import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 

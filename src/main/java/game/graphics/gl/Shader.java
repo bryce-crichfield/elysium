@@ -1,4 +1,4 @@
-package game.platform.gl;
+package game.graphics.gl;
 
 import lombok.Getter;
 import org.lwjgl.opengl.GL20;

@@ -1,4 +1,4 @@
-package game.platform;
+package game.graphics.platform;
 
 import java.awt.*;
 import java.awt.event.*;

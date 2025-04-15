@@ -4,7 +4,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.*;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package game.platform.texture;
+package game.graphics.texture;
 
 import lombok.Getter;
 import org.lwjgl.opengl.GL11;
@@ -66,8 +66,8 @@ public class Texture {
 
     private void setDefaultParameters() {
         // Set filtering parameters
-        GL11.glTexParameteri(target, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-        GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(target, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         // Set wrapping parameters
         GL11.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);

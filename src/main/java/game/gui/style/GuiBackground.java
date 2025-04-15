@@ -1,6 +1,6 @@
 package game.gui.style;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.*;
 

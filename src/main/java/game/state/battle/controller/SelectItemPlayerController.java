@@ -2,7 +2,7 @@ package game.state.battle.controller;
 
 //import game.state.battle.hud.ItemsMenu;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.battle.BattleState;
 
 import java.time.Duration;

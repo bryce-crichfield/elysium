@@ -1,4 +1,4 @@
-package game.platform;
+package game.graphics;
 
 import lombok.Getter;
 import org.joml.Matrix4f;

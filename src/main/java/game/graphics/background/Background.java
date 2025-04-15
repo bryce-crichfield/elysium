@@ -1,6 +1,6 @@
 package game.graphics.background;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.time.Duration;
 

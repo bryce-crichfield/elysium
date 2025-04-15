@@ -9,7 +9,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiLabel;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.GameState;
 import game.transition.Transitions;
 import game.util.Easing;

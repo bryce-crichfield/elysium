@@ -1,6 +1,6 @@
-package game.platform.paint;
+package game.graphics.paint;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.*;
 

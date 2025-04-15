@@ -1,4 +1,4 @@
-package game.platform.gl;
+package game.graphics.gl;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;

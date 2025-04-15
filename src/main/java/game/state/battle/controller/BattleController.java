@@ -2,7 +2,7 @@ package game.state.battle.controller;
 
 import game.input.MouseEvent;
 import game.event.EventContext;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.battle.BattleState;
 
 import java.time.Duration;
@@ -33,6 +33,10 @@ public abstract class BattleController {
     public abstract boolean isDone();
 
     public void onMouseClicked(MouseEvent.Clicked event) {
+
+    }
+
+    public void onMouseMoved(MouseEvent.Moved event) {
 
     }
 

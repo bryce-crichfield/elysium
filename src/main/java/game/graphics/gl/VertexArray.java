@@ -1,9 +1,8 @@
-package game.platform.gl;
+package game.graphics.gl;
 
 
 import lombok.Getter;
 
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.*;
 

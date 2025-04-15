@@ -1,6 +1,6 @@
 package game.transition;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.image.BufferedImage;
 import java.time.Duration;

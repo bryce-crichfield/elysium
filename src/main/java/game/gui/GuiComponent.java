@@ -2,8 +2,8 @@ package game.gui;
 
 import game.gui.input.*;
 import game.input.MouseEvent;
-import game.platform.Renderer;
-import game.platform.Transform;
+import game.graphics.Renderer;
+import game.graphics.Transform;
 import lombok.Getter;
 import lombok.Setter;
 

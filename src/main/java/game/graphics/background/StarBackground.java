@@ -1,9 +1,9 @@
 package game.graphics.background;
 
 import game.Game;
-import game.platform.paint.LinearGradientPaint;
-import game.platform.paint.Paint;
-import game.platform.Renderer;
+import game.graphics.paint.LinearGradientPaint;
+import game.graphics.paint.Paint;
+import game.graphics.Renderer;
 import game.util.Util;
 
 import java.awt.*;
@@ -72,7 +72,7 @@ public class StarBackground extends Background {
         Paint startPaint = graphics.getPaint();
         // Draw dark gradient background with black at the bottom and dark dark blue at the top
         Color black = new Color(0x000000);
-        Color darkBlue = new Color(0x0A001A);
+        Color darkBlue = new Color(0x000744);
         var gradient = new LinearGradientPaint(
                 screenWidth/2.0f, 0,
                 screenWidth/2.0f, screenHeight,

@@ -15,7 +15,7 @@ import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.GameState;
 import game.state.battle.BattleState;
 import game.state.options.OptionsState;

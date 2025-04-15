@@ -2,7 +2,7 @@ package game.state.battle.controller;
 
 import game.event.Event;
 import game.input.Keyboard;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.event.ActorHovered;
 import game.state.battle.model.Actor;

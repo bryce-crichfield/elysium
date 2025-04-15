@@ -1,5 +1,6 @@
 package game.state.battle.controller;
 
+import game.input.MouseEvent;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import lombok.Getter;
@@ -21,6 +22,5 @@ public abstract class PlayerController extends BattleController {
 
         return playerActorsNotWaiting.isEmpty();
     }
-
 
 }

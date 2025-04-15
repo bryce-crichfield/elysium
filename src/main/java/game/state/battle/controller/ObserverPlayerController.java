@@ -3,7 +3,7 @@ package game.state.battle.controller;
 import game.input.Keyboard;
 import game.input.MouseEvent;
 import game.input.Mouse;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import game.state.battle.model.Cursor;
@@ -43,6 +43,7 @@ public class ObserverPlayerController extends PlayerController {
     }
 
     public final void selectActor() {
+        System.out.println("selectActor");
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
@@ -56,7 +57,7 @@ public class ObserverPlayerController extends PlayerController {
             if (hovered.get().isWaiting())
                 return;
             state.getSelection().select(hovered.get());
-            state.transitionTo(SelectActionPlayerController::new);
+            state.transitionTo(SelectMovePlayerController::new);
 
 //            ActorSelected.event.fire(actor.get());
         }

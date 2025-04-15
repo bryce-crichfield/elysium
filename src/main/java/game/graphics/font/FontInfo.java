@@ -1,4 +1,4 @@
-package game.platform.font;
+package game.graphics.font;
 
 import lombok.Getter;
 import org.lwjgl.stb.STBTTFontinfo;
@@ -8,8 +8,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static game.platform.font.FontRenderer.FIRST_CHAR;
-import static game.platform.font.FontRenderer.NUM_CHARS;
+import static game.graphics.font.FontRenderer.FIRST_CHAR;
+import static game.graphics.font.FontRenderer.NUM_CHARS;
 
 @Getter
 public class FontInfo {

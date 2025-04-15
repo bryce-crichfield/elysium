@@ -1,4 +1,4 @@
-package game.character;
+package game.state.character;
 
 public class Level {
     int value;

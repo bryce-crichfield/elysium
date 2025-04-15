@@ -1,4 +1,4 @@
-package game.platform.font;
+package game.graphics.font;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

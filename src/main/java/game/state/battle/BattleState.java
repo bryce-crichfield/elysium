@@ -2,10 +2,11 @@ package game.state.battle;
 
 import game.Game;
 import game.graphics.background.StarBackground;
+import game.input.Mouse;
 import game.input.MouseEvent;
-import game.platform.Renderer;
-import game.platform.Transform;
-import game.platform.texture.SpriteRenderer;
+import game.graphics.Renderer;
+import game.graphics.Transform;
+import game.graphics.texture.SpriteRenderer;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
@@ -24,8 +25,11 @@ import java.time.Duration;
 import java.util.Optional;
 
 public class BattleState extends GameState {
+    @Getter
     private final Camera camera;
+    @Getter
     private final World world;
+    @Getter
     private final Cursor cursor;
 
     private final SpriteRenderer spriteRenderer = new SpriteRenderer("shaders/sprite/SpriteVertex.glsl", "shaders/sprite/SpriteFragment.glsl");
@@ -38,7 +42,7 @@ public class BattleState extends GameState {
     public BattleState(Game game) {
         super(game);
         camera = new Camera(game);
-        world = new World(16, 16);
+        world = new World(64, 64);
         cursor = new Cursor(camera, game, world);
         addBackground(StarBackground::new);
 
@@ -75,6 +79,15 @@ public class BattleState extends GameState {
         int worldY = camera.getWorldY(event.getY());
         var e = event.withPoint(new Point(worldX, worldY));
         currentController.ifPresent(c -> c.onMouseClicked(e));
+    }
+
+    @Override
+    public void onMouseMoved(MouseEvent.Moved event) {
+        // translate from screen coordinates to world coordinates
+        int worldX = camera.getWorldX(event.getX());
+        int worldY = camera.getWorldY(event.getY());
+        var e = event.withPoint(new Point(worldX, worldY));
+        currentController.ifPresent(c -> c.onMouseMoved(e));
     }
 
     @Override
@@ -130,13 +143,5 @@ public class BattleState extends GameState {
         currentController.ifPresent(c -> c.onExit());
         currentController = Optional.of(factory.create(this));
         currentController.ifPresent(c -> c.onEnter());
-    }
-
-    public Cursor getCursor() {
-        return cursor;
-    }
-
-    public World getWorld() {
-        return world;
     }
 }

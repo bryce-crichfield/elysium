@@ -1,9 +1,9 @@
-package game.platform.texture;
+package game.graphics.texture;
 
-import game.platform.Transform;
-import game.platform.gl.Program;
-import game.platform.gl.VertexArray;
-import game.platform.gl.VertexBuffer;
+import game.graphics.Transform;
+import game.graphics.gl.Program;
+import game.graphics.gl.VertexArray;
+import game.graphics.gl.VertexBuffer;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Matrix4f;

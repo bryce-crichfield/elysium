@@ -1,8 +1,7 @@
 package game.state.battle.model;
 
-import game.Game;
-import game.platform.Renderer;
-import game.platform.texture.SpriteRenderer;
+import game.graphics.Renderer;
+import game.graphics.texture.SpriteRenderer;
 import game.state.battle.model.capabilities.HasSprite;
 import game.util.Util;
 import lombok.Getter;
@@ -77,6 +76,9 @@ public class World {
     }
 
     public Tile getTile(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return null;
+        }
         return tiles[x][y];
     }
 

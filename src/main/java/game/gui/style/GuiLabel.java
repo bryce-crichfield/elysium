@@ -1,7 +1,7 @@
 package game.gui.style;
 
 import game.gui.GuiComponent;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 

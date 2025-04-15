@@ -1,7 +1,7 @@
 package game.transition;
 
-import game.platform.FrameBuffer;
-import game.platform.Renderer;
+import game.graphics.FrameBuffer;
+import game.graphics.Renderer;
 import game.util.Easing;
 
 import java.awt.*;

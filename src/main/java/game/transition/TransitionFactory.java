@@ -1,6 +1,6 @@
 package game.transition;
 
-import game.platform.FrameBuffer;
+import game.graphics.FrameBuffer;
 
 @FunctionalInterface
 public interface TransitionFactory {

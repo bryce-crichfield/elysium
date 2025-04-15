@@ -1,6 +1,8 @@
-package game.platform;
+package game.graphics.platform;
 
 import game.Game;
+import game.graphics.FrameBuffer;
+import game.graphics.Renderer;
 import game.input.KeyEvent;
 import game.input.MouseEvent;
 import org.lwjgl.glfw.GLFWVidMode;

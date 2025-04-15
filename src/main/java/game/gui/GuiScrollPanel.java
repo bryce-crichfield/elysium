@@ -3,8 +3,8 @@ package game.gui;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
-import game.platform.Renderer;
-import game.platform.Transform;
+import game.graphics.Renderer;
+import game.graphics.Transform;
 import lombok.Getter;
 
 import java.awt.*;

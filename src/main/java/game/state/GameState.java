@@ -4,7 +4,7 @@ import game.Game;
 import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
 import game.gui.input.GuiMouseManager;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;

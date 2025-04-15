@@ -2,7 +2,7 @@ package game.state.overworld;
 
 import game.Game;
 import game.graphics.background.StarBackground;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.GameState;
 import game.state.overworld.entity.Frame;
 import game.state.overworld.entity.Player;

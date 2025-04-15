@@ -1,9 +1,9 @@
 package game.state.battle.model.components;
 
 import game.Game;
-import game.platform.texture.Sprite;
-import game.platform.texture.SpriteRenderer;
-import game.platform.texture.Texture;
+import game.graphics.texture.Sprite;
+import game.graphics.texture.SpriteRenderer;
+import game.graphics.texture.Texture;
 import lombok.RequiredArgsConstructor;
 
 

@@ -1,7 +1,7 @@
 package game.util;
 
 import game.Game;
-import game.platform.Transform;
+import game.graphics.Transform;
 
 public class Camera {
     Game game;
@@ -53,11 +53,9 @@ public class Camera {
     }
 
     public int getWorldX(int screenX) {
-        System.out.println("screenX = " + screenX);
         // Convert screen coordinates to world coordinates
         float screenCenterX = Game.SCREEN_WIDTH / 2.0f;
         float worldX = (screenX - screenCenterX) / zoom + x;
-        System.out.println("worldX = " + worldX);
         return Math.round(worldX);
     }
 

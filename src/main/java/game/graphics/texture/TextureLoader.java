@@ -1,4 +1,4 @@
-package game.platform.texture;
+package game.graphics.texture;
 
 import game.asset.AssetLoader;
 import org.lwjgl.BufferUtils;

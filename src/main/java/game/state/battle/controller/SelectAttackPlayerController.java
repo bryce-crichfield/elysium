@@ -1,7 +1,7 @@
 package game.state.battle.controller;
 
 import game.event.Event;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.model.Actor;
 import game.state.battle.model.Cursor;

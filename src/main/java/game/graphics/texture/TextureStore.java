@@ -1,4 +1,4 @@
-package game.platform.texture;
+package game.graphics.texture;
 
 import game.asset.AssetStore;
 import lombok.Getter;

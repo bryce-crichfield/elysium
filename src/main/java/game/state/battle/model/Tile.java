@@ -1,6 +1,6 @@
 package game.state.battle.model;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.*;
 import java.util.Arrays;

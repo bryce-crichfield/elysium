@@ -1,6 +1,6 @@
 package game.state.overworld.entity;
 
-import game.platform.Renderer;
+import game.graphics.Renderer;
 
 import java.awt.*;
 import java.util.HashMap;

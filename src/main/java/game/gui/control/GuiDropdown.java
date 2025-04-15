@@ -3,7 +3,7 @@ package game.gui.control;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
-import game.platform.Renderer;
+import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.Setter;
 

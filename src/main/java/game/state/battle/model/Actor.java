@@ -1,9 +1,9 @@
 package game.state.battle.model;
 
-import game.character.GameCharacter;
-import game.character.StarTrooper;
-import game.platform.Renderer;
-import game.platform.texture.TextureStore;
+import game.state.character.GameCharacter;
+import game.state.character.StarTrooper;
+import game.graphics.Renderer;
+import game.graphics.texture.TextureStore;
 import game.state.battle.event.*;
 import game.state.battle.model.capabilities.HasSprite;
 import game.state.battle.model.components.PositionComponent;
@@ -11,9 +11,9 @@ import game.state.battle.model.components.SpriteComponent;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.text.Position;
 import java.awt.*;
 import java.time.Duration;
+import java.util.List;
 
 public class Actor implements HasSprite {
     PositionComponent position;
@@ -64,16 +64,16 @@ public class Actor implements HasSprite {
         return currentHealthPoints;
     }
 
-    public void onActorMoved(ActionActorMoved event) {
-        if (event.actor.equals(this)) {
-            // remove the self-tile from the path
-            event.movePath.remove(0);
+    public void move(List<Tile> movePath) {
+        if (movePath.isEmpty()) return;
 
-            currentMovementPoints -= event.movePath.size();
-            System.out.println("Actor " + this + " has " + currentMovementPoints + " movement points left");
-            System.out.println("Moved for " + event.movePath.size() + " tiles");
-            animation.start(event.movePath);
+        // If the first tile in the path is the same as the current position, remove it
+        if (movePath.get(0).getX() == position.getX() && movePath.get(0).getY() == position.getY()) {
+            movePath.remove(0);
         }
+
+        currentMovementPoints -= movePath.size();
+        animation.start(movePath);
     }
 
     public void onCursorMoved(Cursor cursor) {

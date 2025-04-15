@@ -1,8 +1,8 @@
 package game.state;
 
 import game.Game;
-import game.platform.FrameBuffer;
-import game.platform.Renderer;
+import game.graphics.FrameBuffer;
+import game.graphics.Renderer;
 import game.transition.Transition;
 import game.transition.TransitionFactory;
 

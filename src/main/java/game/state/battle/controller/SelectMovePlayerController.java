@@ -1,8 +1,9 @@
 package game.state.battle.controller;
 
-import game.event.Event;
 import game.input.Keyboard;
-import game.platform.Renderer;
+import game.graphics.Renderer;
+import game.input.Mouse;
+import game.input.MouseEvent;
 import game.state.battle.BattleState;
 import game.state.battle.event.ActionActorMoved;
 import game.state.battle.event.CursorMoved;
@@ -22,7 +23,6 @@ public class SelectMovePlayerController extends PlayerController {
 //    private final StatsMenu selectedActorStats;
 //    private final StatsMenu hoveredActorStats;
 
-    Event<Actor> onChangeHovered = new Event<>();
     private List<Tile> possiblePath;
 
     public SelectMovePlayerController(BattleState state) {
@@ -30,14 +30,11 @@ public class SelectMovePlayerController extends PlayerController {
 
         possiblePath = new ArrayList<>();
 
-        Event<Actor> onChangeSelected = new Event<>();
 //        selectedActorStats = new StatsMenu(20, 20, onChangeSelected);
 //        selectedActorStats.setVisible(true);
-        onChangeSelected.fire(state.getSelection().get());
 
 //        hoveredActorStats = new StatsMenu(280, 20, onChangeHovered);
 //        hoveredActorStats.setVisible(false);
-        onChangeHovered.fire(state.getSelection().get());
     }
 
     @Override
@@ -52,7 +49,7 @@ public class SelectMovePlayerController extends PlayerController {
     public void actorMoved(ActionActorMoved movement) {
         Util.ensure(state.getSelection().isPresent(), "No actor selected in the select move mode");
 
-        // the actor has now moved and can no longer move this turn, it is waiting for the next turn
+        // The actor has now moved and can no longer move this turn, it is waiting for the next turn
         if (state.getSelection().get().getMovementPoints() <= 0) {
             state.getSelection().get().setWaiting(true);
             state.getSelection().clear();
@@ -87,7 +84,6 @@ public class SelectMovePlayerController extends PlayerController {
 
             Actor hovered = hoveredActor.get();
 //            hoveredActorStats.setVisible(true);
-            onChangeHovered.fire(hovered);
         }
     }
 
@@ -98,21 +94,17 @@ public class SelectMovePlayerController extends PlayerController {
 
     @Override
     public void onWorldRender(Renderer renderer) {
-//        selectedActorStats.onRender(graphics);
-//        hoveredActorStats.onRender(graphics);
-
         int distance = state.getSelection().get().getMovementPoints();
         int actorX = (int) state.getSelection().get().getX();
         int actorY = (int) state.getSelection().get().getY();
         List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);
 
-        Composite originalComposite = renderer.getComposite();
-        renderer.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
         for (Tile tile : inRange) {
-            renderer.setColor(Color.ORANGE.darker().darker());
+            var color = Color.ORANGE.darker().darker();
+            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
+            renderer.setColor(color);
             renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
         }
-        renderer.setComposite(originalComposite);
 
         Tile.drawOutline(inRange, renderer, Color.ORANGE);
         Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
@@ -121,35 +113,60 @@ public class SelectMovePlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-
+//        selectedActorStats.onRender(graphics);
+//        hoveredActorStats.onRender(graphics);
     }
 
+    @Override
+    public void onMouseMoved(MouseEvent.Moved event) {
+        // Set the cursor to where the mouse is
+        int worldX = event.getX();
+        int worldY = event.getY();
+        int tileX = worldX / 32;
+        int tileY = worldY / 32;
+
+        // If outside the bounds of the moveable area, return
+        Tile tile = state.getWorld().getTile(tileX, tileY);
+        if (tile == null) {
+            return;
+        }
+
+        state.getCursor().setPosition(tileX, tileY);
+    }
+
+    @Override
+    public void onMouseClicked(MouseEvent.Clicked event) {
+        if (event.getButton() == Mouse.LEFT) {
+            moveActor();
+        }
+    }
+
+    void moveActor() {
+        if (possiblePath.isEmpty()) {
+            return;
+        }
+
+        int cursorX = state.getCursor().getCursorX();
+        int cursorY = state.getCursor().getCursorY();
+        boolean hoveringOnEmptyTile = state.getWorld().getActorByPosition(cursorX, cursorY).isEmpty();
+        Actor actor = state.getSelection().get();
+
+        if (!hoveringOnEmptyTile) return;
+
+
+        // getBattleState().getGame().getAudio().play("select.wav");
+        actor.move(possiblePath);
+        possiblePath = new ArrayList<>();
+        state.transitionTo(ObserverPlayerController::new);
+    }
 
     @Override
     public void onKeyPressed(int keyCode) {
         state.getCursor().onKeyPressed(keyCode);
 
-        boolean primaryPressed = keyCode == Keyboard.PRIMARY;
-        int cursorX = state.getCursor().getCursorX();
-        int cursorY = state.getCursor().getCursorY();
-        boolean hoveringOnEmptyTile = state.getWorld().getActorByPosition(cursorX, cursorY).isEmpty();
-
-        if (hoveringOnEmptyTile && primaryPressed) {
-//            getBattleState().getGame().getAudio().play("select.wav");
-            if (possiblePath.isEmpty()) {
-                return;
-            }
-
-            ActionActorMoved.event.fire(new ActionActorMoved(state.getSelection().get(), possiblePath));
-            possiblePath = new ArrayList<>();
+        if (keyCode == Keyboard.PRIMARY) {
+            moveActor();
         }
-
-//        if (keyCode == Keyboard.SECONDARY) {
-//            if (actor.isEmpty()) {
-//                throw new IllegalStateException("No actor selected in the select action mode");
-//            }
-//            battleStateMachine.transitionTo(new SelectActionPlayerController(this));
-////            ControllerTransition.defer.fire(() -> new SelectActionPlayerController(this));
     }
 }
 

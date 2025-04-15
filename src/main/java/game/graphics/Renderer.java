@@ -1,9 +1,9 @@
-package game.platform;
+package game.graphics;
 
-import game.platform.font.FontInfo;
-import game.platform.font.FontRenderer;
-import game.platform.paint.Paint;
-import game.platform.paint.SolidColorPaint;
+import game.graphics.font.FontInfo;
+import game.graphics.font.FontRenderer;
+import game.graphics.paint.Paint;
+import game.graphics.paint.SolidColorPaint;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector2f;
@@ -35,7 +35,7 @@ public class Renderer {
     @Getter
     private Composite composite;
     @Getter
-    private game.platform.paint.Paint paint;
+    private game.graphics.paint.Paint paint;
 
     public Renderer(FrameBuffer frameBuffer) {
         this.parentFramebuffer = frameBuffer;
@@ -228,7 +228,7 @@ public class Renderer {
         ensureCorrectFboBound();
 
         // Check if we're using a LinearGradientPaint
-        if (paint instanceof game.platform.paint.LinearGradientPaint gradient) {
+        if (paint instanceof game.graphics.paint.LinearGradientPaint gradient) {
             fillRectWithGradient(x, y, width, height, gradient);
             return;
         }
@@ -258,7 +258,7 @@ public class Renderer {
 
     // New method to fill rectangle with gradient
     // Updated method to fill rectangle with gradient in any direction
-    private void fillRectWithGradient(int x, int y, int width, int height, game.platform.paint.LinearGradientPaint gradient) {
+    private void fillRectWithGradient(int x, int y, int width, int height, game.graphics.paint.LinearGradientPaint gradient) {
         pushTransform(Transform.fromScreenSpace(bufferWidth, bufferHeight));
 
         Transform transform = transformStack.peek();
