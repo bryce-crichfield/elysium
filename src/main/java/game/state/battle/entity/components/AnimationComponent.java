@@ -1,7 +1,9 @@
 package game.state.battle.entity.components;
 
 import com.google.gson.JsonObject;
+import game.state.battle.entity.Entity;
 import game.state.battle.entity.component.Component;
+import game.state.battle.entity.component.ComponentDeserializer;
 import game.state.battle.world.Tile;
 import game.util.Util;
 
@@ -23,13 +25,19 @@ public class AnimationComponent extends Component {
     Queue<Tile> animationPath = new LinkedList<>();
 
     public AnimationComponent(PositionComponent position) {
-//        this.entity = entity;
         this.position = position;
 
-//        animationX = entity.getX();
-//        animationY = entity.getY();
         animationX = position.getX();
         animationY = position.getY();
+    }
+
+    @ComponentDeserializer(type = AnimationComponent.class, dependencies = {PositionComponent.class})
+    public static AnimationComponent deserialize(JsonObject json, Entity entity) {
+        PositionComponent position = entity.getComponent(PositionComponent.class);
+
+        AnimationComponent animationComponent = new AnimationComponent(position);
+        animationComponent.animationPeriod = json.get("animationPeriod").getAsFloat();
+        return animationComponent;
     }
 
     public void start(List<Tile> path) {
@@ -37,8 +45,6 @@ public class AnimationComponent extends Component {
 
         animationX = position.getX();
         animationY = position.getY();
-//        animationX = entity.getX();
-//        animationY = entity.getY();
 
         animationPath = new LinkedList<>(path);
 
@@ -94,6 +100,11 @@ public class AnimationComponent extends Component {
 
     public float getY() {
         return animationY;
+    }
+
+    @Override
+    public JsonObject serialize() {
+        return new JsonObject();
     }
 
 }

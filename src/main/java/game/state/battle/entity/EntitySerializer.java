@@ -1,7 +1,7 @@
 package game.state.battle.entity;
 
 import com.google.gson.*;
-import game.state.battle.entity.component.ComponentRegistry;
+import game.state.battle.entity.component.ComponentDeserializerRegistry;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -15,7 +15,7 @@ public class EntitySerializer {
             .create();
 
     static {
-        ComponentRegistry.init();
+        ComponentDeserializerRegistry.registerDeserializers();
     }
 
     public static void saveScene(String filePath, List<Entity> entities, JsonObject worldData) throws IOException {

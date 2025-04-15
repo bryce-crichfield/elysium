@@ -6,4 +6,6 @@ public abstract class Component {
     public final String getComponentType() {
         return getClass().getSimpleName();
     }
+
+    public abstract JsonObject serialize();
 }

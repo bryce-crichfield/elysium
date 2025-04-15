@@ -43,16 +43,17 @@ public class World {
         }
 
 
-        var entity = new Entity("test");
-        var position = new PositionComponent(0, 0);
-        entity.addComponent(position);
-        var texture = TextureStore.getInstance().getAssets("sprites/test");
-        entity.addComponent(new SpriteComponent(position, texture));
-
-        entities.add(entity);
+//        var entity = new Entity("test");
+//        var position = new PositionComponent(0, 0);
+//        entity.addComponent(position);
+//        var texture = TextureStore.getInstance().getAssets("sprites/test");
+//        entity.addComponent(new SpriteComponent(position, texture));
+//
+//        entities.add(entity);
 
         try {
-            EntitySerializer.saveScene("test.json", entities, new JsonObject());
+            var scene = EntitySerializer.loadScene("test.json");
+            entities = scene.getEntities();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

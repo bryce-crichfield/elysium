@@ -1,13 +1,13 @@
 package game.state.battle.entity.components;
 
 import com.google.gson.JsonObject;
+import game.state.battle.entity.Entity;
 import game.state.battle.entity.component.Component;
 import game.state.battle.entity.component.ComponentDeserializer;
-import game.state.battle.entity.component.JsonSerializable;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PositionComponent extends Component implements JsonSerializable {
+public class PositionComponent extends Component {
     @Getter
     @Setter
     private int x;
@@ -21,26 +21,17 @@ public class PositionComponent extends Component implements JsonSerializable {
         this.y = y;
     }
 
-    @Override
-    public JsonObject jsonSerialize() {
+    public JsonObject serialize() {
         JsonObject json = new JsonObject();
         json.addProperty("x", x);
         json.addProperty("y", y);
         return json;
     }
 
-    public static class Deserializer implements ComponentDeserializer<PositionComponent> {
-
-        @Override
-        public String getComponentType() {
-            return PositionComponent.class.getSimpleName();
-        }
-
-        @Override
-        public PositionComponent deserialize(JsonObject json) {
-            int x = json.get("x").getAsInt();
-            int y = json.get("y").getAsInt();
-            return new PositionComponent(x, y);
-        }
+    @ComponentDeserializer(type = PositionComponent.class)
+    public static PositionComponent deserialize(JsonObject json, Entity entity) {
+        int x = json.get("x").getAsInt();
+        int y = json.get("y").getAsInt();
+        return new PositionComponent(x, y);
     }
 }

@@ -2,20 +2,17 @@ package game.state.battle.entity;
 
 import com.google.gson.JsonObject;
 import game.graphics.Renderer;
-import game.state.battle.entity.component.ComponentRegistry;
-import game.state.battle.entity.component.JsonSerializable;
+import game.state.battle.entity.component.ComponentDeserializerRegistry;
 import game.state.battle.entity.components.*;
 import game.state.battle.entity.component.Component;
-import game.state.battle.event.*;
 import game.state.battle.world.Tile;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class Entity {
     private final String id;
@@ -92,9 +89,9 @@ public class Entity {
         var animation = getComponent(AnimationComponent.class);
         var position = getComponent(PositionComponent.class);
 
-        animation.onUpdate(duration);
-        position.setX((int) animation.getX());
-        position.setY((int) animation.getY());
+//        animation.onUpdate(duration);
+//        position.setX((int) animation.getX());
+//        position.setY((int) animation.getY());
     }
 
     public void onRender(Renderer renderer) {
@@ -142,11 +139,7 @@ public class Entity {
 
         JsonObject componentsJson = new JsonObject();
         for (var component : components.values()) {
-            if (component instanceof JsonSerializable serializable) {
-                var type = component.getComponentType();
-                var jsonComponent = serializable.jsonSerialize();
-                componentsJson.add(type, jsonComponent);
-            }
+            componentsJson.add(component.getComponentType(), component.serialize());
         }
         json.add("components", componentsJson);
 
@@ -154,13 +147,27 @@ public class Entity {
     }
 
     public static Entity deserialize(JsonObject json) {
-        String id = json.get("id").getAsString();
-        Entity entity = new Entity(id);
+        Entity entity = new Entity(json.get("id").getAsString());
 
+        // Get components JSON data
         JsonObject componentsJson = json.getAsJsonObject("components");
-        for (String componentType : componentsJson.keySet()) {
-            JsonObject componentJson = componentsJson.getAsJsonObject(componentType);
-            Component component = ComponentRegistry.deserialize(componentType, componentJson);
+
+        // Get component types from the JSON
+        Set<String> componentTypes = new HashSet<>(componentsJson.keySet());
+
+        // Get component types in dependency order
+        List<String> orderedTypes = ComponentDeserializerRegistry.getDependencyOrder(componentTypes);
+
+        // print the order of component types
+        System.out.println("Order of component types:");
+        orderedTypes.forEach(System.out::println);
+
+        // Load components in correct order
+        for (var type : orderedTypes) {
+            JsonObject componentJson = componentsJson.getAsJsonObject(type);
+            var deserializer = ComponentDeserializerRegistry.getDeserializer(type);
+            System.out.println("Attempting to deserialize component of type: " + type);
+            Component component = deserializer.deserialize(componentJson, entity);
             entity.addComponent(component);
         }
 

@@ -6,17 +6,27 @@ import game.graphics.texture.Sprite;
 import game.graphics.texture.SpriteRenderer;
 import game.graphics.texture.Texture;
 import game.graphics.texture.TextureStore;
+import game.state.battle.entity.Entity;
 import game.state.battle.entity.component.Component;
 import game.state.battle.entity.component.ComponentDeserializer;
-import game.state.battle.entity.component.JsonSerializable;
 import lombok.RequiredArgsConstructor;
 
 
 @RequiredArgsConstructor
-public class SpriteComponent extends Component implements JsonSerializable {
+public class SpriteComponent extends Component {
     private final PositionComponent position;
     private final Texture texture;
 
+    @ComponentDeserializer(type = SpriteComponent.class,
+            dependencies = {PositionComponent.class})
+    public static SpriteComponent deserialize(JsonObject json, Entity entity) {
+        PositionComponent position = entity.getComponent(PositionComponent.class);
+
+        String texturePath = json.get("texture").getAsString();
+        Texture texture = TextureStore.getInstance().getAssets(texturePath);
+
+        return new SpriteComponent(position, texture);
+    }
 
     public void onRender(SpriteRenderer renderer) {
         var x = position.getX() * Game.TILE_SIZE;
@@ -27,25 +37,9 @@ public class SpriteComponent extends Component implements JsonSerializable {
         renderer.drawSprite(x, y, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
     }
 
-    @Override
-    public JsonObject jsonSerialize() {
+    public JsonObject serialize() {
         JsonObject json = new JsonObject();
         json.addProperty("texture", texture.getName());
         return json;
-    }
-
-    public static class Deserializer implements ComponentDeserializer<SpriteComponent> {
-
-        @Override
-        public String getComponentType() {
-            return SpriteComponent.class.getSimpleName();
-        }
-
-        @Override
-        public SpriteComponent deserialize(JsonObject json) {
-            String textureName = json.get("texture").getAsString();
-            Texture texture = TextureStore.getInstance().getAssets(textureName);
-            return new SpriteComponent(new PositionComponent(0, 0), texture);
-        }
     }
 }
