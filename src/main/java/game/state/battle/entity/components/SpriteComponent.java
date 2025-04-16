@@ -2,8 +2,8 @@ package game.state.battle.entity.components;
 
 import com.google.gson.JsonObject;
 import game.Game;
-import game.graphics.texture.Sprite;
-import game.graphics.texture.SpriteRenderer;
+import game.graphics.sprite.Sprite;
+import game.graphics.sprite.SpriteRenderer;
 import game.graphics.texture.Texture;
 import game.graphics.texture.TextureStore;
 import game.state.battle.entity.Entity;

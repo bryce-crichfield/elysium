@@ -1,4 +1,6 @@
-package game.state.battle.world;
+package game.state.battle.util;
+
+import game.state.battle.world.Tile;
 
 import java.util.ArrayList;
 import java.util.List;

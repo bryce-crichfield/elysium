@@ -34,4 +34,12 @@ public class PositionComponent extends Component {
         int y = json.get("y").getAsInt();
         return new PositionComponent(x, y);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof PositionComponent)) return false;
+        PositionComponent other = (PositionComponent) obj;
+        return x == other.x && y == other.y;
+    }
 }

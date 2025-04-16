@@ -9,7 +9,7 @@ import game.state.battle.entity.Entity;
 import game.state.battle.event.ActionActorMoved;
 import game.state.battle.event.CursorMoved;
 import game.state.battle.util.Cursor;
-import game.state.battle.world.Pathfinder;
+import game.state.battle.util.Pathfinder;
 import game.state.battle.world.Tile;
 import game.util.Util;
 

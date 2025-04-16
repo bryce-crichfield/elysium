@@ -1,26 +1,41 @@
 package game.state.battle.world;
+//
+//import game.graphics.Renderer;
+//import lombok.Getter;
+//
+//import java.awt.*;
+//import java.util.Arrays;
+//import java.util.List;
+//import java.util.Optional;
+//import java.util.stream.Collectors;
+//
 
+import game.Game;
 import game.graphics.Renderer;
+import game.graphics.sprite.Sprite;
+import game.graphics.sprite.SpriteRenderer;
+import game.graphics.texture.Texture;
+import game.graphics.texture.TextureStore;
 import lombok.Getter;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public abstract class Tile {
+public class Tile {
     @Getter
     private final int x;
+
     @Getter
     private final int y;
-    @Getter
-    private final boolean isPassable;
+    private final String textureId;
 
-    public Tile(int x, int y, boolean isPassable) {
+    public Tile(int x, int y, String textureId) {
         this.x = x;
         this.y = y;
-        this.isPassable = isPassable;
+        this.textureId = textureId;
     }
 
     public static void drawOutline(List<Tile> tiles, Renderer renderer, Color color) {
@@ -108,14 +123,39 @@ public abstract class Tile {
         renderer.setLineWidth(stroke);
     }
 
-    public abstract void onRender(Renderer renderer);
-
     public List<Tile> getNeighbors(List<Tile> tiles) {
-        Optional<Tile> above = tiles.stream().filter(tile -> tile.x == x && tile.y == y - 1).findFirst();
-        Optional<Tile> below = tiles.stream().filter(tile -> tile.x == x && tile.y == y + 1).findFirst();
-        Optional<Tile> left = tiles.stream().filter(tile -> tile.x == x - 1 && tile.y == y).findFirst();
-        Optional<Tile> right = tiles.stream().filter(tile -> tile.x == x + 1 && tile.y == y).findFirst();
-        return Arrays.asList(above, below, left, right).stream().filter(Optional::isPresent).map(Optional::get).collect(
+        tiles = tiles.stream().filter(tile -> !tile.equals(this)).collect(Collectors.toList());
+        // filter out if x and y are the same
+        tiles = tiles.stream().filter(tile -> {
+            return tile.getX() != this.getX() || tile.getY() != this.getY();
+        }).collect(Collectors.toList());
+        Optional<Tile> above = tiles.stream().filter(tile -> tile.getY() == getY() - 1).findFirst();
+        Optional<Tile> below = tiles.stream().filter(tile -> tile.getY() == getY() + 1).findFirst();
+        Optional<Tile> left = tiles.stream().filter(tile -> tile.getX() == getX() - 1).findFirst();
+        Optional<Tile> right = tiles.stream().filter(tile -> tile.getX() == getX() + 1).findFirst();
+        return Stream.of(above, below, left, right).filter(Optional::isPresent).map(Optional::get).collect(
                 Collectors.toList());
     }
+
+    public boolean isPassable() {
+        return true;
+    }
+
+
+    public void onRender(SpriteRenderer renderer) {
+        Texture texture = TextureStore.getInstance().getAssets("tiles/Cyan");
+        Sprite sprite = new Sprite(texture, 0, 0, Game.TILE_SIZE, Game.TILE_SIZE);
+        int drawX = (int) (getX() * Game.TILE_SIZE);
+        int drawY = (int) (getY() * Game.TILE_SIZE);
+        renderer.drawSprite(drawX, drawY, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
+//        var color = getTileComponent().getColor();
+//        int size = Game.TILE_SIZE;
+//        int alpha = (int) (255 * 0.15f);
+//        var drawColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+//        renderer.setColor(drawColor);
+//        renderer.fillRect((int) (getX() * size), (int) (getY() * size), size, size);
+//        renderer.setColor(color.darker().darker());
+//        renderer.drawRect((int) (getX() * size), (int) (getY() * size), size, size);
+    }
+
 }

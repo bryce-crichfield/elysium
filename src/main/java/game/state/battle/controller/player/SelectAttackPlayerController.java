@@ -5,7 +5,7 @@ import game.graphics.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
 import game.state.battle.util.Cursor;
-import game.state.battle.world.Raycast;
+import game.state.battle.util.Raycast;
 
 import java.awt.*;
 import java.time.Duration;

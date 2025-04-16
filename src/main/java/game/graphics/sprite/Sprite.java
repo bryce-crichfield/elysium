@@ -1,5 +1,6 @@
-package game.graphics.texture;
+package game.graphics.sprite;
 
+import game.graphics.texture.Texture;
 import lombok.Getter;
 
 

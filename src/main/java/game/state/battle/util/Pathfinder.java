@@ -1,6 +1,8 @@
-package game.state.battle.world;
+package game.state.battle.util;
 
 import game.state.battle.entity.Entity;
+import game.state.battle.world.Tile;
+import game.state.battle.world.World;
 import game.util.Util;
 
 import java.util.*;
@@ -33,7 +35,7 @@ public class Pathfinder {
 
         int hScore = (int) Util.distance(start.getX(), start.getY(), end.getX(), end.getY());
         int gScore = 0;
-        Node startNode = new Node(start.getX(), start.getY(), gScore, hScore, null);
+        Node startNode = new Node((int) start.getX(), (int) start.getY(), gScore, hScore, null);
         open.add(startNode);
 
         while (!open.isEmpty()) {
@@ -63,14 +65,14 @@ public class Pathfinder {
     public void expand(Tile start, Node current, Tile end) {
         // Add the neighbors to the open list
         for (Tile neighbor : world.getNeighbors(current.x, current.y)) {
-            if (!neighbor.isPassable() || actorOccupies(neighbor.getX(), neighbor.getY())) {
+            if (!neighbor.isPassable() || actorOccupies((int) neighbor.getX(), (int) neighbor.getY())) {
                 continue;
             }
 
             int gScore = (int) Util.distance(current.x, current.y, neighbor.getX(), neighbor.getY());
             int hScore = (int) Util.distance(neighbor.getX(), neighbor.getY(), end.getX(), end.getY());
 
-            Node neighborNode = new Node(neighbor.getX(), neighbor.getY(), gScore, hScore, current);
+            Node neighborNode = new Node((int) neighbor.getX(), (int) neighbor.getY(), gScore, hScore, current);
             if (open.contains(neighborNode)) {
                 continue;
             }

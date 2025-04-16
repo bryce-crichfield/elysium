@@ -4,7 +4,7 @@ import game.Game;
 import game.graphics.Renderer;
 import game.graphics.Transform;
 import game.graphics.background.StarBackground;
-import game.graphics.texture.SpriteRenderer;
+import game.graphics.sprite.SpriteRenderer;
 import game.input.MouseEvent;
 import game.state.GameState;
 import game.state.battle.controller.BattleController;
@@ -43,7 +43,7 @@ public class BattleState extends GameState {
     public BattleState(Game game) {
         super(game);
         camera = new Camera(game);
-        world = new World(64, 64);
+        world = new World(16, 16);
         cursor = new Cursor(camera, game, world);
         addBackground(StarBackground::new);
 

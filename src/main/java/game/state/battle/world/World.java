@@ -1,18 +1,16 @@
 package game.state.battle.world;
 
-import com.google.gson.JsonObject;
 import game.graphics.Renderer;
-import game.graphics.texture.SpriteRenderer;
+import game.graphics.sprite.SpriteRenderer;
 import game.graphics.texture.TextureStore;
-import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
-import game.state.battle.entity.EntitySerializer;
+import game.state.battle.entity.EntityIO;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.entity.components.SpriteComponent;
+import game.state.battle.util.Raycast;
 import game.util.Util;
 import lombok.Getter;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -25,43 +23,60 @@ public class World {
     private final int width;
     @Getter
     private final int height;
-    private final Tile[][] tiles;
-    private List<Entity> entities = new ArrayList<>();
+//    private final Tile[][] tiles;
+
+    private Tile[][] tiles;
+    private List<Entity> entities;
 
     public World(int width, int height) {
         this.width = width;
         this.height = height;
 
-        tiles = new Tile[width][height];
+//        tiles = new Tile[width][height];
 
         // Initialize the tiles
+        tiles = new Tile[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Color color = Color.cyan;
-                tiles[x][y] = new ColorTile(x, y, true, color);
+                var tile = new Tile(x, y, "");
+                tiles[x][y] = tile;
             }
         }
-
-
-//        var entity = new Entity("test");
-//        var position = new PositionComponent(0, 0);
-//        entity.addComponent(position);
-//        var texture = TextureStore.getInstance().getAssets("sprites/test");
-//        entity.addComponent(new SpriteComponent(position, texture));
 //
-//        entities.add(entity);
+        entities = new ArrayList<>();
+        var entity = new Entity("test");
+        var position = new PositionComponent(0, 0);
+        entity.addComponent(position);
+        var texture = TextureStore.getInstance().getAssets("sprites/test");
+        entity.addComponent(new SpriteComponent(position, texture));
 
-        try {
-            var scene = EntitySerializer.loadScene("test.json");
-            entities = scene.getEntities();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        entities.add(entity);
 
-    }
+//        try {
+//            var tileEntities = new ArrayList<Entity>();
+//            for (int x = 0; x < width; x++) {
+//                for (int y = 0; y < height; y++) {
+//                    var tile = tiles[x][y];
+//                    tileEntities.add(tile.getEntity());
+//                }
+//            }
+//            EntitySerializer.saveScene("test.json", entities, tileEntities);
+//            var scene = EntityIO.loadScene("test.json");
+//            this.entities = scene.getEntities();
+//            this.tiles = new Tile[width][height];
+//            var loadedWorld = scene.getWorldData();
+//            for (int x = 0; x < width; x++) {
+//                for (int y = 0; y < height; y++) {
+//                    var tile = loadedWorld.get(x * width + y);
+//                    if (tile != null) {
+//                        tiles[x][y] = new Tile(x, y, "");
+//                    }
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
-    public void wall(int x, int y) {
-        tiles[x][y] = new ColorTile(x, y, false, Color.RED.darker().darker().darker());
     }
 
     public void onUpdate(Duration duration) {
@@ -71,11 +86,15 @@ public class World {
     }
 
     public void onRender(Renderer renderer, SpriteRenderer spriteRenderer) {
+        spriteRenderer.begin();
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles[x][y].onRender(renderer);
+                tiles[x][y].onRender(spriteRenderer);
             }
         }
+
+        spriteRenderer.end();
 
         spriteRenderer.begin();
         for (Entity entity : entities) {

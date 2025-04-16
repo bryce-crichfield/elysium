@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySerializer {
+public class EntityIO {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
@@ -18,7 +18,7 @@ public class EntitySerializer {
         ComponentDeserializerRegistry.registerDeserializers();
     }
 
-    public static void saveScene(String filePath, List<Entity> entities, JsonObject worldData) throws IOException {
+    public static void saveScene(String filePath, List<Entity> entities, List<Entity> world) throws IOException {
         JsonObject root = new JsonObject();
 
         // Serialize entities
@@ -29,7 +29,11 @@ public class EntitySerializer {
         root.add("entities", entitiesJson);
 
         // Add world data
-        root.add("world", worldData);
+        JsonArray worldJson = new JsonArray();
+        for (Entity entity : world) {
+            worldJson.add(entity.serialize());
+        }
+        root.add("world", worldJson);
 
         // Write to file
         try (FileWriter writer = new FileWriter(filePath)) {
@@ -50,7 +54,12 @@ public class EntitySerializer {
             }
 
             // Get world data
-            JsonObject worldData = root.getAsJsonObject("world");
+            List<Entity> worldData = new ArrayList<>();
+            JsonArray worldJson = root.getAsJsonArray("world");
+            for (JsonElement entityElement : worldJson) {
+                Entity entity = Entity.deserialize(entityElement.getAsJsonObject());
+                worldData.add(entity);
+            }
 
             return new BattleScene(entities, worldData);
         }
@@ -58,9 +67,9 @@ public class EntitySerializer {
 
     public static class BattleScene {
         private final List<Entity> entities;
-        private final JsonObject worldData;
+        private final List<Entity> worldData;
 
-        public BattleScene(List<Entity> entities, JsonObject worldData) {
+        public BattleScene(List<Entity> entities, List<Entity> worldData) {
             this.entities = entities;
             this.worldData = worldData;
         }
@@ -69,7 +78,7 @@ public class EntitySerializer {
             return entities;
         }
 
-        public JsonObject getWorldData() {
+        public List<Entity> getWorldData() {
             return worldData;
         }
     }

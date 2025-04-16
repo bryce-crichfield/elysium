@@ -1,9 +1,10 @@
-package game.graphics.texture;
+package game.graphics.sprite;
 
 import game.graphics.Transform;
 import game.graphics.gl.Program;
 import game.graphics.gl.VertexArray;
 import game.graphics.gl.VertexBuffer;
+import game.graphics.texture.Texture;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Matrix4f;
