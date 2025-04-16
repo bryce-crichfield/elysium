@@ -11,10 +11,11 @@ import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
 import game.state.battle.controller.player.ObserverPlayerController;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.PositionComponent;
+import game.state.battle.entity.components.SpriteComponent;
 import game.state.battle.util.Camera;
 import game.state.battle.util.Cursor;
 import game.state.battle.util.Selection;
-import game.state.battle.world.World;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -23,13 +24,14 @@ import lombok.Getter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class BattleState extends GameState {
     @Getter
     private final Camera camera;
     @Getter
-    private final World world;
+    private final Scene scene;
     @Getter
     private final Cursor cursor;
 
@@ -43,24 +45,26 @@ public class BattleState extends GameState {
     public BattleState(Game game) {
         super(game);
         camera = new Camera(game);
-        world = new World(16, 16);
-        cursor = new Cursor(camera, game, world);
-        addBackground(StarBackground::new);
 
-        for (Entity entity : world.getEntities()) {
-//            getSubscriptions().on(ActionActorMoved.event).run(actor::onActorMoved);
-//            getSubscriptions().on(ActorSelected.event).run(a -> {
-//                if (a.equals(actor)) {
-//                    actor.setSelected(true);
-//                } else {
-//                    actor.setSelected(false);
-//                }
-//            });
-//            getSubscriptions().on(ActorUnselected.event).run(actor::onActorDeselected);
-//            getSubscriptions().on(ActionActorAttack.event).run(actor::onActorAttacked);
-//            getSubscriptions().on(ActorKilled.event).run(world::removeActor);
-//            getSubscriptions().on(CursorMoved.event).run(actor::onCursorMoved);
-        }
+//        var tiles = new Tile[16][16];
+//        for (int x = 0; x < tiles.length; x++) {
+//            for (int y = 0; y < tiles[x].length; y++) {
+//                var tile = new Tile(x, y, "tiles/Cyan");
+//                tiles[x][y] = tile;
+//            }
+//        }
+//
+//        var entities = new ArrayList<Entity>();
+//        var entity = new Entity();
+//        entity.addComponent(new PositionComponent(0, 0));
+//        entity.addComponent(new SpriteComponent("sprites/test"));
+//        entities.add(entity);
+
+//        scene = new Scene(tiles, entities);
+        scene = Scene.deserialize("scene1");
+//        Scene.serialize("scene1", scene);
+        cursor = new Cursor(camera, game, scene);
+        addBackground(StarBackground::new);
 
         transitionTo(ObserverPlayerController::new);
 
@@ -110,7 +114,7 @@ public class BattleState extends GameState {
 
     @Override
     public void onUpdate(Duration delta) {
-        world.onUpdate(delta);
+        scene.onUpdate(delta);
 
 //        if (getGame().getKeyboard().pressed(KeyEvent.VK_ESCAPE)) {
 //            getGame().popState();
@@ -125,7 +129,7 @@ public class BattleState extends GameState {
         Transform worldTransform = camera.getTransform();
         renderer.pushTransform(worldTransform);
         spriteRenderer.setView(worldTransform);
-        world.onRender(renderer, spriteRenderer);
+        scene.onRender(renderer, spriteRenderer);
         currentController.ifPresent(c -> c.onWorldRender(renderer));
         renderer.popTransform();
 

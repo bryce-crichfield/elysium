@@ -1,83 +1,77 @@
-package game.state.battle.world;
+package game.state.battle;
 
 import game.graphics.Renderer;
 import game.graphics.sprite.SpriteRenderer;
-import game.graphics.texture.TextureStore;
 import game.state.battle.entity.Entity;
-import game.state.battle.entity.EntityIO;
-import game.state.battle.entity.components.PositionComponent;
-import game.state.battle.entity.components.SpriteComponent;
 import game.state.battle.util.Raycast;
 import game.util.Util;
 import lombok.Getter;
 
-import java.io.IOException;
+import java.io.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class World {
-    @Getter
+@Getter
+public class Scene implements Serializable {
     private final int width;
-    @Getter
     private final int height;
-//    private final Tile[][] tiles;
+    private final Tile[][] tiles;
+    private final List<Entity> entities;
 
-    private Tile[][] tiles;
-    private List<Entity> entities;
-
-    public World(int width, int height) {
-        this.width = width;
-        this.height = height;
-
-//        tiles = new Tile[width][height];
-
-        // Initialize the tiles
-        tiles = new Tile[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                var tile = new Tile(x, y, "");
-                tiles[x][y] = tile;
-            }
+    public static void serialize(String path, Scene scene) throws RuntimeException {
+        try (var fileOut = new FileOutputStream(path);
+             var out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-//
-        entities = new ArrayList<>();
-        var entity = new Entity("test");
-        var position = new PositionComponent(0, 0);
-        entity.addComponent(position);
-        var texture = TextureStore.getInstance().getAssets("sprites/test");
-        entity.addComponent(new SpriteComponent(position, texture));
-
-        entities.add(entity);
-
-//        try {
-//            var tileEntities = new ArrayList<Entity>();
-//            for (int x = 0; x < width; x++) {
-//                for (int y = 0; y < height; y++) {
-//                    var tile = tiles[x][y];
-//                    tileEntities.add(tile.getEntity());
-//                }
-//            }
-//            EntitySerializer.saveScene("test.json", entities, tileEntities);
-//            var scene = EntityIO.loadScene("test.json");
-//            this.entities = scene.getEntities();
-//            this.tiles = new Tile[width][height];
-//            var loadedWorld = scene.getWorldData();
-//            for (int x = 0; x < width; x++) {
-//                for (int y = 0; y < height; y++) {
-//                    var tile = loadedWorld.get(x * width + y);
-//                    if (tile != null) {
-//                        tiles[x][y] = new Tile(x, y, "");
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
     }
+
+    public static Scene deserialize(String path) throws RuntimeException {
+        try (FileInputStream fileIn = new FileInputStream(path);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            return (Scene) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Scene(Tile[][] tiles, List<Entity> entities) {
+        this.tiles = tiles;
+        this.entities = entities;
+        this.width = tiles.length;
+        this.height = tiles[0].length;
+    }
+
+//    public Scene(int width, int height) {
+//        this.width = width;
+//        this.height = height;
+//
+////        tiles = new Tile[width][height];
+//
+//        // Initialize the tiles
+//        tiles = new Tile[width][height];
+//        for (int x = 0; x < width; x++) {
+//            for (int y = 0; y < height; y++) {
+//                var tile = new Tile(x, y, "");
+//                tiles[x][y] = tile;
+//            }
+//        }
+////
+////        entities = new ArrayList<>();
+////        var entity = new Entity();
+////        var position = new PositionComponent(0, 0);
+////        entity.addComponent(position);
+////        entity.addComponent(new SpriteComponent("sprites/test"));
+////
+////        entities.add(entity);
+////
+////        Entity.serialize(entities, "test.bin");
+//        entities = Entity.deserialize("test.bin");
+//    }
 
     public void onUpdate(Duration duration) {
         for (Entity entity : entities) {
@@ -98,15 +92,12 @@ public class World {
 
         spriteRenderer.begin();
         for (Entity entity : entities) {
-            if (entity.hasComponent(SpriteComponent.class)) {
-                var spriteComponent = entity.getComponent(SpriteComponent.class);
-                spriteComponent.onRender(spriteRenderer);
-            }
+            entity.onSpriteRender(spriteRenderer);
         }
         spriteRenderer.end();
 
         for (Entity entity : entities) {
-            entity.onRender(renderer);
+            entity.onVectorRender(renderer);
         }
     }
 
@@ -145,9 +136,9 @@ public class World {
 
     public Optional<Entity> getActorByPosition(int x, int y) {
         for (Entity entity : entities) {
-            if (entity.getX() == x && entity.getY() == y) {
-                return Optional.of(entity);
-            }
+//            if (entity.getX() == x && entity.getY() == y) {
+//                return Optional.of(entity);
+//            }
         }
 
         return Optional.empty();
@@ -162,7 +153,7 @@ public class World {
     }
 
     public List<Entity> getEntities() {
-        return entities;
+        return entities.stream().toList();
     }
 
     public Optional<Entity> findActor(Predicate<Entity> predicate) {

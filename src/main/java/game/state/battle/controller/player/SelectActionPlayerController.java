@@ -40,11 +40,11 @@ public class SelectActionPlayerController extends PlayerController {
             // The actor has issued its action, it is now waiting. So we can go back to the observer mode.
             int cursorX = state.getCursor().getCursorX();
             int cursorY = state.getCursor().getCursorY();
-            int actorX = (int) state.getSelection().get().getX();
-            int actorY = (int) state.getSelection().get().getY();
-            if (cursorX == actorX && cursorY == actorY) {
-                ActorHovered.event.fire(state.getSelection().get());
-            }
+//            int actorX = (int) state.getSelection().get().getX();
+//            int actorY = (int) state.getSelection().get().getY();
+//            if (cursorX == actorX && cursorY == actorY) {
+//                ActorHovered.event.fire(state.getSelection().get());
+//            }
 
             state.transitionTo(ObserverPlayerController::new);
 

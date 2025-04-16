@@ -1,20 +1,20 @@
 package game.state.battle.util;
 
 import game.state.battle.entity.Entity;
-import game.state.battle.world.Tile;
-import game.state.battle.world.World;
+import game.state.battle.Tile;
+import game.state.battle.Scene;
 import game.util.Util;
 
 import java.util.*;
 
 public class Pathfinder {
-    World world;
+    Scene scene;
     Queue<Node> open;
     Set<Node> closed;
     Entity entity;
 
-    public Pathfinder(World world, Entity entity) {
-        this.world = world;
+    public Pathfinder(Scene scene, Entity entity) {
+        this.scene = scene;
         this.entity = entity;
         open = new PriorityQueue<>(Comparator.comparingInt(n -> n.gScore + n.hScore));
         closed = new HashSet<>();
@@ -55,7 +55,7 @@ public class Pathfinder {
         List<Tile> path = new ArrayList<>();
         Node current = end;
         while (current != null) {
-            path.add(world.getTile(current.x, current.y));
+            path.add(scene.getTile(current.x, current.y));
             current = current.parent;
         }
         Collections.reverse(path);
@@ -64,7 +64,7 @@ public class Pathfinder {
 
     public void expand(Tile start, Node current, Tile end) {
         // Add the neighbors to the open list
-        for (Tile neighbor : world.getNeighbors(current.x, current.y)) {
+        for (Tile neighbor : scene.getNeighbors(current.x, current.y)) {
             if (!neighbor.isPassable() || actorOccupies((int) neighbor.getX(), (int) neighbor.getY())) {
                 continue;
             }
@@ -84,7 +84,7 @@ public class Pathfinder {
     }
 
     public boolean actorOccupies(int x, int y) {
-        return world.getActorByPosition(x, y).isPresent();
+        return scene.getActorByPosition(x, y).isPresent();
     }
 
     private static class Node {

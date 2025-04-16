@@ -1,10 +1,8 @@
 package game.state.battle.entity.components;
 
-import com.google.gson.JsonObject;
 import game.state.battle.entity.Entity;
-import game.state.battle.entity.component.Component;
-import game.state.battle.entity.component.ComponentDeserializer;
-import game.state.battle.world.Tile;
+import game.state.battle.entity.component.UpdatableComponent;
+import game.state.battle.Tile;
 import game.util.Util;
 
 import java.time.Duration;
@@ -12,9 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class AnimationComponent extends Component {
+public class AnimationComponent implements UpdatableComponent {
     //    private final Entity entity;
-    private final PositionComponent position;
     boolean animationEnabled = false;
     float animationPeriod = 0.35f;
     float animationX = 0;
@@ -24,25 +21,13 @@ public class AnimationComponent extends Component {
     float animationAccumulator = 0;
     Queue<Tile> animationPath = new LinkedList<>();
 
-    public AnimationComponent(PositionComponent position) {
-        this.position = position;
-
-        animationX = position.getX();
-        animationY = position.getY();
+    public AnimationComponent() {
     }
 
-    @ComponentDeserializer(type = AnimationComponent.class, dependencies = {PositionComponent.class})
-    public static AnimationComponent deserialize(JsonObject json, Entity entity) {
-        PositionComponent position = entity.getComponent(PositionComponent.class);
-
-        AnimationComponent animationComponent = new AnimationComponent(position);
-        animationComponent.animationPeriod = json.get("animationPeriod").getAsFloat();
-        return animationComponent;
-    }
-
-    public void start(List<Tile> path) {
+    public void start(Entity self, List<Tile> path) {
         animationAccumulator = 0;
 
+        var position = self.getComponent(PositionComponent.class);
         animationX = position.getX();
         animationY = position.getY();
 
@@ -61,7 +46,8 @@ public class AnimationComponent extends Component {
         animationEnabled = true;
     }
 
-    public void onUpdate(Duration delta) {
+    @Override
+    public void onUpdate(Entity self, Duration delta) {
         if (!animationEnabled) {
             return;
         }
@@ -90,21 +76,5 @@ public class AnimationComponent extends Component {
         if (Math.abs(animationTargetY - animationY) < 0.1) {
             animationY = animationTargetY;
         }
-
-//        ActorAnimated.event.fire(entity);
     }
-
-    public float getX() {
-        return animationX;
-    }
-
-    public float getY() {
-        return animationY;
-    }
-
-    @Override
-    public JsonObject serialize() {
-        return new JsonObject();
-    }
-
 }

@@ -10,7 +10,7 @@ import game.state.battle.event.ActionActorMoved;
 import game.state.battle.event.CursorMoved;
 import game.state.battle.util.Cursor;
 import game.state.battle.util.Pathfinder;
-import game.state.battle.world.Tile;
+import game.state.battle.Tile;
 import game.util.Util;
 
 import java.awt.*;
@@ -63,15 +63,15 @@ public class SelectMovePlayerController extends PlayerController {
         int cursorX = cursor.getCursorX();
         int cursorY = cursor.getCursorY();
 
-        Optional<Entity> hoveredActor = state.getWorld().getActorByPosition(cursorX, cursorY);
+        Optional<Entity> hoveredActor = state.getScene().getActorByPosition(cursorX, cursorY);
         boolean hoveringOnEmptyTile = hoveredActor.isEmpty();
         if (hoveringOnEmptyTile) {
-            Pathfinder pathfinder = new Pathfinder(state.getWorld(), state.getSelection().get());
-            int actorX = (int) state.getSelection().get().getX();
-            int actorY = (int) state.getSelection().get().getY();
-            Tile start = state.getWorld().getTile(actorX, actorY);
-            Tile end = state.getWorld().getTile(cursorX, cursorY);
-            possiblePath = pathfinder.find(start, end);
+            Pathfinder pathfinder = new Pathfinder(state.getScene(), state.getSelection().get());
+//            int actorX = (int) state.getSelection().get().getX();
+//            int actorY = (int) state.getSelection().get().getY();
+//            Tile start = state.getWorld().getTile(actorX, actorY);
+//            Tile end = state.getWorld().getTile(cursorX, cursorY);
+//            possiblePath = pathfinder.find(start, end);
 
 //            hoveredActorStats.setVisible(false);
         } else {
@@ -96,19 +96,19 @@ public class SelectMovePlayerController extends PlayerController {
     public void onWorldRender(Renderer renderer) {
 //        int distance = state.getSelection().get().getVitals().movementPoints;
         int distance = 5;
-        int actorX = (int) state.getSelection().get().getX();
-        int actorY = (int) state.getSelection().get().getY();
-        List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);
+//        int actorX = (int) state.getSelection().get().getX();
+//        int actorY = (int) state.getSelection().get().getY();
+//        List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);
 
-        for (Tile tile : inRange) {
-            var color = Color.ORANGE.darker().darker();
-            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
-            renderer.setColor(color);
-            renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
-        }
-
-        Tile.drawOutline(inRange, renderer, Color.ORANGE);
-        Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
+//        for (Tile tile : inRange) {
+//            var color = Color.ORANGE.darker().darker();
+//            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
+//            renderer.setColor(color);
+//            renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
+//        }
+//
+//        Tile.drawOutline(inRange, renderer, Color.ORANGE);
+//        Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
         state.getCursor().onRender(renderer);
     }
 
@@ -127,7 +127,7 @@ public class SelectMovePlayerController extends PlayerController {
         int tileY = worldY / 32;
 
         // If outside the bounds of the moveable area, return
-        Tile tile = state.getWorld().getTile(tileX, tileY);
+        Tile tile = state.getScene().getTile(tileX, tileY);
         if (tile == null) {
             return;
         }
@@ -149,14 +149,14 @@ public class SelectMovePlayerController extends PlayerController {
 
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
-        boolean hoveringOnEmptyTile = state.getWorld().getActorByPosition(cursorX, cursorY).isEmpty();
+        boolean hoveringOnEmptyTile = state.getScene().getActorByPosition(cursorX, cursorY).isEmpty();
         Entity entity = state.getSelection().get();
 
         if (!hoveringOnEmptyTile) return;
 
 
         // getBattleState().getGame().getAudio().play("select.wav");
-        entity.move(possiblePath);
+//        entity.move(possiblePath);
         possiblePath = new ArrayList<>();
         state.transitionTo(ObserverPlayerController::new);
     }

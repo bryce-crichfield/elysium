@@ -2,122 +2,67 @@ package game.state.battle.entity;
 
 import com.google.gson.JsonObject;
 import game.graphics.Renderer;
-import game.state.battle.entity.component.ComponentDeserializerRegistry;
-import game.state.battle.entity.components.*;
+import game.graphics.sprite.SpriteRenderer;
 import game.state.battle.entity.component.Component;
-import game.state.battle.world.Tile;
-import lombok.Getter;
-import lombok.Setter;
+import game.state.battle.entity.component.RenderableComponent;
+import game.state.battle.entity.component.UpdatableComponent;
 
-import java.awt.*;
+import java.io.*;
 import java.time.Duration;
 import java.util.*;
-import java.util.List;
 
-public class Entity {
-    private final String id;
-    private Map<Class<? extends Component>, Component> components = new HashMap<>();
+public final class Entity implements Serializable {
+    private final Map<Class<? extends Component>, Component> components = new HashMap<>();
 
-    @Getter
-    @Setter
-    private boolean waiting = false;
-
-    public Entity(String id) {
-        this.id = id;
-//        this.position = new PositionComponent(x, y);
-//        animation = new AnimationComponent(position);
-//        vitals = new VitalsComponent();
-//        character = new CharacterComponent(StarTrooper.create());
-//        sprite = new SpriteComponent(position, TextureStore.getInstance().getAssets("sprites/test"));
+    public Entity() {
     }
 
-    public void move(List<Tile> movePath) {
-        if (movePath.isEmpty()) return;
 
-        // If the first tile in the path is the same as the current position, remove it
-        var position = getComponent(PositionComponent.class);
-//        var vitals = getComponent(VitalsComponent.class);
-        var animation = getComponent(AnimationComponent.class);
-
-        if (movePath.get(0).getX() == position.getX() && movePath.get(0).getY() == position.getY()) {
-            movePath.remove(0);
+    public static void serialize(Collection<Entity> entities, String path) {
+        try (FileOutputStream fileOut = new FileOutputStream(path);
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            // Write the entire collection at once
+            out.writeObject(entities);
+            System.out.println("Entities serialized to " + path);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-//        vitals.movementPoints -= movePath.size();
-        animation.start(movePath);
     }
 
-//    public void onCursorMoved(Cursor cursor) {
-//        boolean cursorHovers = cursor.getCursorX() == this.position.getX() && cursor.getCursorY() == this.position.getY();
-//
-//        if (hovered && !cursorHovers) {
-//            hovered = true;
-//            ActorHovered.event.fire(this);
-//        } else if (!hovered && cursorHovers) {
-//            hovered = false;
-//            ActorUnhovered.event.fire(this);
-//        }
-//    }
-
-
-//    public void onActorAttacked(ActionActorAttack attack) {
-//        if (attack.getAttacker().equals(this)) {
-//            return;
-//        }
-//
-//        for (Tile tile : attack.getTargets()) {
-//            if (tile.getX() == position.getX() && tile.getY() == position.getY()) {
-//                vitals.health -= attack.getAttacker().getAttack();
-//                ActorDamaged.event.fire(this);
-//
-//                if (vitals.health <= 0) {
-//                    ActorKilled.event.fire(this);
-//                }
-//            }
-//        }
-//    }
-
-    public float getX() {
-        return getComponent(PositionComponent.class).getX();
-    }
-
-    public float getY() {
-        return getComponent(PositionComponent.class).getY();
+    public static Collection<Entity> deserialize(String path) {
+        Collection<Entity> entities = null;
+        try (FileInputStream fileIn = new FileInputStream(path);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            // Read and cast the collection
+            entities = (Collection<Entity>) in.readObject();
+            System.out.println("Entities deserialized from " + path);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return entities;
     }
 
     public void onUpdate(Duration duration) {
-        var animation = getComponent(AnimationComponent.class);
-        var position = getComponent(PositionComponent.class);
-
-//        animation.onUpdate(duration);
-//        position.setX((int) animation.getX());
-//        position.setY((int) animation.getY());
+        for (Component component : this.components.values()) {
+            if (component instanceof UpdatableComponent updatable) {
+                updatable.onUpdate(this, duration);
+            }
+        }
     }
 
-    public void onRender(Renderer renderer) {
-        if (hasComponent(AnimationComponent.class)) {
-            var animation = getComponent(AnimationComponent.class);
+    public void onSpriteRender(SpriteRenderer spriteRenderer) {
+        for (Component component : this.components.values()) {
+            if (component instanceof RenderableComponent renderable) {
+                renderable.onSpriteRender(this, spriteRenderer);
+            }
+        }
+    }
 
-            // Draw the actor
-            float x = animation.getX();
-            float y = animation.getY();
-
-            // Draw the health bar
-//        float healthPercentage = vitals.health / character.getHealth();
-            float healthPercentage = 1;
-            Color healthColor = healthPercentage > 0.5 ? Color.GREEN : healthPercentage > 0.25 ? Color.YELLOW : Color.RED;
-            renderer.setColor(healthColor);
-            int healthWidth = (int) ((32 - 10) * healthPercentage);
-            int healthHeight = 5;
-            int healthX = (int) ((x * 32) + 5);
-            int healthY = (int) ((y * 32) + 32 - 5);
-
-            renderer.setColor(Color.BLACK);
-            renderer.fillRect(healthX, healthY, 32 - 10, healthHeight);
-            renderer.setColor(healthColor);
-            renderer.fillRect(healthX, healthY, healthWidth, healthHeight);
-            renderer.setColor(Color.BLACK);
-            renderer.drawRect(healthX, healthY, 32 - 10, healthHeight);
+    public void onVectorRender(Renderer renderer) {
+        for (Component component : this.components.values()) {
+            if (component instanceof RenderableComponent renderable) {
+                renderable.onVectorRender(this, renderer);
+            }
         }
     }
 
@@ -133,44 +78,7 @@ public class Entity {
         return components.containsKey(componentClass);
     }
 
-    public JsonObject serialize() {
-        JsonObject json = new JsonObject();
-        json.addProperty("id", id);
-
-        JsonObject componentsJson = new JsonObject();
-        for (var component : components.values()) {
-            componentsJson.add(component.getComponentType(), component.serialize());
-        }
-        json.add("components", componentsJson);
-
-        return json;
-    }
-
-    public static Entity deserialize(JsonObject json) {
-        Entity entity = new Entity(json.get("id").getAsString());
-
-        // Get components JSON data
-        JsonObject componentsJson = json.getAsJsonObject("components");
-
-        // Get component types from the JSON
-        Set<String> componentTypes = new HashSet<>(componentsJson.keySet());
-
-        // Get component types in dependency order
-        List<String> orderedTypes = ComponentDeserializerRegistry.getDependencyOrder(componentTypes);
-
-        // print the order of component types
-        System.out.println("Order of component types:");
-        orderedTypes.forEach(System.out::println);
-
-        // Load components in correct order
-        for (var type : orderedTypes) {
-            JsonObject componentJson = componentsJson.getAsJsonObject(type);
-            var deserializer = ComponentDeserializerRegistry.getDeserializer(type);
-            System.out.println("Attempting to deserialize component of type: " + type);
-            Component component = deserializer.deserialize(componentJson, entity);
-            entity.addComponent(component);
-        }
-
-        return entity;
+    public <T extends Component> boolean lacksComponent(Class<T> componentClass) {
+        return !components.containsKey(componentClass);
     }
 }

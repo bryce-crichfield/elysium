@@ -1,11 +1,6 @@
 package game.state.battle.entity.component;
 
-import com.google.gson.JsonObject;
+import java.io.Serializable;
 
-public abstract class Component {
-    public final String getComponentType() {
-        return getClass().getSimpleName();
-    }
-
-    public abstract JsonObject serialize();
+public interface Component extends Serializable {
 }

@@ -1,14 +1,4 @@
-package game.state.battle.world;
-//
-//import game.graphics.Renderer;
-//import lombok.Getter;
-//
-//import java.awt.*;
-//import java.util.Arrays;
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.stream.Collectors;
-//
+package game.state.battle;
 
 import game.Game;
 import game.graphics.Renderer;
@@ -19,12 +9,13 @@ import game.graphics.texture.TextureStore;
 import lombok.Getter;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Tile {
+public class Tile implements Serializable {
     @Getter
     private final int x;
 
@@ -133,8 +124,7 @@ public class Tile {
         Optional<Tile> below = tiles.stream().filter(tile -> tile.getY() == getY() + 1).findFirst();
         Optional<Tile> left = tiles.stream().filter(tile -> tile.getX() == getX() - 1).findFirst();
         Optional<Tile> right = tiles.stream().filter(tile -> tile.getX() == getX() + 1).findFirst();
-        return Stream.of(above, below, left, right).filter(Optional::isPresent).map(Optional::get).collect(
-                Collectors.toList());
+        return Stream.of(above, below, left, right).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
     public boolean isPassable() {
@@ -145,17 +135,8 @@ public class Tile {
     public void onRender(SpriteRenderer renderer) {
         Texture texture = TextureStore.getInstance().getAssets("tiles/Cyan");
         Sprite sprite = new Sprite(texture, 0, 0, Game.TILE_SIZE, Game.TILE_SIZE);
-        int drawX = (int) (getX() * Game.TILE_SIZE);
-        int drawY = (int) (getY() * Game.TILE_SIZE);
+        int drawX = getX() * Game.TILE_SIZE;
+        int drawY = getY() * Game.TILE_SIZE;
         renderer.drawSprite(drawX, drawY, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
-//        var color = getTileComponent().getColor();
-//        int size = Game.TILE_SIZE;
-//        int alpha = (int) (255 * 0.15f);
-//        var drawColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-//        renderer.setColor(drawColor);
-//        renderer.fillRect((int) (getX() * size), (int) (getY() * size), size, size);
-//        renderer.setColor(color.darker().darker());
-//        renderer.drawRect((int) (getX() * size), (int) (getY() * size), size, size);
     }
-
 }

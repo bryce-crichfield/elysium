@@ -6,7 +6,7 @@ import game.input.KeyEvent;
 import game.input.Keyboard;
 import game.input.MouseEvent;
 import game.state.battle.event.CursorMoved;
-import game.state.battle.world.World;
+import game.state.battle.Scene;
 import game.util.Util;
 
 import java.awt.*;
@@ -27,7 +27,7 @@ public class Cursor {
     Color color = Color.RED;
     float timer = 0;
 
-    public Cursor(Camera camera, Game game, World world) {
+    public Cursor(Camera camera, Game game, Scene scene) {
         this.camera = camera;
         this.tileSize = Game.TILE_SIZE;
         this.game = game;
@@ -42,8 +42,8 @@ public class Cursor {
 
         // TODO: Should this be in the constructor?
         CursorMoved.event.addListener(event -> {
-            cursorX = Util.clamp(cursorX, 0, world.getWidth() - 1);
-            cursorY = Util.clamp(cursorY, 0, world.getHeight() - 1);
+            cursorX = Util.clamp(cursorX, 0, scene.getWidth() - 1);
+            cursorY = Util.clamp(cursorY, 0, scene.getHeight() - 1);
             game.getAudio().play("type_preview/swipe");
         });
     }

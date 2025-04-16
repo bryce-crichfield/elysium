@@ -7,39 +7,25 @@ import game.graphics.sprite.SpriteRenderer;
 import game.graphics.texture.Texture;
 import game.graphics.texture.TextureStore;
 import game.state.battle.entity.Entity;
-import game.state.battle.entity.component.Component;
-import game.state.battle.entity.component.ComponentDeserializer;
+import game.state.battle.entity.component.RenderableComponent;
 import lombok.RequiredArgsConstructor;
 
 
 @RequiredArgsConstructor
-public class SpriteComponent extends Component {
-    private final PositionComponent position;
-    private final Texture texture;
+public class SpriteComponent implements RenderableComponent {
+    private final String textureId;
 
-    @ComponentDeserializer(type = SpriteComponent.class,
-            dependencies = {PositionComponent.class})
-    public static SpriteComponent deserialize(JsonObject json, Entity entity) {
-        PositionComponent position = entity.getComponent(PositionComponent.class);
+    @Override
+    public void onSpriteRender(Entity self, SpriteRenderer renderer) {
+        if (self.lacksComponent(PositionComponent.class)) return;
 
-        String texturePath = json.get("texture").getAsString();
-        Texture texture = TextureStore.getInstance().getAssets(texturePath);
-
-        return new SpriteComponent(position, texture);
-    }
-
-    public void onRender(SpriteRenderer renderer) {
+        var position = self.getComponent(PositionComponent.class);
         var x = position.getX() * Game.TILE_SIZE;
         var y = position.getY() * Game.TILE_SIZE;
 
         // TODO: Delegate the sprite selection to an animation component
+        Texture texture = TextureStore.getInstance().getAssets(textureId);
         Sprite sprite = new Sprite(texture, 0, 0, 64, 64);
         renderer.drawSprite(x, y, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
-    }
-
-    public JsonObject serialize() {
-        JsonObject json = new JsonObject();
-        json.addProperty("texture", texture.getName());
-        return json;
     }
 }
