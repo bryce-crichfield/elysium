@@ -43,7 +43,6 @@ public class ObserverPlayerController extends PlayerController {
     }
 
     public final void selectActor() {
-        System.out.println("selectActor");
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
@@ -100,7 +99,7 @@ public class ObserverPlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        hoveredActorStats.onRender(renderer);
+//        hoveredActorStats.onSpriteRender(renderer);
     }
 
     private void hoverActor(Cursor cursor) {

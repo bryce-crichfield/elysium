@@ -6,8 +6,8 @@ import game.input.Mouse;
 import game.input.MouseEvent;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.event.ActionActorMoved;
-import game.state.battle.event.CursorMoved;
 import game.state.battle.util.Cursor;
 import game.state.battle.util.Pathfinder;
 import game.state.battle.Tile;
@@ -42,7 +42,6 @@ public class SelectMovePlayerController extends PlayerController {
         state.getCursor().enterBlinkingMode();
         state.getCursor().setColor(Color.ORANGE);
 
-        events.on(CursorMoved.event).run(this::onCursorMoved);
         events.on(ActionActorMoved.event).run(this::actorMoved);
     }
 
@@ -59,7 +58,8 @@ public class SelectMovePlayerController extends PlayerController {
 //        }
     }
 
-    private void onCursorMoved(Cursor cursor) {
+    @Override
+    public void onCursorMoved(Cursor cursor) {
         int cursorX = cursor.getCursorX();
         int cursorY = cursor.getCursorY();
 
@@ -67,11 +67,14 @@ public class SelectMovePlayerController extends PlayerController {
         boolean hoveringOnEmptyTile = hoveredActor.isEmpty();
         if (hoveringOnEmptyTile) {
             Pathfinder pathfinder = new Pathfinder(state.getScene(), state.getSelection().get());
-//            int actorX = (int) state.getSelection().get().getX();
-//            int actorY = (int) state.getSelection().get().getY();
-//            Tile start = state.getWorld().getTile(actorX, actorY);
-//            Tile end = state.getWorld().getTile(cursorX, cursorY);
-//            possiblePath = pathfinder.find(start, end);
+            var selectedActor = state.getSelection().get();
+            if (selectedActor.lacksComponent(PositionComponent.class)) return;
+            var position = selectedActor.getComponent(PositionComponent.class);
+            int actorX = (int) position.getX();
+            int actorY = (int) position.getY();
+            Tile start = state.getScene().getTile(actorX, actorY);
+            Tile end = state.getScene().getTile(cursorX, cursorY);
+            possiblePath = pathfinder.find(start, end);
 
 //            hoveredActorStats.setVisible(false);
         } else {
@@ -94,28 +97,37 @@ public class SelectMovePlayerController extends PlayerController {
 
     @Override
     public void onWorldRender(Renderer renderer) {
+        state.getCursor().onRender(renderer);
+        drawMoveableArea(renderer);
+    }
+
+    private void drawMoveableArea(Renderer renderer) {
+        var selected = state.getSelection().get();
 //        int distance = state.getSelection().get().getVitals().movementPoints;
         int distance = 5;
-//        int actorX = (int) state.getSelection().get().getX();
-//        int actorY = (int) state.getSelection().get().getY();
-//        List<Tile> inRange = state.getWorld().getTilesInRange(actorX, actorY, distance);
 
-//        for (Tile tile : inRange) {
-//            var color = Color.ORANGE.darker().darker();
-//            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
-//            renderer.setColor(color);
-//            renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
-//        }
-//
-//        Tile.drawOutline(inRange, renderer, Color.ORANGE);
-//        Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
-        state.getCursor().onRender(renderer);
+        if (selected.lacksComponent(PositionComponent.class)) return;
+
+        var position = selected.getComponent(PositionComponent.class);
+        int x = (int) position.getX();
+        int y = (int) position.getY();
+        List<Tile> inRange = state.getScene().getTilesInRange(x, y, distance);
+
+        for (Tile tile : inRange) {
+            var color = Color.ORANGE.darker().darker();
+            color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
+            renderer.setColor(color);
+            renderer.fillRect(tile.getX() * 32, tile.getY() * 32, 32, 32);
+        }
+
+        Tile.drawOutline(inRange, renderer, Color.ORANGE);
+        Tile.drawTurtle(possiblePath, renderer, Color.ORANGE);
     }
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        selectedActorStats.onRender(graphics);
-//        hoveredActorStats.onRender(graphics);
+//        selectedActorStats.onSpriteRender(graphics);
+//        hoveredActorStats.onSpriteRender(graphics);
     }
 
     @Override

@@ -68,7 +68,8 @@ public class SelectAttackPlayerController extends PlayerController {
 //        on(CursorMoved.event).run(this::onCursorMoved);
     }
 
-    private void onCursorMoved(Cursor cursor) {
+    @Override
+    public void onCursorMoved(Cursor cursor) {
 //        int cursorX = cursor.getCursorX();
 //        int cursorY = cursor.getCursorY();
 //        raycast = world.raycast((int) actor.get().getX(), (int) actor.get().getY(), cursorX, cursorY);
@@ -107,12 +108,12 @@ public class SelectAttackPlayerController extends PlayerController {
 
 //    @Override
 //    public void onGuiRender(Graphics2D graphics) {
-//        hoveredActorStats.onRender(graphics);
+//        hoveredActorStats.onSpriteRender(graphics);
 //    }
 
 //    @Override
 //    public void onWorldRender(Graphics2D graphics) {
-//        cursor.onRender(graphics);
+//        cursor.onSpriteRender(graphics);
 //
 //        if (raycast == null) {
 //            return;

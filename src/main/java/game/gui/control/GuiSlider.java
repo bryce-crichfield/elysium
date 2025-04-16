@@ -1,5 +1,6 @@
 package game.gui.control;
 
+import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
@@ -180,8 +181,8 @@ public class GuiSlider extends GuiComponent {
     }
 
     @Override
-    public boolean processMouseEvent(MouseEvent e) {
-        if (!visible || !enabled) return false;
+    public GuiEventState processMouseEvent(MouseEvent e) {
+        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
 
         Point localPoint = transformToLocalSpace(e.getPoint());
 
@@ -194,7 +195,7 @@ public class GuiSlider extends GuiComponent {
         }
 
         // If we're not in bounds and not captured by a drag operation, ignore the event
-        if (!containsPoint && !GuiMouseManager.isCapturedComponent(this)) return false;
+        if (!containsPoint && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
 
         // Handle ongoing drag operation
         if (isDragging && GuiMouseManager.isCapturedComponent(this)) {
@@ -220,14 +221,14 @@ public class GuiSlider extends GuiComponent {
                     }
                 }
 
-                return true;
+                return GuiEventState.CONSUMED;
             }
             else if (e instanceof MouseEvent.Released) {
                 // End dragging operation
                 isDragging = false;
                 dragStart = null;
                 GuiMouseManager.releaseMouseCapture();
-                return true;
+                return GuiEventState.CONSUMED;
             }
         }
 
@@ -242,7 +243,7 @@ public class GuiSlider extends GuiComponent {
                 dragStart = new Point(localPoint);
                 dragStartValue = value;
                 GuiMouseManager.setMouseCapture(this);
-                return true;
+                return GuiEventState.CONSUMED;
             }
             // If we clicked on the track, jump to that position
             else if (containsPoint) {
@@ -262,7 +263,7 @@ public class GuiSlider extends GuiComponent {
                     }
                 }
 
-                return true;
+                return GuiEventState.CONSUMED;
             }
         }
 
@@ -271,6 +272,6 @@ public class GuiSlider extends GuiComponent {
             return super.processMouseEvent(e);
         }
 
-        return false;
+        return GuiEventState.NOT_CONSUMED;
     }
 }

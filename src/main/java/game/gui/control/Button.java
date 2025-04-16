@@ -33,7 +33,7 @@
 //    }
 //
 //    @Override
-//    protected void onRender(Graphics2D g) {
+//    protected void onSpriteRender(Graphics2D g) {
 //        // Save the original clip
 ////        Shape originalClip = g.getClip();
 //        Shape originalClip = setClip(g);

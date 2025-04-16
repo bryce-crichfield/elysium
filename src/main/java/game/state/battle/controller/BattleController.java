@@ -4,6 +4,7 @@ import game.event.EventContext;
 import game.graphics.Renderer;
 import game.input.MouseEvent;
 import game.state.battle.BattleState;
+import game.state.battle.util.Cursor;
 
 import java.time.Duration;
 
@@ -42,5 +43,8 @@ public abstract class BattleController {
 
     public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
 
+    }
+
+    public void onCursorMoved(Cursor cursor) {
     }
 }

@@ -5,32 +5,35 @@ import game.graphics.Renderer;
 import game.input.KeyEvent;
 import game.input.Keyboard;
 import game.input.MouseEvent;
-import game.state.battle.event.CursorMoved;
-import game.state.battle.Scene;
+import game.state.battle.BattleState;
 import game.util.Util;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 import java.time.Duration;
 
 public class Cursor {
     private final Game game;
+    private final BattleState state;
+
     private final float timerMax = .75f;
+    @Getter
     public int cursorX;
+    @Getter
     public int cursorY;
     float velocityX;
     float velocityY;
     float accelerationX;
     float accelerationY;
-    Camera camera;
-    int tileSize;
     Mode mode = Mode.NORMAL;
+    @Setter
     Color color = Color.RED;
     float timer = 0;
 
-    public Cursor(Camera camera, Game game, Scene scene) {
-        this.camera = camera;
-        this.tileSize = Game.TILE_SIZE;
+    public Cursor(Game game, BattleState state) {
         this.game = game;
+        this.state = state;
 
         cursorX = 0;
         cursorY = 0;
@@ -38,58 +41,53 @@ public class Cursor {
         velocityY = 0;
         accelerationX = 0;
         accelerationY = 0;
+    }
 
-
-        // TODO: Should this be in the constructor?
-        CursorMoved.event.addListener(event -> {
-            cursorX = Util.clamp(cursorX, 0, scene.getWidth() - 1);
-            cursorY = Util.clamp(cursorY, 0, scene.getHeight() - 1);
-            game.getAudio().play("type_preview/swipe");
-        });
+    private void onCursorMoved() {
+        cursorX = Util.clamp(cursorX, 0, state.getScene().getWidth() - 1);
+        cursorY = Util.clamp(cursorY, 0, state.getScene().getHeight() - 1);
+        game.getAudio().play("type_preview/swipe");
+        state.getController().onCursorMoved(this);
     }
 
     public void setPosition(int x, int y) {
         cursorX = x;
         cursorY = y;
-        CursorMoved.event.fire(this);
+        onCursorMoved();
     }
 
     public void onKeyPressed(Integer keyCode) {
         switch (keyCode) {
             case Keyboard.LEFT -> {
                 cursorX--;
-                CursorMoved.event.fire(this);
+                onCursorMoved();
             }
             case Keyboard.RIGHT -> {
                 cursorX++;
-                CursorMoved.event.fire(this);
+                onCursorMoved();
             }
             case Keyboard.UP -> {
                 cursorY--;
-                CursorMoved.event.fire(this);
+                onCursorMoved();
             }
             case Keyboard.DOWN -> {
                 cursorY++;
-                CursorMoved.event.fire(this);
+                onCursorMoved();
 
             }
             case KeyEvent.VK_MINUS -> {
-                float zoom = camera.getZoom();
+                float zoom = state.getCamera().getZoom();
                 zoom = Math.max(zoom - 0.25f, 0.25f);
-                camera.setZoom(zoom);
-                CursorMoved.event.fire(this);
+                state.getCamera().setZoom(zoom);
+                onCursorMoved();
             }
             case KeyEvent.VK_EQUALS -> {
-                float zoom = camera.getZoom();
+                float zoom = state.getCamera().getZoom();
                 zoom = Math.min(zoom + 0.25f, 2);
-                camera.setZoom(zoom);
-                CursorMoved.event.fire(this);
+                state.getCamera().setZoom(zoom);
+                onCursorMoved();
             }
         }
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     public void enterBlinkingMode() {
@@ -108,14 +106,16 @@ public class Cursor {
             timer = Util.wrap(timer, 0, timerMax);
         }
 
-        int cursorWorldX = cursorX * tileSize;
-        int cursorWorldY = cursorY * tileSize;
+        int cursorWorldX = cursorX * Game.TILE_SIZE;
+        int cursorWorldY = cursorY * Game.TILE_SIZE;
 
-        velocityX = (cursorWorldX - camera.getX()) * 10;
-        velocityY = (cursorWorldY - camera.getY()) * 10;
+        velocityX = (cursorWorldX - state.getCamera().getX()) * 10;
+        velocityY = (cursorWorldY - state.getCamera().getY()) * 10;
 
-        camera.setX(camera.getX() + (velocityX * dt));
-        camera.setY(camera.getY() + (velocityY * dt));
+        var cameraX = state.getCamera().getX() + (velocityX * dt);
+        var cameraY = state.getCamera().getY() + (velocityY * dt);
+        state.getCamera().setX(cameraX);
+        state.getCamera().setY(cameraY);
 
         velocityX *= 0.9;
         velocityY *= 0.9;
@@ -127,9 +127,9 @@ public class Cursor {
             offset = 5;
         }
 
-        int size = tileSize + offset;
-        int x = cursorX * tileSize - offset / 2;
-        int y = cursorY * tileSize - offset / 2;
+        int size = Game.TILE_SIZE + offset;
+        int x = cursorX * Game.TILE_SIZE - offset / 2;
+        int y = cursorY * Game.TILE_SIZE - offset / 2;
 
         var oldStroke = renderer.getLineWidth();
         renderer.setColor(Color.BLACK);
@@ -140,28 +140,20 @@ public class Cursor {
         renderer.drawRect(x, y, size, size);
     }
 
-    public int getCursorX() {
-        return cursorX;
-    }
-
-    public int getCursorY() {
-        return cursorY;
-    }
-
     public void onMouseClicked(MouseEvent event) {
         int x = event.getX();
         int y = event.getY();
 
-        cursorX = (x / tileSize);
-        cursorY = (y / tileSize);
-        CursorMoved.event.fire(this);
+        cursorX = (x / Game.TILE_SIZE);
+        cursorY = (y / Game.TILE_SIZE);
+        onCursorMoved();
     }
 
     public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         int wheelRotation = (int) event.getWheelRotation();
-        float newZoom = camera.getZoom() + (Math.signum(wheelRotation) * -0.1f);
+        float newZoom = state.getCamera().getZoom() + (Math.signum(wheelRotation) * -0.1f);
         newZoom = Util.clamp(newZoom, 0.25f, 4f);
-        camera.setZoom(newZoom);
+        state.getCamera().setZoom(newZoom);
     }
 
     enum Mode {

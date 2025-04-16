@@ -3,6 +3,7 @@ package game.state.battle;
 import game.graphics.Renderer;
 import game.graphics.sprite.SpriteRenderer;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.util.Raycast;
 import game.util.Util;
 import lombok.Getter;
@@ -46,33 +47,6 @@ public class Scene implements Serializable {
         this.height = tiles[0].length;
     }
 
-//    public Scene(int width, int height) {
-//        this.width = width;
-//        this.height = height;
-//
-////        tiles = new Tile[width][height];
-//
-//        // Initialize the tiles
-//        tiles = new Tile[width][height];
-//        for (int x = 0; x < width; x++) {
-//            for (int y = 0; y < height; y++) {
-//                var tile = new Tile(x, y, "");
-//                tiles[x][y] = tile;
-//            }
-//        }
-////
-////        entities = new ArrayList<>();
-////        var entity = new Entity();
-////        var position = new PositionComponent(0, 0);
-////        entity.addComponent(position);
-////        entity.addComponent(new SpriteComponent("sprites/test"));
-////
-////        entities.add(entity);
-////
-////        Entity.serialize(entities, "test.bin");
-//        entities = Entity.deserialize("test.bin");
-//    }
-
     public void onUpdate(Duration duration) {
         for (Entity entity : entities) {
             entity.onUpdate(duration);
@@ -84,7 +58,7 @@ public class Scene implements Serializable {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles[x][y].onRender(spriteRenderer);
+                tiles[x][y].onSpriteRender(spriteRenderer);
             }
         }
 
@@ -136,9 +110,11 @@ public class Scene implements Serializable {
 
     public Optional<Entity> getActorByPosition(int x, int y) {
         for (Entity entity : entities) {
-//            if (entity.getX() == x && entity.getY() == y) {
-//                return Optional.of(entity);
-//            }
+            if (entity.lacksComponent(PositionComponent.class)) continue;
+            var position = entity.getComponent(PositionComponent.class);
+            if (position.getX() == x && position.getY() == y) {
+                return Optional.of(entity);
+            }
         }
 
         return Optional.empty();

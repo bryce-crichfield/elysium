@@ -67,7 +67,7 @@ public class SelectActionPlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        statsMenu.onRender(graphics);
-//        actionsMenu.onRender(graphics);
+//        statsMenu.onSpriteRender(graphics);
+//        actionsMenu.onSpriteRender(graphics);
     }
 }

@@ -69,8 +69,8 @@ public abstract class GuiComponent {
     }
 
     // Process mouse events and delegate to handlers
-    public boolean processMouseEvent(MouseEvent event) {
-        if (!visible || !enabled) return false;
+    public GuiEventState processMouseEvent(MouseEvent event) {
+        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
 
         // Transform coordinates to local space
         Point localPoint = transformToLocalSpace(event.getPoint());
@@ -96,7 +96,7 @@ public abstract class GuiComponent {
         }
 
         // Check if point is within bounds for other events
-        if (!isInBounds && !GuiMouseManager.isCapturedComponent(this)) return false;
+        if (!isInBounds && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
 
         // Set focus on mouse click
         if (e instanceof MouseEvent.Pressed && isInBounds) {
@@ -104,19 +104,19 @@ public abstract class GuiComponent {
         }
 
         // If the event gets handled by the component itself, return true
-        if (onMouseEvent(e)) return true;
+        if (onMouseEvent(e) == GuiEventState.CONSUMED) return GuiEventState.CONSUMED;
 
         // Delegate to handlers
         for (GuiMouseHandler handler : mouseHandlers) {
             if (e.isConsumed()) break;
-            handler.dispatchMouseEvent(e);
+            if (handler.dispatchMouseEvent(e) == GuiEventState.CONSUMED) return GuiEventState.CONSUMED;
         }
 
-        return true;
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    protected boolean onMouseEvent(MouseEvent e) {
-        return false;
+    protected GuiEventState onMouseEvent(MouseEvent e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
     protected Point transformToLocalSpace(Point point) {

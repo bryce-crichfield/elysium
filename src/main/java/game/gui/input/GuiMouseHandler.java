@@ -6,44 +6,53 @@ public interface GuiMouseHandler {
     static GuiMouseHandler onClick(Runnable action) {
         return new GuiMouseHandler() {
             @Override
-            public void onMouseClicked(MouseEvent.Clicked e) {
+            public GuiEventState onMouseClicked(MouseEvent.Clicked e) {
                 action.run();
+                return GuiEventState.CONSUMED;
             }
         };
     }
 
-    default void onMousePressed(MouseEvent.Pressed e) {
+    default GuiEventState onMousePressed(MouseEvent.Pressed e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void onMouseReleased(MouseEvent.Released e) {
+    default GuiEventState onMouseReleased(MouseEvent.Released e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void onMouseClicked(MouseEvent.Clicked e) {
+    default GuiEventState onMouseClicked(MouseEvent.Clicked e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void onMouseDragged(MouseEvent.Dragged e) {
+    default GuiEventState onMouseDragged(MouseEvent.Dragged e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void onMouseMoved(MouseEvent.Moved e) {
+    default GuiEventState onMouseMoved(MouseEvent.Moved e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void onMouseWheelMoved(MouseEvent.WheelMoved e) {
+    default GuiEventState onMouseWheelMoved(MouseEvent.WheelMoved e) {
+        return GuiEventState.NOT_CONSUMED;
     }
 
-    default void dispatchMouseEvent(MouseEvent event) {
+    default GuiEventState dispatchMouseEvent(MouseEvent event) {
         // Type-safe dispatch using instanceof
         if (event instanceof MouseEvent.Moved moved) {
-            onMouseMoved(moved);
+            return onMouseMoved(moved);
         } else if (event instanceof MouseEvent.Dragged dragged) {
-            onMouseDragged(dragged);
+            return onMouseDragged(dragged);
         } else if (event instanceof MouseEvent.Clicked clicked) {
-            onMouseClicked(clicked);
+            return onMouseClicked(clicked);
         } else if (event instanceof MouseEvent.Pressed pressed) {
-            onMousePressed(pressed);
+            return onMousePressed(pressed);
         } else if (event instanceof MouseEvent.Released released) {
-            onMouseReleased(released);
+            return onMouseReleased(released);
         } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
-            onMouseWheelMoved(wheelMoved);
+            return onMouseWheelMoved(wheelMoved);
         }
+
+        return GuiEventState.NOT_CONSUMED;
     }
 }

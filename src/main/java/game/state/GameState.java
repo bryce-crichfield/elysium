@@ -5,6 +5,7 @@ import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
 import game.gui.input.GuiMouseManager;
 import game.graphics.Renderer;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public abstract class GameState {
+    @Getter
     protected final Game game;
     private final List<Background> backgrounds = new ArrayList<>();
 

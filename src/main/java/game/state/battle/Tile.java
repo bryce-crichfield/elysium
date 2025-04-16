@@ -7,6 +7,7 @@ import game.graphics.sprite.SpriteRenderer;
 import game.graphics.texture.Texture;
 import game.graphics.texture.TextureStore;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -15,19 +16,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
+@RequiredArgsConstructor
 public class Tile implements Serializable {
-    @Getter
     private final int x;
-
-    @Getter
     private final int y;
     private final String textureId;
-
-    public Tile(int x, int y, String textureId) {
-        this.x = x;
-        this.y = y;
-        this.textureId = textureId;
-    }
+    private final boolean isPassable;
 
     public static void drawOutline(List<Tile> tiles, Renderer renderer, Color color) {
         for (Tile tile : tiles) {
@@ -127,12 +122,7 @@ public class Tile implements Serializable {
         return Stream.of(above, below, left, right).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
-    public boolean isPassable() {
-        return true;
-    }
-
-
-    public void onRender(SpriteRenderer renderer) {
+    public void onSpriteRender(SpriteRenderer renderer) {
         Texture texture = TextureStore.getInstance().getAssets("tiles/Cyan");
         Sprite sprite = new Sprite(texture, 0, 0, Game.TILE_SIZE, Game.TILE_SIZE);
         int drawX = getX() * Game.TILE_SIZE;

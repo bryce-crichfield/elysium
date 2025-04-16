@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
 import game.gui.input.GuiMouseManager;
@@ -152,8 +153,8 @@ public class GuiScrollPanel extends GuiContainer {
     }
 
     @Override
-    public boolean processMouseEvent(MouseEvent e) {
-        if (!visible || !enabled) return false;
+    public GuiEventState processMouseEvent(MouseEvent e) {
+        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
 
         // Convert to local space first
         Point localPoint = transformToLocalSpace(e.getPoint());
@@ -174,21 +175,22 @@ public class GuiScrollPanel extends GuiContainer {
         }
 
         // Check that we are not hovered and not captured by some dragging event
-        if (!isHovered && !GuiMouseManager.isCapturedComponent(this)) return false;
+        if (!isHovered && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
 
         // Check to see if there is a scroll bar interaction (click, release or drag).  If there isn't, but we are hovered
         // return true to ensure we consume the event.
         if (isPointOnScrollbar(localPoint) || GuiMouseManager.isCapturedComponent(this)) {
 //            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
             var localEvent = e.withPoint(localPoint);
-            return handleScrollbarInteraction(localEvent, localPoint) || isHovered;
+            boolean handledScrollbar = handleScrollbarInteraction(localEvent, localPoint);
+            if (handledScrollbar || isHovered) return GuiEventState.CONSUMED;
         }
 
         // Handle mouse wheel for scrolling
         if (e instanceof MouseEvent.WheelMoved wheelMoved) {
             float scrollAmount = wheelMoved.getWheelRotation() * 20;
             scrollState.scroll(0, scrollAmount);
-            return true;
+            return GuiEventState.CONSUMED;
         }
 
         // Adjust coordinates for content area
@@ -204,20 +206,20 @@ public class GuiScrollPanel extends GuiContainer {
         // Let children handle it
         for (int i = children.size() - 1; i >= 0; i--) {
             GuiComponent child = children.get(i);
-            if (child.processMouseEvent(contentEvent)) {
-                return true;
+            if (child.processMouseEvent(contentEvent) == GuiEventState.CONSUMED) {
+                return GuiEventState.CONSUMED;
             }
         }
 
         // Handle by us or our handlers
-        if (onMouseEvent(contentEvent)) return true;
+        if (onMouseEvent(contentEvent) == GuiEventState.CONSUMED) return GuiEventState.CONSUMED;
 
         for (var handler : mouseHandlers) {
             if (contentEvent.isConsumed()) break;
             handler.dispatchMouseEvent(contentEvent);
         }
 
-        return true;
+        return GuiEventState.CONSUMED;
     }
 
     private boolean handleScrollbarInteraction(MouseEvent e, Point localPoint) {
