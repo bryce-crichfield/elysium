@@ -182,9 +182,11 @@ public class GuiSlider extends GuiComponent {
 
     @Override
     public GuiEventState processMouseEvent(MouseEvent e) {
-        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
+        if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
-        Point localPoint = transformToLocalSpace(e.getPoint());
+        Point point = e.getPoint();
+        // Transform the point to local space
+        Point localPoint = new Point(point.x - x, point.y - y);
 
         // Check if we're in bounds for hover state
         boolean containsPoint = containsPoint(localPoint);

@@ -8,4 +8,5 @@ public abstract class GuiTheme {
 
     public abstract GuiStyle button();
     public abstract GuiStyle buttonHover();
+    public abstract GuiStyle label();
 }

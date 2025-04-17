@@ -4,7 +4,7 @@ import game.gui.container.GuiScrollPanel;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
-import game.gui.style.GuiLabel;
+import game.gui.control.GuiLabel;
 import game.state.battle.BattleState;
 
 import java.awt.*;

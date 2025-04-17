@@ -155,10 +155,12 @@ public class GuiScrollPanel extends GuiContainer {
 
     @Override
     public GuiEventState processMouseEvent(MouseEvent e) {
-        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
+        if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
         // Convert to local space first
-        Point localPoint = transformToLocalSpace(e.getPoint());
+        Point point = e.getPoint();
+        // Transform the point to local space
+        Point localPoint = new Point(point.x - x, point.y - y);
         boolean isInBounds = containsPoint(localPoint) || isPointOnScrollbar(localPoint);
 
         boolean mouseEntered = e instanceof MouseEvent.Moved && (!isHovered && isInBounds);

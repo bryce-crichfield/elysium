@@ -22,4 +22,11 @@ public class DefaultGuiTheme extends GuiTheme {
                 .font(new GuiFont(Color.WHITE, "fonts/neuropol", 12))
                 .build();
     }
+
+    @Override
+    public GuiStyle label() {
+        return GuiStyle.builder()
+                .font(new GuiFont(Color.WHITE, "fonts/neuropol", 12))
+                .build();
+    }
 }

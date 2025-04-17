@@ -33,17 +33,17 @@ public class GuiButton extends GuiComponent {
             }
         });
 
-        this.addHoverHandler(new GuiHoverHandler() {
-            @Override
-            public void onEnter(MouseEvent event) {
-                isHovered = true;
-            }
-
-            @Override
-            public void onExit(MouseEvent event) {
-                isHovered = false;
-            }
-        });
+//        this.addHoverHandler(new GuiHoverHandler() {
+//            @Override
+//            public void onEnter(MouseEvent event) {
+//                isHovered = true;
+//            }
+//
+//            @Override
+//            public void onExit(MouseEvent event) {
+//                isHovered = false;
+//            }
+//        });
 
         style = GuiTheme.getInstance().button();
     }
