@@ -95,11 +95,11 @@ public class Scene implements Serializable {
         return Optional.empty();
     }
 
-    public void addActor(Entity entity) {
+    public void addEntity(Entity entity) {
         entities.add(entity);
     }
 
-    public void removeActor(Entity entity) {
+    public void removeEntity(Entity entity) {
         entities.remove(entity);
     }
 

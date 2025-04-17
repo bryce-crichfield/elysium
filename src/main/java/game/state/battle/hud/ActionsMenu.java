@@ -1,11 +1,16 @@
 package game.state.battle.hud;
 
 import game.gui.GuiContainer;
+import game.gui.GuiScrollPanel;
 import game.gui.control.GuiButton;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.state.battle.BattleState;
+import game.state.battle.Scene;
+import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.PositionComponent;
+import game.state.battle.entity.components.SpriteComponent;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -13,9 +18,9 @@ import game.util.Easing;
 import java.awt.*;
 import java.time.Duration;
 
-public class ActionsMenu extends GuiContainer {
-    private static final int WIDTH = 160;
-    private static final int HEIGHT = 95;
+public class ActionsMenu extends GuiScrollPanel {
+    private static final int WIDTH = 115;
+    private static final int HEIGHT = 250;
     private final BattleState state;
 
     public ActionsMenu(BattleState state, int x, int y) {
@@ -24,6 +29,7 @@ public class ActionsMenu extends GuiContainer {
 
         var layout = new GuiVerticalLayout();
         layout.setSpacing(5);
+        layout.setPadding(5);
         this.setLayout(layout);
 
         var background = new GuiBackground.Fill(Color.BLACK);
@@ -34,12 +40,26 @@ public class ActionsMenu extends GuiContainer {
 
         var saveSceneBtn = new GuiButton("Save Scene", 100, 20, () -> {
             // Save scene logic
-            System.out.println("Scene saved!");
+            Scene.serialize("scene1", state.getScene());
         });
 
-        var loadSceneBtn = new GuiButton("Load Scene", 100, 20, () -> {
+        var createEntity = new GuiButton("Create", 100, 20, () -> {
             // Load scene logic
-            System.out.println("Scene loaded!");
+            var cursorX = state.getCursor().getCursorX();
+            var cursorY = state.getCursor().getCursorY();
+            var entity = new Entity();
+            var position = new PositionComponent(cursorX, cursorY);
+            var sprite = new SpriteComponent("sprites/test");
+            entity.addComponent(position);
+            entity.addComponent(sprite);
+            state.getScene().addEntity(entity);
+        });
+
+        var removeEntity = new GuiButton("Remove", 100, 20, () -> {
+            var cursorX = state.getCursor().getCursorX();
+            var cursorY = state.getCursor().getCursorY();
+            var entity = state.getScene().findEntityByPosition(cursorX, cursorY);
+            entity.ifPresent(value -> state.getScene().removeEntity(value));
         });
 
         var exitBtn = new GuiButton("Exit", 100, 20, () -> {
@@ -49,7 +69,8 @@ public class ActionsMenu extends GuiContainer {
         });
 
         this.addChild(saveSceneBtn);
-        this.addChild(loadSceneBtn);
+        this.addChild(createEntity);
+        this.addChild(removeEntity);
         this.addChild(exitBtn);
     }
 }

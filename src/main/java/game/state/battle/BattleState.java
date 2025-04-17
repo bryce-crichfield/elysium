@@ -17,6 +17,7 @@ import game.state.battle.entity.Entity;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.entity.components.SpriteComponent;
 import game.state.battle.hud.ActionsMenu;
+import game.state.battle.hud.EntityInspector;
 import game.state.battle.tile.Tile;
 import game.state.battle.util.Camera;
 import game.state.battle.util.Cursor;
@@ -68,6 +69,7 @@ public class BattleState extends GameState {
 
         scene = new Scene(tiles, entities);
         Scene.serialize("scene1", scene);
+//        scene = Scene.deserialize("scene1");
         cursor = new Cursor(game, this);
         addBackground(StarBackground::new);
 
@@ -77,6 +79,7 @@ public class BattleState extends GameState {
         spriteRenderer.setProjection(transform);
 
         gui.addChild(new ActionsMenu(this, 0, 0));
+        gui.addChild(new EntityInspector(this, Game.SCREEN_WIDTH - 500, 0));
         gui.setLayout(new GuiNullLayout());
     }
 
@@ -113,8 +116,8 @@ public class BattleState extends GameState {
 
     @Override
     public void onUpdate(Duration delta) {
+        gui.update(delta);
         scene.onUpdate(delta);
-
         controller.onUpdate(delta);
     }
 

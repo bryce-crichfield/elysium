@@ -82,4 +82,8 @@ public final class Entity implements Serializable {
     public <T extends Component> boolean lacksComponent(Class<T> componentClass) {
         return !components.containsKey(componentClass);
     }
+
+    public Map<Class<? extends Component>, Component> getComponents() {
+        return components;
+    }
 }

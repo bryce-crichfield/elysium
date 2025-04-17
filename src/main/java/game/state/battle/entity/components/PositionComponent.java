@@ -26,4 +26,12 @@ public class PositionComponent implements Component {
         if (!(obj instanceof PositionComponent other)) return false;
         return x == other.x && y == other.y;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

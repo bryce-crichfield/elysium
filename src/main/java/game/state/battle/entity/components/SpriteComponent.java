@@ -27,4 +27,11 @@ public class SpriteComponent implements RenderableComponent {
         Sprite sprite = new Sprite(texture, 0, 0, 64, 64);
         renderer.drawSprite(x, y, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "textureId='" + textureId + '\'' +
+                '}';
+    }
 }
