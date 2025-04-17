@@ -9,13 +9,19 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependency versions -->
         <lwjgl.version>3.3.3</lwjgl.version>
-        <lwjgl.natives>natives-linux</lwjgl.natives>
         <joml.version>1.10.5</joml.version>
         <gson.version>2.10.1</gson.version>
+
+        <!-- LWJGL natives based on OS detection -->
+        <lwjgl.natives>natives-windows</lwjgl.natives>
+        <lwjgl.natives.macos>natives-macos</lwjgl.natives.macos>
+        <lwjgl.natives.linux>natives-linux</lwjgl.natives.linux>
     </properties>
 
     <dependencies>
@@ -98,4 +104,41 @@
             <version>0.10.2</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>lwjgl-natives-linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>${lwjgl.natives.linux}</lwjgl.natives>
+            </properties>
+        </profile>
+        <profile>
+            <id>lwjgl-natives-macos</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>${lwjgl.natives.macos}</lwjgl.natives>
+            </properties>
+        </profile>
+        <profile>
+            <id>lwjgl-natives-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>natives-windows</lwjgl.natives>
+            </properties>
+        </profile>
+    </profiles>
 </project>

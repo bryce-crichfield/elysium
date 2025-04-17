@@ -22,10 +22,10 @@ public class ObserverPlayerController extends PlayerController {
 
     @Override
     public void onMouseEvent(MouseEvent event) {
-        if (event instanceof MouseEvent.Clicked clicked) {
-            onMouseClicked(clicked);
-        } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
-            onMouseWheelMoved(wheelMoved);
+        switch (event) {
+            case MouseEvent.Clicked clicked -> onMouseClicked(clicked);
+            case MouseEvent.WheelMoved wheelMoved -> onMouseWheelMoved(wheelMoved);
+            default -> {}
         }
     }
 
