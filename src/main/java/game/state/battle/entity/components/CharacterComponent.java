@@ -1,16 +1,17 @@
 package game.state.battle.entity.components;
 
 
-import game.state.character.GameCharacter;
+import com.google.gson.JsonObject;
+import game.state.battle.entity.component.Component;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class CharacterComponent {
-    @Getter
-    private final GameCharacter character;
-    @Getter
+@Getter
+@AllArgsConstructor
+public class CharacterComponent implements Component {
     private float health;
 
-    public CharacterComponent(GameCharacter character) {
-        this.character = character;
+    public JsonObject serialize() {
+        return null;
     }
 }

@@ -5,7 +5,6 @@ import game.graphics.Renderer;
 import game.input.Keyboard;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
-import game.state.battle.event.ActorHovered;
 
 import java.time.Duration;
 
@@ -40,11 +39,11 @@ public class SelectActionPlayerController extends PlayerController {
             // The actor has issued its action, it is now waiting. So we can go back to the observer mode.
             int cursorX = state.getCursor().getCursorX();
             int cursorY = state.getCursor().getCursorY();
-            int actorX = (int) state.getSelection().get().getX();
-            int actorY = (int) state.getSelection().get().getY();
-            if (cursorX == actorX && cursorY == actorY) {
-                ActorHovered.event.fire(state.getSelection().get());
-            }
+//            int actorX = (int) state.getSelection().get().getX();
+//            int actorY = (int) state.getSelection().get().getY();
+//            if (cursorX == actorX && cursorY == actorY) {
+//                ActorHovered.event.fire(state.getSelection().get());
+//            }
 
             state.transitionTo(ObserverPlayerController::new);
 
@@ -67,7 +66,7 @@ public class SelectActionPlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        statsMenu.onRender(graphics);
-//        actionsMenu.onRender(graphics);
+//        statsMenu.onSpriteRender(graphics);
+//        actionsMenu.onSpriteRender(graphics);
     }
 }

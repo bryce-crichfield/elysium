@@ -1,5 +1,6 @@
 package game.gui.control;
 
+import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
@@ -201,7 +202,7 @@ public class GuiDropdown<T> extends GuiComponent {
     }
 
     @Override
-    public boolean processMouseEvent(MouseEvent e) {
+    public GuiEventState processMouseEvent(MouseEvent e) {
         Point localPoint = transformToLocalSpace(e.getPoint());
         boolean wasPress = e instanceof MouseEvent.Pressed || e instanceof MouseEvent.Clicked || e instanceof MouseEvent.Released;
         boolean wasInSelectionArea = new Rectangle(0, height, width, Math.min(maxDropdownHeight, items.size() * itemHeight)).contains(localPoint);
@@ -216,13 +217,13 @@ public class GuiDropdown<T> extends GuiComponent {
             // If clicking outside, close dropdown
             toggleDropdown();
             GuiMouseManager.releaseMouseCapture();
-            return true; // Let other components handle the click
+            return GuiEventState.CONSUMED; // Let other components handle the click
         }
 
         // Clicking the toggle area, open/close the dropdown
         if (wasInToggleArea && !wasInSelectionArea && wasPress) {
             toggleDropdown();
-            return true;
+            return GuiEventState.CONSUMED;
         }
 
         // Clicked on a dropdown option
@@ -243,7 +244,7 @@ public class GuiDropdown<T> extends GuiComponent {
                 onSelectionChanged.accept(selectedItem);
             }
 
-            return true;
+            return GuiEventState.CONSUMED;
         }
 
 
@@ -252,7 +253,7 @@ public class GuiDropdown<T> extends GuiComponent {
             return super.processMouseEvent(e);
         }
 
-        return false;
+        return GuiEventState.NOT_CONSUMED;
     }
 
     @Override

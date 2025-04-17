@@ -15,9 +15,9 @@ public abstract class PlayerController extends BattleController {
 
     @Override
     public final boolean isDone() {
-        List<Entity> playerActorsNotWaiting = state.getWorld().getEntities().stream()
-                .filter(Entity::isPlayer)
-                .filter(actor -> !actor.isWaiting())
+        List<Entity> playerActorsNotWaiting = state.getScene().getEntities().stream()
+//                .filter(Entity::isPlayer)
+//                .filter(actor -> !actor.isWaiting())
                 .toList();
 
         return playerActorsNotWaiting.isEmpty();

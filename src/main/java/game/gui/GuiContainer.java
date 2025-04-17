@@ -1,5 +1,7 @@
 package game.gui;
 
+import game.gui.input.GuiEventState;
+import game.gui.layout.GuiNullLayout;
 import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
 import game.gui.layout.GuiVerticalLayout;
@@ -16,7 +18,9 @@ import java.util.List;
 public class GuiContainer extends GuiComponent {
     @Getter
     protected List<GuiComponent> children = new ArrayList<>();
-    protected GuiLayout layout = new GuiVerticalLayout();
+
+    @Getter
+    protected GuiLayout layout = new GuiNullLayout();
 
     @Getter
     @Setter
@@ -65,15 +69,15 @@ public class GuiContainer extends GuiComponent {
     }
 
     @Override
-    protected final boolean onMouseEvent(MouseEvent e) {
+    protected final GuiEventState onMouseEvent(MouseEvent e) {
         // Propagate backwards because insertion order implicitly defines z-order
         for (int i = children.size() - 1; i >= 0; i--) {
-            if (children.get(i).processMouseEvent(e)) {
-                return true;
+            if (children.get(i).processMouseEvent(e) == GuiEventState.CONSUMED) {
+                return GuiEventState.CONSUMED;
             }
         }
 
-        return false;
+        return GuiEventState.NOT_CONSUMED;
     }
 
     public void setLayout(GuiLayout guiLayout) {

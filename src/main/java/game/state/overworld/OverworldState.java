@@ -1,13 +1,13 @@
 package game.state.overworld;
 
 import game.Game;
-import game.graphics.background.StarBackground;
 import game.graphics.Renderer;
+import game.graphics.background.StarBackground;
 import game.state.GameState;
+import game.state.battle.util.Camera;
 import game.state.overworld.entity.Frame;
 import game.state.overworld.entity.Player;
 import game.state.overworld.entity.Tile;
-import game.state.battle.util.Camera;
 import game.util.Util;
 
 import java.time.Duration;

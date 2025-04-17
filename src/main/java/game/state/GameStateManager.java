@@ -16,6 +16,7 @@ public class GameStateManager {
     private Transition transition;
     private TransitionType transitionType = TransitionType.NONE;
     private GameState target; // Only used during PUSH transitions
+
     public GameStateManager(Game game) {
         this.game = game;
     }

@@ -1,9 +1,10 @@
-package game.graphics.texture;
+package game.graphics.sprite;
 
 import game.graphics.Transform;
 import game.graphics.gl.Program;
 import game.graphics.gl.VertexArray;
 import game.graphics.gl.VertexBuffer;
+import game.graphics.texture.Texture;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Matrix4f;
@@ -44,7 +45,6 @@ public class SpriteRenderer {
 
     private Matrix4f projectionMatrix = new Matrix4f();
     private Matrix4f viewMatrix = new Matrix4f();
-
 
     public SpriteRenderer(String vertexShaderPath, String fragmentShaderPath) {
         this.vertices = new float[MAX_SPRITES * VERTICES_PER_SPRITE * (VERTEX_SIZE / Float.BYTES)];

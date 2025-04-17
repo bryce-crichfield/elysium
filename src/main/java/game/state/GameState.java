@@ -1,20 +1,22 @@
 package game.state;
 
 import game.Game;
+import game.graphics.Renderer;
 import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
 import game.gui.input.GuiMouseManager;
-import game.graphics.Renderer;
+import game.input.MouseEvent;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
-import game.input.MouseEvent;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public abstract class GameState {
+    @Getter
     protected final Game game;
     private final List<Background> backgrounds = new ArrayList<>();
 
@@ -33,39 +35,13 @@ public abstract class GameState {
             return; // event was handled by the captured component
         }
 
-        // Type-safe dispatch using instanceof
-        if (event instanceof MouseEvent.Moved moved) {
-            onMouseMoved(moved);
-        } else if (event instanceof MouseEvent.Dragged dragged) {
-            onMouseDragged(dragged);
-        } else if (event instanceof MouseEvent.Clicked clicked) {
-            onMouseClicked(clicked);
-        } else if (event instanceof MouseEvent.Pressed pressed) {
-            onMousePressed(pressed);
-        } else if (event instanceof MouseEvent.Released released) {
-            onMouseReleased(released);
-        } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
-            onMouseWheelMoved(wheelMoved);
-        }
+        onMouseEvent(event);
     }
 
-    public void onMouseMoved(MouseEvent.Moved moved) {
+    public void onMouseEvent(MouseEvent event) {
+        // Default implementation does nothing
     }
 
-    public void onMouseDragged(MouseEvent.Dragged dragged) {
-    }
-
-    public void onMouseClicked(MouseEvent.Clicked clicked) {
-    }
-
-    public void onMousePressed(MouseEvent.Pressed pressed) {
-    }
-
-    public void onMouseReleased(MouseEvent.Released released) {
-    }
-
-    public void onMouseWheelMoved(MouseEvent.WheelMoved released) {
-    }
 
     public void onKeyPressed(int keyCode) {
     }

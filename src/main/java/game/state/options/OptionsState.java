@@ -1,7 +1,7 @@
 package game.state.options;
 
 import game.Game;
-import game.input.MouseEvent;
+import game.graphics.Renderer;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiTabPane;
@@ -9,7 +9,7 @@ import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiLabel;
-import game.graphics.Renderer;
+import game.input.MouseEvent;
 import game.state.GameState;
 import game.transition.Transitions;
 import game.util.Easing;
@@ -218,32 +218,12 @@ public class OptionsState extends GameState {
     }
 
     @Override
-    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
-        mainContainer.processMouseEvent(event);
-    }
-
-    @Override
     public void onKeyPressed(int keyCode) {
         // Handle keyboard navigation
     }
 
     @Override
-    public void onMouseClicked(MouseEvent.Clicked event) {
-        mainContainer.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMouseDragged(MouseEvent.Dragged event) {
-        mainContainer.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMousePressed(MouseEvent.Pressed event) {
-        mainContainer.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMouseReleased(MouseEvent.Released event) {
+    public void onMouseEvent(MouseEvent event) {
         mainContainer.processMouseEvent(event);
     }
 

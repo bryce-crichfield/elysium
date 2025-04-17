@@ -36,6 +36,6 @@ public class SelectItemPlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        itemsMenu.onRender(graphics);
+//        itemsMenu.onSpriteRender(graphics);
     }
 }

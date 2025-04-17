@@ -20,17 +20,23 @@ public class ObserverPlayerController extends PlayerController {
 //        hoveredActorStats = new StatsMenu(20, 20, ActorSelected.event);
     }
 
-
     @Override
-    public void onMouseClicked(MouseEvent.Clicked event) {
+    public void onMouseEvent(MouseEvent event) {
+        if (event instanceof MouseEvent.Clicked clicked) {
+            onMouseClicked(clicked);
+        } else if (event instanceof MouseEvent.WheelMoved wheelMoved) {
+            onMouseWheelMoved(wheelMoved);
+        }
+    }
+
+    private void onMouseClicked(MouseEvent.Clicked event) {
         state.getCursor().onMouseClicked(event);
         if (event.getButton() == Mouse.LEFT) {
             this.selectActor();
         }
     }
 
-    @Override
-    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
+    private void onMouseWheelMoved(MouseEvent.WheelMoved event) {
         state.getCursor().onMouseWheelMoved(event);
     }
 
@@ -43,30 +49,29 @@ public class ObserverPlayerController extends PlayerController {
     }
 
     public final void selectActor() {
-        System.out.println("selectActor");
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
-        Optional<Entity> hovered = state.getWorld().getActorByPosition(cursorX, cursorY);
+        Optional<Entity> hovered = state.getScene().findEntityByPosition(cursorX, cursorY);
 
         if (hovered.isEmpty()) {
             return;
         }
 
-        if (hovered.get().isPlayer()) {
-            if (hovered.get().isWaiting())
-                return;
-            state.getSelection().select(hovered.get());
-            state.transitionTo(SelectMovePlayerController::new);
+//        if (hovered.get().isPlayer()) {
+//            if (hovered.get().isWaiting())
+//                return;
+        state.getSelection().select(hovered.get());
+        state.transitionTo(SelectMovePlayerController::new);
 
 //            ActorSelected.event.fire(actor.get());
-        }
+//        }
     }
 
     private void forceHoveredActorStats() {
         int cx = state.getCursor().getCursorX();
         int cy = state.getCursor().getCursorY();
-        Optional<Entity> hov = state.getWorld().getActorByPosition(cx, cy);
+        Optional<Entity> hov = state.getScene().findEntityByPosition(cx, cy);
         hov.ifPresent(actor -> {
 //            onChangeHovered.fire(actor);
 //            hoveredActorStats.setVisible(true);
@@ -100,14 +105,14 @@ public class ObserverPlayerController extends PlayerController {
 
     @Override
     public void onGuiRender(Renderer renderer) {
-//        hoveredActorStats.onRender(renderer);
+//        hoveredActorStats.onSpriteRender(renderer);
     }
 
     private void hoverActor(Cursor cursor) {
         int cursorX = state.getCursor().getCursorX();
         int cursorY = state.getCursor().getCursorY();
 
-        Optional<Entity> actor = state.getWorld().getActorByPosition(cursorX, cursorY);
+        Optional<Entity> actor = state.getScene().findEntityByPosition(cursorX, cursorY);
         if (actor.isEmpty()) {
 //            hoveredActorStats.setVisible(false);
         }

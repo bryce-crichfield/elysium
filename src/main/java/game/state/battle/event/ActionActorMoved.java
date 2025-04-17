@@ -2,7 +2,7 @@ package game.state.battle.event;
 
 import game.event.Event;
 import game.state.battle.entity.Entity;
-import game.state.battle.world.Tile;
+import game.state.battle.tile.Tile;
 
 import java.util.List;
 
