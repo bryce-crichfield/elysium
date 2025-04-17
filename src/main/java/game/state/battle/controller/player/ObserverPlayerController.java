@@ -13,8 +13,6 @@ import java.time.Duration;
 import java.util.Optional;
 
 public class ObserverPlayerController extends PlayerController {
-//    private final StatsMenu hoveredActorStats;
-
     public ObserverPlayerController(BattleState state) {
         super(state);
 //        hoveredActorStats = new StatsMenu(20, 20, ActorSelected.event);
@@ -23,21 +21,17 @@ public class ObserverPlayerController extends PlayerController {
     @Override
     public void onMouseEvent(MouseEvent event) {
         switch (event) {
-            case MouseEvent.Clicked clicked -> onMouseClicked(clicked);
-            case MouseEvent.WheelMoved wheelMoved -> onMouseWheelMoved(wheelMoved);
+            case MouseEvent.Clicked clicked -> {
+                state.getCursor().onMouseClicked(clicked);
+                if (clicked.getButton() == Mouse.LEFT) {
+                    this.selectActor();
+                }
+            }
+            case MouseEvent.WheelMoved wheelMoved -> {
+                state.getCursor().onMouseWheelMoved(wheelMoved);
+            }
             default -> {}
         }
-    }
-
-    private void onMouseClicked(MouseEvent.Clicked event) {
-        state.getCursor().onMouseClicked(event);
-        if (event.getButton() == Mouse.LEFT) {
-            this.selectActor();
-        }
-    }
-
-    private void onMouseWheelMoved(MouseEvent.WheelMoved event) {
-        state.getCursor().onMouseWheelMoved(event);
     }
 
     @Override

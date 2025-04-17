@@ -34,7 +34,7 @@ public final class Game {
     @Delegate
     private final GameStateManager stateManager;
 
-    Game() throws Exception {
+    Game() {
         stateManager = new GameStateManager(this);
 
         effects = new EffectsManager(SCREEN_WIDTH, SCREEN_HEIGHT);
