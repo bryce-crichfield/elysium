@@ -2,6 +2,7 @@ package game.graphics.gl;
 
 import lombok.Getter;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 public class Program {
     // Getters
@@ -11,6 +12,11 @@ public class Program {
 
     public Program(String vertexPath, String fragmentPath) {
         this.shader = new Shader(vertexPath, fragmentPath);
+        this.isRunning = false;
+    }
+
+    public Program(String vertexPath, String geometryPath, String fragmentPath) {
+        this.shader = new Shader(vertexPath, geometryPath, fragmentPath);
         this.isRunning = false;
     }
 
@@ -49,5 +55,18 @@ public class Program {
     public void setMatrix4f(String name, float[] matrix) {
         start();
         shader.setMatrix4f(name, matrix);
+    }
+
+    public int getUniformLocation(String resolution) {
+        return shader.getUniformLocation(resolution);
+    }
+
+    public void setUniform(int location, float x, float y) {
+        float[] values = {x, y};
+        GL20.glUniform2fv(location, values);
+    }
+
+    public void setUniform(int location, float x) {
+        GL20.glUniform1f(location, x);
     }
 }

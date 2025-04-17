@@ -2,6 +2,7 @@ package game;
 
 import game.graphics.platform.ErrorDialog;
 import game.graphics.platform.Window;
+import game.state.TestVectorRenderer;
 import game.state.loading.LoadingState;
 import game.util.Util;
 
@@ -19,7 +20,7 @@ public enum Main {
         window.onInit();
 
         try {
-            game.setState(LoadingState::new);
+            game.setState(TestVectorRenderer::new);
 
             Instant lastUpdate = Instant.now();
             Instant lastRender = Instant.now();

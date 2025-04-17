@@ -1,0 +1,173 @@
+package game.graphics.background;
+
+import game.Game;
+import game.graphics.Renderer;
+import game.graphics.gl.Program;
+import game.graphics.gl.VertexArray;
+import game.graphics.gl.VertexBuffer;
+import lombok.SneakyThrows;
+import org.lwjgl.BufferUtils;
+
+import java.nio.FloatBuffer;
+import java.time.Duration;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+
+public class StarShaderBackground extends Background {
+    private Program shader;
+    private int resolutionLocation;
+    private int timeLocation;
+
+    private final VertexArray vao;
+    private final VertexBuffer vbo;
+
+    // Keep track of total elapsed time
+    private float totalTime = 0.0f;
+
+    // Shader file paths
+    private final String vertexPath;
+    private final String fragmentPath;
+
+    // File watchers
+    private WatchedFile vertexShaderFile;
+    private WatchedFile fragmentShaderFile;
+
+    // Debounce timer
+    private long lastReloadTime = 0;
+    private static final long RELOAD_COOLDOWN = 500; // milliseconds
+
+    public StarShaderBackground(int screenWidth, int screenHeight) {
+        super(screenWidth, screenHeight);
+
+        // Try to find the shader files
+        this.vertexPath = "shaders/stars/StarsVertex.glsl";
+        this.fragmentPath = "shaders/stars/StarsFragment.glsl";
+
+        // Create file watchers
+        this.vertexShaderFile = new WatchedFile(vertexPath);
+        this.fragmentShaderFile = new WatchedFile(fragmentPath);
+
+        // Initialize shader
+        initShader();
+
+        vao = new VertexArray();
+        vbo = new VertexBuffer(GL_ARRAY_BUFFER);
+
+        vao.bind();
+        vbo.bind();
+
+        float[] vertices = {
+                // Positions         // Texture Coords
+                -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
+                -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,  // Bottom-left
+                1.0f, -1.0f, 0.0f,  1.0f, 0.0f,  // Bottom-right
+
+                -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
+                1.0f, -1.0f, 0.0f,  1.0f, 0.0f,  // Bottom-right
+                1.0f,  1.0f, 0.0f,  1.0f, 1.0f   // Top-right
+        };
+
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.length);
+        buffer.put(vertices);
+        buffer.flip();
+
+        vbo.storeData(buffer, GL_STATIC_DRAW);
+
+        vao.enableAttribute(0);
+        vao.enableAttribute(1);
+
+        vbo.createVertexAttribPointer(0, 3, 5 * Float.BYTES, 0);
+        vbo.createVertexAttribPointer(1, 2, 5 * Float.BYTES, 3 * Float.BYTES);
+
+        vbo.unbind();
+        vao.unbind();
+    }
+
+
+    private void initShader() {
+        if (shader != null) {
+            shader.dispose();
+        }
+        // Create shader program
+        var vertPath = vertexShaderFile.getAbsolutePath().toString();
+        var fragPath = fragmentShaderFile.getAbsolutePath().toString();
+
+        shader = new Program(vertPath, fragPath);
+
+        // Get uniform locations
+        resolutionLocation = shader.getUniformLocation("resolution");
+        timeLocation = shader.getUniformLocation("time");
+    }
+
+    @Override
+    public void update(Duration delta) {
+        // Accumulate time to get continuous animation
+        totalTime += delta.toNanos() / 1_000_000_000f;
+
+        // Check for shader file changes
+        checkForShaderChanges();
+    }
+
+    private void checkForShaderChanges() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastReloadTime < RELOAD_COOLDOWN) {
+            return;
+        }
+
+        boolean needsReload = false;
+
+        if (vertexShaderFile.hasChanged()) {
+            needsReload = true;
+        }
+
+        if (fragmentShaderFile.hasChanged()) {
+            needsReload = true;
+        }
+
+        if (!needsReload) return;
+
+        initShader();
+        lastReloadTime = currentTime;
+    }
+
+    @Override
+    public void render(Renderer renderer) {
+        // Clear any errors before rendering
+        glGetError(); // Clear errors
+
+        // Start the shader
+        shader.start();
+
+        // Set uniforms
+        shader.setUniform(resolutionLocation, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+        shader.setUniform(timeLocation, totalTime);
+
+        // Bind VAO and draw
+        vao.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // Unbind VAO and shader
+        vao.unbind();
+        shader.stop();
+
+        // Check for OpenGL errors
+        int error = glGetError();
+        if (error != GL_NO_ERROR) {
+            System.err.println("OpenGL error in StarShaderBackground: " + error);
+        }
+    }
+
+    public void dispose() {
+        if (shader != null) {
+            shader.dispose();
+        }
+        if (vbo != null) {
+            vbo.dispose();
+        }
+        if (vao != null) {
+            vao.dispose();
+        }
+    }
+}

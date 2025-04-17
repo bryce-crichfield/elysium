@@ -2,6 +2,7 @@ package game.graphics.gl;
 
 import lombok.Getter;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32; // For geometry shader support
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,14 +11,36 @@ public class Shader {
     @Getter
     private final int programID;
     private int vertexShaderID;
+    private int geometryShaderID; // New field for geometry shader
     private int fragmentShaderID;
+    private boolean hasGeometryShader; // Track if geometry shader is used
 
+    /**
+     * Create a shader program with just vertex and fragment shaders
+     */
     public Shader(String vertexFile, String fragmentFile) {
+        this(vertexFile, null, fragmentFile);
+    }
+
+    /**
+     * Create a shader program with optional geometry shader
+     */
+    public Shader(String vertexFile, String geometryFile, String fragmentFile) {
         vertexShaderID = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
+
+        // Load geometry shader if provided
+        hasGeometryShader = geometryFile != null;
+        if (hasGeometryShader) {
+            geometryShaderID = loadShader(geometryFile, GL32.GL_GEOMETRY_SHADER);
+        }
+
         fragmentShaderID = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
         programID = GL20.glCreateProgram();
 
         GL20.glAttachShader(programID, vertexShaderID);
+        if (hasGeometryShader) {
+            GL20.glAttachShader(programID, geometryShaderID);
+        }
         GL20.glAttachShader(programID, fragmentShaderID);
 
         GL20.glLinkProgram(programID);
@@ -34,6 +57,9 @@ public class Shader {
 
         // Detach shaders after linking (best practice)
         GL20.glDetachShader(programID, vertexShaderID);
+        if (hasGeometryShader) {
+            GL20.glDetachShader(programID, geometryShaderID);
+        }
         GL20.glDetachShader(programID, fragmentShaderID);
     }
 
@@ -49,6 +75,9 @@ public class Shader {
         stop();
         GL20.glDeleteProgram(programID);
         GL20.glDeleteShader(vertexShaderID);
+        if (hasGeometryShader) {
+            GL20.glDeleteShader(geometryShaderID);
+        }
         GL20.glDeleteShader(fragmentShaderID);
     }
 
@@ -66,23 +95,41 @@ public class Shader {
 
     private static int loadShader(String resourcePath, int type) {
         StringBuilder shaderSource = new StringBuilder();
-        try {
-            InputStream inputStream = Shader.class.getClassLoader().getResourceAsStream(resourcePath);
-            if (inputStream == null) {
-                throw new RuntimeException("Shader resource not found: " + resourcePath);
-            }
 
-            var streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            try (BufferedReader reader = new BufferedReader(streamReader)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    shaderSource.append(line).append("\n");
+        // Try file system first, then fall back to classpath if file doesn't exist
+        File file = new File(resourcePath);
+
+        try {
+            if (file.exists()) {
+                // Load from file system
+                System.out.println("Loading shader from file system: " + file.getAbsolutePath());
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        shaderSource.append(line).append("\n");
+                    }
+                }
+            } else {
+                // Fall back to classpath
+                System.out.println("Loading shader from classpath: " + resourcePath);
+                InputStream inputStream = Shader.class.getClassLoader().getResourceAsStream(resourcePath);
+                if (inputStream == null) {
+                    throw new RuntimeException("Shader resource not found: " + resourcePath);
+                }
+
+                var streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                try (BufferedReader reader = new BufferedReader(streamReader)) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        shaderSource.append(line).append("\n");
+                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Error reading shader resource: " + resourcePath, e);
         }
 
+        // Rest of the method remains the same...
         int shaderID = GL20.glCreateShader(type);
         GL20.glShaderSource(shaderID, shaderSource);
         GL20.glCompileShader(shaderID);
