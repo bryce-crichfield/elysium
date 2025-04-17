@@ -2,7 +2,6 @@ package game.state.battle.entity.components;
 
 
 import com.google.gson.JsonObject;
-import game.state.battle.entity.Entity;
 import game.state.battle.entity.component.Component;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

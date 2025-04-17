@@ -17,6 +17,7 @@ import game.state.battle.entity.Entity;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.entity.components.SpriteComponent;
 import game.state.battle.hud.ActionsMenu;
+import game.state.battle.tile.Tile;
 import game.state.battle.util.Camera;
 import game.state.battle.util.Cursor;
 import game.state.battle.util.Selection;
@@ -42,12 +43,10 @@ public class BattleState extends GameState {
 
     @Getter
     private final Selection selection = new Selection();
-
-    @Getter
-    private BattleController controller = new ObserverPlayerController(this);
-
     @Getter
     private final GuiContainer gui = new GuiContainer(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
+    @Getter
+    private BattleController controller = new ObserverPlayerController(this);
 
     public BattleState(Game game) {
         super(game);
@@ -77,7 +76,6 @@ public class BattleState extends GameState {
         var transform = Transform.orthographic(0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, 0, -1, 1);
         spriteRenderer.setProjection(transform);
 
-
         gui.addChild(new ActionsMenu(this, 0, 0));
         gui.setLayout(new GuiNullLayout());
     }
@@ -88,40 +86,21 @@ public class BattleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent.Clicked event) {
-        if (gui.processMouseEvent(event) == GuiEventState.CONSUMED) {
-            return;
-        }
-
-        // translate from screen coordinates to world coordinates
-        int worldX = camera.getWorldX(event.getX());
-        int worldY = camera.getWorldY(event.getY());
-        var e = event.withPoint(new Point(worldX, worldY));
-        controller.onMouseClicked(e);
+    public void onExit() {
+        controller.onExit();
     }
 
     @Override
-    public void onMouseMoved(MouseEvent.Moved event) {
+    public void onMouseEvent(MouseEvent event) {
         if (gui.processMouseEvent(event) == GuiEventState.CONSUMED) {
             return;
         }
-        // translate from screen coordinates to world coordinates
-        int worldX = camera.getWorldX(event.getX());
-        int worldY = camera.getWorldY(event.getY());
-        var e = event.withPoint(new Point(worldX, worldY));
-        controller.onMouseMoved(e);
-    }
 
-    @Override
-    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
-        if (gui.processMouseEvent(event) == GuiEventState.CONSUMED) {
-            return;
-        }
-        // translate from screen coordinates to world coordinates
-        int worldX = camera.getWorldX(event.getX());
-        int worldY = camera.getWorldY(event.getY());
-        var e = event.withPoint(new Point(worldX, worldY));
-        controller.onMouseWheelMoved(e);
+        var worldX = camera.getWorldX(event.getX());
+        var worldY = camera.getWorldY(event.getY());
+        event = event.withPoint(new Point(worldX, worldY));
+
+        controller.onMouseEvent(event);
     }
 
     public void onKeyPressed(int keycode) {

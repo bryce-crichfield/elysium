@@ -1,8 +1,8 @@
 package game.state.overworld.entity;
 
 import game.Game;
-import game.input.Keyboard;
 import game.graphics.Renderer;
+import game.input.Keyboard;
 
 import java.awt.*;
 import java.time.Duration;

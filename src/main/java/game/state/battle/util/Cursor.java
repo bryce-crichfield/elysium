@@ -43,49 +43,43 @@ public class Cursor {
         accelerationY = 0;
     }
 
-    private void onCursorMoved() {
-        cursorX = Util.clamp(cursorX, 0, state.getScene().getWidth() - 1);
-        cursorY = Util.clamp(cursorY, 0, state.getScene().getHeight() - 1);
+    public void setPosition(int x, int y) {
+        var newCursorX = Util.clamp(x, 0, state.getScene().getWidth() - 1);
+        var newCursorY = Util.clamp(y, 0, state.getScene().getHeight() - 1);
+
+        if (newCursorX == cursorX && newCursorY == cursorY) {
+            return;
+        }
+
+        cursorX = newCursorX;
+        cursorY = newCursorY;
         game.getAudio().play("type_preview/swipe");
         state.getController().onCursorMoved(this);
-    }
-
-    public void setPosition(int x, int y) {
-        cursorX = x;
-        cursorY = y;
-        onCursorMoved();
     }
 
     public void onKeyPressed(Integer keyCode) {
         switch (keyCode) {
             case Keyboard.LEFT -> {
-                cursorX--;
-                onCursorMoved();
+                setPosition(cursorX - 1, cursorY);
             }
             case Keyboard.RIGHT -> {
-                cursorX++;
-                onCursorMoved();
+                setPosition(cursorX + 1, cursorY);
             }
             case Keyboard.UP -> {
-                cursorY--;
-                onCursorMoved();
+                setPosition(cursorX, cursorY - 1);
             }
             case Keyboard.DOWN -> {
-                cursorY++;
-                onCursorMoved();
-
+                setPosition(cursorX, cursorY + 1);
             }
             case KeyEvent.VK_MINUS -> {
                 float zoom = state.getCamera().getZoom();
                 zoom = Math.max(zoom - 0.25f, 0.25f);
                 state.getCamera().setZoom(zoom);
-                onCursorMoved();
             }
             case KeyEvent.VK_EQUALS -> {
                 float zoom = state.getCamera().getZoom();
                 zoom = Math.min(zoom + 0.25f, 2);
                 state.getCamera().setZoom(zoom);
-                onCursorMoved();
             }
         }
     }
@@ -143,10 +137,7 @@ public class Cursor {
     public void onMouseClicked(MouseEvent event) {
         int x = event.getX();
         int y = event.getY();
-
-        cursorX = (x / Game.TILE_SIZE);
-        cursorY = (y / Game.TILE_SIZE);
-        onCursorMoved();
+        setPosition(x / Game.TILE_SIZE, y / Game.TILE_SIZE);
     }
 
     public void onMouseWheelMoved(MouseEvent.WheelMoved event) {

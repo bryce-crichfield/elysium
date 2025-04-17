@@ -2,7 +2,7 @@ package game.state.battle.entity.components;
 
 import game.state.battle.entity.Entity;
 import game.state.battle.entity.component.UpdatableComponent;
-import game.state.battle.Tile;
+import game.state.battle.tile.Tile;
 import game.util.Util;
 
 import java.time.Duration;

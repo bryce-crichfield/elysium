@@ -1,7 +1,6 @@
 package game.state.battle.hud;
 
 import game.gui.GuiContainer;
-import game.gui.GuiScrollPanel;
 import game.gui.control.GuiButton;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;

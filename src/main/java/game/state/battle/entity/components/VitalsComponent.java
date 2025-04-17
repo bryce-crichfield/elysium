@@ -30,13 +30,13 @@ public class VitalsComponent implements RenderableComponent {
         var character = self.getComponent(CharacterComponent.class);
         var position = self.getComponent(PositionComponent.class);
 
-        float healthPercentage = (float) character.getHealth() / character.getHealth();
+        float healthPercentage = character.getHealth() / character.getHealth();
         Color healthColor = healthPercentage > 0.5 ? Color.GREEN : healthPercentage > 0.25 ? Color.YELLOW : Color.RED;
         renderer.setColor(healthColor);
         int healthWidth = (int) ((32 - 10) * healthPercentage);
         int healthHeight = 5;
-        int healthX = (int) ((position.getX() * 32) + 5);
-        int healthY = (int) ((position.getY() * 32) + 32 - 5);
+        int healthX = (position.getX() * 32) + 5;
+        int healthY = (position.getY() * 32) + 32 - 5;
 
         renderer.setColor(Color.BLACK);
         renderer.fillRect(healthX, healthY, 32 - 10, healthHeight);

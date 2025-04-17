@@ -5,7 +5,6 @@ import game.graphics.Renderer;
 import game.input.Keyboard;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
-import game.state.battle.event.ActorHovered;
 
 import java.time.Duration;
 

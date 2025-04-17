@@ -1,6 +1,5 @@
 package game.state.battle.entity;
 
-import com.google.gson.JsonObject;
 import game.graphics.Renderer;
 import game.graphics.sprite.SpriteRenderer;
 import game.state.battle.entity.component.Component;
@@ -9,7 +8,9 @@ import game.state.battle.entity.component.UpdatableComponent;
 
 import java.io.*;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Entity implements Serializable {
     private final Map<Class<? extends Component>, Component> components = new HashMap<>();

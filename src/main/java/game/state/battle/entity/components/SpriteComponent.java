@@ -1,6 +1,5 @@
 package game.state.battle.entity.components;
 
-import com.google.gson.JsonObject;
 import game.Game;
 import game.graphics.sprite.Sprite;
 import game.graphics.sprite.SpriteRenderer;

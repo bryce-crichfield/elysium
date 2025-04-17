@@ -33,18 +33,10 @@ public abstract class BattleController {
 
     public abstract boolean isDone();
 
-    public void onMouseClicked(MouseEvent.Clicked event) {
-
-    }
-
-    public void onMouseMoved(MouseEvent.Moved event) {
-
-    }
-
-    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
-
-    }
 
     public void onCursorMoved(Cursor cursor) {
+    }
+
+    public void onMouseEvent(MouseEvent event) {
     }
 }

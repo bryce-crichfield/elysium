@@ -5,7 +5,6 @@ import game.graphics.Renderer;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
 import game.state.battle.util.Cursor;
-import game.state.battle.util.Raycast;
 
 import java.awt.*;
 import java.time.Duration;
@@ -13,7 +12,6 @@ import java.time.Duration;
 public class SelectAttackPlayerController extends PlayerController {
     private final game.event.Event<Entity> onChangeHovered;
     //    private final StatsMenu hoveredActorStats;
-    Raycast raycast;
 
     protected SelectAttackPlayerController(BattleState state) {
         super(state);
@@ -74,7 +72,7 @@ public class SelectAttackPlayerController extends PlayerController {
 //        int cursorY = cursor.getCursorY();
 //        raycast = world.raycast((int) actor.get().getX(), (int) actor.get().getY(), cursorX, cursorY);
 //
-//        Optional<Actor> hoveredActor = world.getActorByPosition(cursorX, cursorY);
+//        Optional<Actor> hoveredActor = world.findEntityByPosition(cursorX, cursorY);
 //        if (hoveredActor.isEmpty()) {
 //            hoveredActorStats.setVisible(false);
 //        }

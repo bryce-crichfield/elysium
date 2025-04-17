@@ -46,7 +46,6 @@ public class SpriteRenderer {
     private Matrix4f projectionMatrix = new Matrix4f();
     private Matrix4f viewMatrix = new Matrix4f();
 
-
     public SpriteRenderer(String vertexShaderPath, String fragmentShaderPath) {
         this.vertices = new float[MAX_SPRITES * VERTICES_PER_SPRITE * (VERTEX_SIZE / Float.BYTES)];
         this.indices = new int[MAX_SPRITES * INDICES_PER_SPRITE];

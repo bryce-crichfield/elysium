@@ -4,16 +4,16 @@ import game.graphics.Renderer;
 import game.graphics.sprite.SpriteRenderer;
 import game.state.battle.entity.Entity;
 import game.state.battle.entity.components.PositionComponent;
-import game.state.battle.util.Raycast;
-import game.util.Util;
+import game.state.battle.tile.Tile;
+import game.state.battle.tile.TileArea;
 import lombok.Getter;
 
 import java.io.*;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
 public class Scene implements Serializable {
@@ -21,6 +21,13 @@ public class Scene implements Serializable {
     private final int height;
     private final Tile[][] tiles;
     private final List<Entity> entities;
+
+    public Scene(Tile[][] tiles, List<Entity> entities) {
+        this.tiles = tiles;
+        this.entities = entities;
+        this.width = tiles.length;
+        this.height = tiles[0].length;
+    }
 
     public static void serialize(String path, Scene scene) throws RuntimeException {
         try (var fileOut = new FileOutputStream(path);
@@ -38,13 +45,6 @@ public class Scene implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Scene(Tile[][] tiles, List<Entity> entities) {
-        this.tiles = tiles;
-        this.entities = entities;
-        this.width = tiles.length;
-        this.height = tiles[0].length;
     }
 
     public void onUpdate(Duration duration) {
@@ -82,33 +82,8 @@ public class Scene implements Serializable {
         return tiles[x][y];
     }
 
-    public Tile[] getNeighbors(int x, int y) {
-        List<Tile> neighbors = new ArrayList<>();
 
-        // Up
-        if (y > 0) {
-            neighbors.add(tiles[x][y - 1]);
-        }
-
-        // Down
-        if (y < height - 1) {
-            neighbors.add(tiles[x][y + 1]);
-        }
-
-        // Left
-        if (x > 0) {
-            neighbors.add(tiles[x - 1][y]);
-        }
-
-        // Right
-        if (x < width - 1) {
-            neighbors.add(tiles[x + 1][y]);
-        }
-
-        return neighbors.toArray(new Tile[0]);
-    }
-
-    public Optional<Entity> getActorByPosition(int x, int y) {
+    public Optional<Entity> findEntityByPosition(int x, int y) {
         for (Entity entity : entities) {
             if (entity.lacksComponent(PositionComponent.class)) continue;
             var position = entity.getComponent(PositionComponent.class);
@@ -132,31 +107,11 @@ public class Scene implements Serializable {
         return entities.stream().toList();
     }
 
-    public Optional<Entity> findActor(Predicate<Entity> predicate) {
-        for (Entity entity : entities) {
-            if (predicate.test(entity)) {
-                return Optional.of(entity);
-            }
-        }
 
-        return Optional.empty();
-    }
-
-    public Raycast raycast(int startX, int startY, int endX, int endY) {
-        return new Raycast(tiles, startX, startY, endX, endY);
-    }
-
-    public List<Tile> getTilesInRange(int x, int y, int walkDistance) {
-        List<Tile> found = new ArrayList<>();
-
-        for (Tile[] row : tiles) {
-            for (Tile tile : row) {
-                if (Util.distance(x, y, tile.getX(), tile.getY()) <= walkDistance) {
-                    found.add(tile);
-                }
-            }
-        }
-
-        return found;
+    public TileArea getTiles() {
+        var tileList = Arrays.stream(tiles)
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList());
+        return new TileArea(tileList);
     }
 }

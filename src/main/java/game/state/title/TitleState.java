@@ -1,8 +1,8 @@
 package game.state.title;
 
 import game.Game;
+import game.graphics.Renderer;
 import game.graphics.background.StarBackground;
-import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.GuiContainer;
 import game.gui.GuiScrollPanel;
@@ -15,7 +15,7 @@ import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiLabel;
-import game.graphics.Renderer;
+import game.input.MouseEvent;
 import game.state.GameState;
 import game.state.battle.BattleState;
 import game.state.options.OptionsState;
@@ -214,10 +214,6 @@ public class TitleState extends GameState {
     public void onEnter() {
     }
 
-    @Override
-    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
-        mainMenu.processMouseEvent(event);
-    }
 
     @Override
     public void onKeyPressed(int keyCode) {
@@ -225,27 +221,7 @@ public class TitleState extends GameState {
     }
 
     @Override
-    public void onMouseClicked(MouseEvent.Clicked event) {
-        mainMenu.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMouseMoved(MouseEvent.Moved event) {
-        mainMenu.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMouseDragged(MouseEvent.Dragged event) {
-        mainMenu.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMousePressed(MouseEvent.Pressed event) {
-        mainMenu.processMouseEvent(event);
-    }
-
-    @Override
-    public void onMouseReleased(MouseEvent.Released event) {
+    public void onMouseEvent(MouseEvent event) {
         mainMenu.processMouseEvent(event);
     }
 
