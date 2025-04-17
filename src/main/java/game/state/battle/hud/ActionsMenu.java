@@ -1,8 +1,8 @@
 package game.state.battle.hud;
 
-import game.gui.GuiContainer;
-import game.gui.GuiScrollPanel;
+import game.gui.container.GuiScrollPanel;
 import game.gui.control.GuiButton;
+import game.gui.layout.GuiHorizontalLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
@@ -27,7 +27,7 @@ public class ActionsMenu extends GuiScrollPanel {
         super(x, y, WIDTH, HEIGHT);
         this.state = state;
 
-        var layout = new GuiVerticalLayout();
+        var layout = new GuiHorizontalLayout();
         layout.setSpacing(5);
         layout.setPadding(5);
         this.setLayout(layout);

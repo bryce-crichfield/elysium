@@ -1,5 +1,6 @@
-package game.gui;
+package game.gui.container;
 
+import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;

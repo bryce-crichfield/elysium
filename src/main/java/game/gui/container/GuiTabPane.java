@@ -1,5 +1,6 @@
-package game.gui;
+package game.gui.container;
 
+import game.gui.GuiComponent;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;

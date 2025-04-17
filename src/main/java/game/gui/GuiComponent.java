@@ -1,6 +1,7 @@
 package game.gui;
 
 import game.gui.input.*;
+import game.gui.style.GuiStyle;
 import game.input.MouseEvent;
 import game.graphics.Renderer;
 import game.graphics.Transform;
@@ -30,7 +31,12 @@ public abstract class GuiComponent {
     @Getter
     protected boolean isHovered = false;
 
-    protected GuiComponent parent;
+    @Setter
+    protected GuiComponent parent;                                      // Only set this if you know what you're doing
+
+    @Getter
+    @Setter
+    protected GuiStyle style;
 
     public GuiComponent(int x, int y, int width, int height) {
         this.x = x;
@@ -133,7 +139,7 @@ public abstract class GuiComponent {
         this.y = y;
     }
 
-    protected void setSize(int width, int height) {
+    public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
     }

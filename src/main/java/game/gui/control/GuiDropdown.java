@@ -104,7 +104,6 @@ public class GuiDropdown<T> extends GuiComponent {
 
             // Set clipping region for dropdown items
             renderer.pushClip(0, height, width, dropdownListHeight);
-//            renderer.clipRect(0, height, width, dropdownListHeight);
 
             // Draw dropdown items
             int yPos = height - scrollOffset;
@@ -139,8 +138,6 @@ public class GuiDropdown<T> extends GuiComponent {
             // Restore original apply and clip
             renderer.popTransform();
             renderer.popClip();
-//            renderer.setTransform(originalTransform);
-//            renderer.setClip(originalClip);
         }
     }
 

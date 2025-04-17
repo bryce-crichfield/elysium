@@ -600,6 +600,10 @@ public class Renderer {
         fontRenderer.setFont(font.getName(), font.getSize());
     }
 
+    public void setFont(String name, int size) {
+        fontRenderer.setFont(name, size);
+    }
+
     public void drawString(String str, int x, int y) {
         // Ensure we're drawing to our framebuffer
         ensureCorrectFboBound();

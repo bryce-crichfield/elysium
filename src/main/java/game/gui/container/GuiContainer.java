@@ -1,10 +1,10 @@
-package game.gui;
+package game.gui.container;
 
+import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
 import game.gui.layout.GuiNullLayout;
 import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
-import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
 import game.graphics.Renderer;
@@ -36,7 +36,7 @@ public class GuiContainer extends GuiComponent {
 
     public void addChild(GuiComponent child) {
         children.add(child);
-        child.parent = this;
+        child.setParent(this);
         layout.onLayout(this);
     }
 
@@ -87,10 +87,7 @@ public class GuiContainer extends GuiComponent {
 
     public void removeChild(GuiComponent child) {
         children.remove(child);
-        child.parent = null;
+        child.setParent(null);
         layout.onLayout(this);
     }
-
-
-    // Other methods for child management, etc.
 }

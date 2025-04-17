@@ -1,5 +1,11 @@
 package game.gui.style;
 
-public class GuiTheme {
-    private static final GuiTheme instance = new GuiTheme();
+import lombok.Getter;
+
+public abstract class GuiTheme {
+    @Getter
+    private static final GuiTheme instance = new DefaultGuiTheme();
+
+    public abstract GuiStyle button();
+    public abstract GuiStyle buttonHover();
 }

@@ -5,7 +5,7 @@ import game.graphics.Renderer;
 import game.graphics.Transform;
 import game.graphics.background.StarBackground;
 import game.graphics.sprite.SpriteRenderer;
-import game.gui.GuiContainer;
+import game.gui.container.GuiContainer;
 import game.gui.input.GuiEventState;
 import game.gui.layout.GuiNullLayout;
 import game.input.MouseEvent;
