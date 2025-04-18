@@ -104,7 +104,6 @@ public class GuiDropdown<T> extends GuiComponent {
 
             // Set clipping region for dropdown items
             renderer.pushClip(0, height, width, dropdownListHeight);
-//            renderer.clipRect(0, height, width, dropdownListHeight);
 
             // Draw dropdown items
             int yPos = height - scrollOffset;
@@ -139,8 +138,6 @@ public class GuiDropdown<T> extends GuiComponent {
             // Restore original apply and clip
             renderer.popTransform();
             renderer.popClip();
-//            renderer.setTransform(originalTransform);
-//            renderer.setClip(originalClip);
         }
     }
 
@@ -203,7 +200,9 @@ public class GuiDropdown<T> extends GuiComponent {
 
     @Override
     public GuiEventState processMouseEvent(MouseEvent e) {
-        Point localPoint = transformToLocalSpace(e.getPoint());
+        Point point = e.getPoint();
+        // Transform the point to local space
+        Point localPoint = new Point(point.x - x, point.y - y);
         boolean wasPress = e instanceof MouseEvent.Pressed || e instanceof MouseEvent.Clicked || e instanceof MouseEvent.Released;
         boolean wasInSelectionArea = new Rectangle(0, height, width, Math.min(maxDropdownHeight, items.size() * itemHeight)).contains(localPoint);
         boolean wasInToggleArea = new Rectangle(0, 0, width, height).contains(localPoint);
@@ -266,5 +265,10 @@ public class GuiDropdown<T> extends GuiComponent {
         }
         // Normal bounds check otherwise
         return super.containsPoint(point);
+    }
+
+    @Override
+    protected String getComponentName() {
+        return "dropdown";
     }
 }

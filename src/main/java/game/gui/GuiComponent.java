@@ -1,9 +1,10 @@
 package game.gui;
 
-import game.gui.input.*;
-import game.input.MouseEvent;
 import game.graphics.Renderer;
 import game.graphics.Transform;
+import game.gui.input.*;
+import game.gui.style.GuiStyle;
+import game.input.MouseEvent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +12,9 @@ import java.awt.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class GuiComponent {
-    // Input handler delegation - keeps the flexibility
     protected final List<GuiMouseHandler> mouseHandlers = new ArrayList<>();
     protected final List<GuiKeyHandler> keyHandlers = new ArrayList<>();
     protected final List<GuiFocusHandler> focusHandlers = new ArrayList<>();
@@ -21,16 +22,21 @@ public abstract class GuiComponent {
     @Getter
     protected int x, y, width, height;
     @Getter
-    protected boolean visible = true;
+    protected boolean isVisible = true;
     @Getter
-    protected boolean enabled = true;
+    protected boolean isEnabled = true;
     @Getter
     @Setter
     protected boolean isFocused = true;
     @Getter
     protected boolean isHovered = false;
 
-    protected GuiComponent parent;
+    @Setter
+    protected GuiComponent parent;                                      // Only set this if you know what you're doing
+
+    @Getter
+    @Setter
+    protected GuiStyle style;
 
     public GuiComponent(int x, int y, int width, int height) {
         this.x = x;
@@ -40,7 +46,7 @@ public abstract class GuiComponent {
     }
 
     public void render(Renderer renderer) {
-        if (!visible) return;
+        if (!isVisible) return;
 
         renderer.pushTransform(Transform.createTranslate(x, y));
         onRender(renderer);
@@ -52,7 +58,7 @@ public abstract class GuiComponent {
 
     // Simple inheritance for updates
     public void update(Duration delta) {
-        if (!visible) return;
+        if (!isVisible) return;
         onUpdate(delta);
     }
 
@@ -70,10 +76,12 @@ public abstract class GuiComponent {
 
     // Process mouse events and delegate to handlers
     public GuiEventState processMouseEvent(MouseEvent event) {
-        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
+        if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
         // Transform coordinates to local space
-        Point localPoint = transformToLocalSpace(event.getPoint());
+        Point point = event.getPoint();
+        // Transform the point to local space
+        Point localPoint = new Point(point.x - x, point.y - y);
         boolean isInBounds = containsPoint(localPoint);
 
         // Move the event to local coordinates
@@ -119,11 +127,6 @@ public abstract class GuiComponent {
         return GuiEventState.NOT_CONSUMED;
     }
 
-    protected Point transformToLocalSpace(Point point) {
-        // Transform the point to local space
-        return new Point(point.x - x, point.y - y);
-    }
-
     protected boolean containsPoint(Point point) {
         return point.x >= 0 && point.x < width && point.y >= 0 && point.y < height;
     }
@@ -133,7 +136,7 @@ public abstract class GuiComponent {
         this.y = y;
     }
 
-    protected void setSize(int width, int height) {
+    public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
     }
@@ -150,5 +153,14 @@ public abstract class GuiComponent {
     public final void dispatchOnExit(MouseEvent event) {
         isHovered = false;
         hoverHandlers.forEach(h -> h.onExit(event));
+    }
+
+    protected abstract String getComponentName();
+
+    public void applyStyle(Map<String, GuiStyle> styles) {
+        GuiStyle style = styles.get(getComponentName());
+        if (style != null) {
+            setStyle(style);
+        }
     }
 }

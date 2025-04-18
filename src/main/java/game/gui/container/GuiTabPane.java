@@ -1,5 +1,6 @@
-package game.gui;
+package game.gui.container;
 
+import game.gui.GuiComponent;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
@@ -117,6 +118,11 @@ public class GuiTabPane extends GuiContainer {
                 renderer.setColor(Color.WHITE);
                 renderer.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
             }
+        }
+
+        @Override
+        protected String getComponentName() {
+            return "tabHeader";
         }
     }
 }

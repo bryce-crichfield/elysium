@@ -2,7 +2,6 @@ package game.gui.control;
 
 import game.gui.GuiComponent;
 import game.gui.style.GuiBackground;
-import game.gui.style.GuiLabel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -78,13 +77,18 @@ public class GuiTextField extends GuiComponent {
         }
     }
 
+    @Override
+    protected String getComponentName() {
+        return "textfield";
+    }
+
     protected void onRender(Graphics2D g) {
         // Save original clip and color
         Shape originalClip = g.getClip();
         Color originalColor = g.getColor();
 
         // Set text color
-        g.setColor(text.getColor());
+//        g.setColor(text.getColor());
 
         // Create clip region to ensure text stays within bounds
         g.setClip(0, 0, width, height);  // Changed from x, y to 0, 0

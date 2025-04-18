@@ -3,7 +3,7 @@ package game.gui.input;
 import game.input.MouseEvent;
 
 public abstract class GuiMouseHandler {
-    static GuiMouseHandler onClick(Runnable action) {
+    public static GuiMouseHandler onClick(Runnable action) {
         return new GuiMouseHandler() {
             @Override
             public GuiEventState onMouseClicked(MouseEvent.Clicked e) {

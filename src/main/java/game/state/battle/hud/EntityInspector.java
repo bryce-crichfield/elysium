@@ -1,19 +1,11 @@
 package game.state.battle.hud;
 
-import game.gui.GuiScrollPanel;
-import game.gui.control.GuiButton;
+import game.gui.container.GuiScrollPanel;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
-import game.gui.style.GuiLabel;
+import game.gui.control.GuiLabel;
 import game.state.battle.BattleState;
-import game.state.battle.Scene;
-import game.state.battle.entity.Entity;
-import game.state.battle.entity.components.PositionComponent;
-import game.state.battle.entity.components.SpriteComponent;
-import game.state.title.TitleState;
-import game.transition.Transitions;
-import game.util.Easing;
 
 import java.awt.*;
 import java.time.Duration;

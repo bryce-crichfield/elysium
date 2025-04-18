@@ -1,11 +1,12 @@
 package game.state.battle.hud;
 
-import game.gui.GuiContainer;
-import game.gui.GuiScrollPanel;
+import game.gui.container.GuiScrollPanel;
 import game.gui.control.GuiButton;
+import game.gui.layout.GuiHorizontalLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
+import game.gui.style.GuiStyle;
 import game.state.battle.BattleState;
 import game.state.battle.Scene;
 import game.state.battle.entity.Entity;
@@ -14,6 +15,7 @@ import game.state.battle.entity.components.SpriteComponent;
 import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
+import game.util.WatchedFile;
 
 import java.awt.*;
 import java.time.Duration;
@@ -22,7 +24,7 @@ public class ActionsMenu extends GuiScrollPanel {
     private static final int WIDTH = 115;
     private static final int HEIGHT = 250;
     private final BattleState state;
-
+    private final WatchedFile stylesheet = new WatchedFile("styles/ActionMenu.json");
     public ActionsMenu(BattleState state, int x, int y) {
         super(x, y, WIDTH, HEIGHT);
         this.state = state;
@@ -32,7 +34,7 @@ public class ActionsMenu extends GuiScrollPanel {
         layout.setPadding(5);
         this.setLayout(layout);
 
-        var background = new GuiBackground.Fill(Color.BLACK);
+        var background = new GuiBackground.Fill(new Color(0, 0, 0, 0.5f));
         this.setBackground(background);
 
         var border = new GuiBorder(Color.WHITE, 2);
@@ -72,5 +74,19 @@ public class ActionsMenu extends GuiScrollPanel {
         this.addChild(createEntity);
         this.addChild(removeEntity);
         this.addChild(exitBtn);
+
+        var style = GuiStyle.load(stylesheet.getAbsolutePath().toString());
+        this.applyStyle(style);
+    }
+
+    @Override
+    protected void onUpdate(Duration delta) {
+        super.onUpdate(delta);
+
+
+        if (stylesheet.hasChanged()) {
+            var style = GuiStyle.load(stylesheet.getAbsolutePath().toString());
+            this.applyStyle(style);
+        }
     }
 }

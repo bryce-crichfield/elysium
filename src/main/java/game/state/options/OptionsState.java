@@ -3,12 +3,12 @@ package game.state.options;
 import game.Game;
 import game.graphics.Renderer;
 import game.gui.GuiComponent;
-import game.gui.GuiContainer;
-import game.gui.GuiTabPane;
+import game.gui.container.GuiContainer;
+import game.gui.container.GuiTabPane;
 import game.gui.input.GuiMouseHandler;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
-import game.gui.style.GuiLabel;
+import game.gui.control.GuiLabel;
 import game.input.MouseEvent;
 import game.state.GameState;
 import game.transition.Transitions;
@@ -35,7 +35,6 @@ public class OptionsState extends GameState {
         // Create title
         GuiLabel titleLabel = new GuiLabel((Game.SCREEN_WIDTH - 200) / 2, 50, "OPTIONS");
 //        titleLabel.setTextColor(Color.WHITE);
-        titleLabel.setFont(new Font("/fonts/arial", Font.BOLD, 36));
         mainContainer.addChild(titleLabel);
 
         // Create tab pane
@@ -187,6 +186,11 @@ public class OptionsState extends GameState {
                 int textHeight = metrics.getHeight();
 
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
+            }
+
+            @Override
+            protected String getComponentName() {
+                return "";
             }
         };
 

@@ -1,6 +1,6 @@
 package game.gui.layout;
 
-import game.gui.GuiContainer;
+import game.gui.container.GuiContainer;
 
 public interface GuiLayout {
     void setAlignment(GuiAlignment alignment);

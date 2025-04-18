@@ -2,7 +2,7 @@ package game.state.overworld;
 
 import game.Game;
 import game.graphics.Renderer;
-import game.graphics.background.StarBackground;
+import game.graphics.background.Background;
 import game.state.GameState;
 import game.state.battle.util.Camera;
 import game.state.overworld.entity.Frame;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class OverworldState extends GameState {
-    StarBackground starBackground;
     Camera camera;
     Player player;
     Map<String, game.state.overworld.entity.Frame> frames = new HashMap<>();
@@ -34,7 +33,7 @@ public class OverworldState extends GameState {
         f1.getTile(0, 0).setExit("f2");
         f2.getTile(5, 5).setExit("f1");
 
-        addBackground(StarBackground::new);
+        addBackground(Background.stars());
     }
 
     @Override

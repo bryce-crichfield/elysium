@@ -1,6 +1,5 @@
 package game.gui.layout;
 
-
 import game.gui.GuiComponent;
 import game.gui.container.GuiContainer;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class GuiVerticalLayout implements GuiLayout {
+public class GuiHorizontalLayout implements GuiLayout {
     private GuiAlignment alignment = GuiAlignment.CENTER;
     private GuiJustification justify = GuiJustification.START;
     private int padding = 0;
@@ -28,44 +27,44 @@ public class GuiVerticalLayout implements GuiLayout {
         int availableWidth = parentWidth - (padding * 2);
         int availableHeight = parentHeight - (padding * 2);
 
-        // First calculate total height of all children + spacing
-        int totalChildrenHeight = 0;
+        // First calculate total width of all children + spacing
+        int totalChildrenWidth = 0;
         for (var child : children) {
             if (child.isVisible()) {
-                totalChildrenHeight += child.getHeight();
-                if (totalChildrenHeight > 0) {
+                totalChildrenWidth += child.getWidth();
+                if (totalChildrenWidth > 0) {
                     // Add spacing after each child except the last one
-                    totalChildrenHeight += spacing;
+                    totalChildrenWidth += spacing;
                 }
             }
         }
         // Remove the last spacing if we added it
-        if (totalChildrenHeight > 0 && children.size() > 1) {
-            totalChildrenHeight -= spacing;
+        if (totalChildrenWidth > 0 && children.size() > 1) {
+            totalChildrenWidth -= spacing;
         }
 
-        // Calculate starting Y position based on justification
-        int startY;
+        // Calculate starting X position based on justification
+        int startX;
         switch (justify) {
             case START:
-                startY = padding;
+                startX = padding;
                 break;
             case CENTER:
-                startY = padding + (availableHeight - totalChildrenHeight) / 2;
+                startX = padding + (availableWidth - totalChildrenWidth) / 2;
                 break;
             case END:
-                startY = padding + availableHeight - totalChildrenHeight;
+                startX = padding + availableWidth - totalChildrenWidth;
                 break;
             case SPACE_BETWEEN:
-                startY = padding;
+                startX = padding;
                 // We'll handle SPACE_BETWEEN separately later
                 break;
             case SPACE_AROUND:
                 // We'll handle SPACE_AROUND separately later
-                startY = padding;
+                startX = padding;
                 break;
             default:
-                startY = padding;
+                startX = padding;
                 break;
         }
 
@@ -73,53 +72,53 @@ public class GuiVerticalLayout implements GuiLayout {
         int effectiveSpacing = spacing;
         if (children.size() > 1) {
             if (justify == GuiJustification.SPACE_BETWEEN) {
-                effectiveSpacing = (availableHeight - getTotalChildrenHeight(children)) / (children.size() - 1);
+                effectiveSpacing = (availableWidth - getTotalChildrenWidth(children)) / (children.size() - 1);
             } else if (justify == GuiJustification.SPACE_AROUND) {
-                effectiveSpacing = (availableHeight - getTotalChildrenHeight(children)) / (children.size() * 2);
-                startY = padding + effectiveSpacing; // Start after first margin
+                effectiveSpacing = (availableWidth - getTotalChildrenWidth(children)) / (children.size() * 2);
+                startX = padding + effectiveSpacing; // Start after first margin
             }
         }
 
         // Position each child
-        int currentY = startY;
+        int currentX = startX;
         for (var child : children) {
             if (!child.isVisible()) {
                 continue;
             }
 
-            // Calculate X position based on horizontal alignment
-            int childX;
+            // Calculate Y position based on vertical alignment
+            int childY;
             switch (alignment) {
                 case START:
-                    childX = padding;
+                    childY = padding;
                     break;
                 case CENTER:
-                    childX = padding + (availableWidth - child.getWidth()) / 2;
+                    childY = padding + (availableHeight - child.getHeight()) / 2;
                     break;
                 case END:
-                    childX = padding + availableWidth - child.getWidth();
+                    childY = padding + availableHeight - child.getHeight();
                     break;
                 default:
-                    childX = padding;
+                    childY = padding;
                     break;
             }
 
             // Set the position
-            child.setPosition(childX, currentY);
+            child.setPosition(currentX, childY);
 
             // Move to next position
-            currentY += child.getHeight() + (justify == GuiJustification.SPACE_AROUND ?
+            currentX += child.getWidth() + (justify == GuiJustification.SPACE_AROUND ?
                     effectiveSpacing * 2 : effectiveSpacing);
         }
     }
 
-    private int getTotalChildrenHeight(List<GuiComponent> children) {
-        int totalHeight = 0;
+    private int getTotalChildrenWidth(List<GuiComponent> children) {
+        int totalWidth = 0;
         for (GuiComponent child : children) {
             if (child.isVisible()) {
-                totalHeight += child.getHeight();
+                totalWidth += child.getWidth();
             }
         }
-        return totalHeight;
+        return totalWidth;
     }
 }

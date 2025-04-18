@@ -1,5 +1,6 @@
-package game.gui;
+package game.gui.container;
 
+import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
@@ -63,12 +64,9 @@ public class GuiScrollPanel extends GuiContainer {
         renderer.pushClip(0, 0, width, height);
 
         // Render container background
-        if (background != null) {
-            background.render(renderer, width, height, 0);
-        }
-
-        if (border != null) {
-            border.render(renderer, width, height, 0);
+        if (style != null) {
+            style.getBackground().render(renderer, width, height, 0);
+            style.getBorder().render(renderer, width, height, 0);
         }
 
         // Push scroll translation
@@ -154,10 +152,12 @@ public class GuiScrollPanel extends GuiContainer {
 
     @Override
     public GuiEventState processMouseEvent(MouseEvent e) {
-        if (!visible || !enabled) return GuiEventState.NOT_CONSUMED;
+        if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
         // Convert to local space first
-        Point localPoint = transformToLocalSpace(e.getPoint());
+        Point point = e.getPoint();
+        // Transform the point to local space
+        Point localPoint = new Point(point.x - x, point.y - y);
         boolean isInBounds = containsPoint(localPoint) || isPointOnScrollbar(localPoint);
 
         boolean mouseEntered = e instanceof MouseEvent.Moved && (!isHovered && isInBounds);

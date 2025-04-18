@@ -34,4 +34,8 @@ public class Audio {
         engine.addProcessor(sampler);
         sampler.play();
     }
+
+    public void close() {
+        engine.stop();
+    }
 }
