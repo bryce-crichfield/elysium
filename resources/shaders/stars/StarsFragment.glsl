@@ -36,7 +36,7 @@ uniform float time;        // Time in seconds
 #define WARBLE_RATE_MAX 50.0       // Maximum warble rate
 
 // Background colors
-#define BG_COLOR_TOP vec3(0.0, 0.027, 0.267)  // Top gradient color (dark blue)
+#define BG_COLOR_TOP vec3(0.0, 0.017, 0.167)  // Top gradient color (dark blue)
 #define BG_COLOR_BOTTOM vec3(0.0, 0.0, 0.0)   // Bottom gradient color (black)
 #define INVERT_GRADIENT false                 // Set to true to invert gradient direction
 

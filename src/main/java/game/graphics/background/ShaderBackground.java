@@ -5,7 +5,7 @@ import game.graphics.Renderer;
 import game.graphics.gl.Program;
 import game.graphics.gl.VertexArray;
 import game.graphics.gl.VertexBuffer;
-import lombok.SneakyThrows;
+import game.util.WatchedFile;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 
-public class StarShaderBackground extends Background {
+public class ShaderBackground extends Background {
     private Program shader;
     private int resolutionLocation;
     private int timeLocation;
@@ -38,7 +38,7 @@ public class StarShaderBackground extends Background {
     private long lastReloadTime = 0;
     private static final long RELOAD_COOLDOWN = 500; // milliseconds
 
-    public StarShaderBackground(int screenWidth, int screenHeight) {
+    public ShaderBackground(int screenWidth, int screenHeight) {
         super(screenWidth, screenHeight);
 
         // Try to find the shader files
@@ -51,12 +51,6 @@ public class StarShaderBackground extends Background {
 
         // Initialize shader
         initShader();
-
-        vao = new VertexArray();
-        vbo = new VertexBuffer(GL_ARRAY_BUFFER);
-
-        vao.bind();
-        vbo.bind();
 
         float[] vertices = {
                 // Positions         // Texture Coords
@@ -73,28 +67,30 @@ public class StarShaderBackground extends Background {
         buffer.put(vertices);
         buffer.flip();
 
-        vbo.storeData(buffer, GL_STATIC_DRAW);
+        vao = new VertexArray();
+        var builder = new VertexBuffer.Builder(vao, GL_ARRAY_BUFFER);
+        vbo = builder.addAttribute(3, GL_FLOAT)     // Position
+                .addAttribute(2, GL_FLOAT)          // Texture Coords
+                .build(vertices, GL_STATIC_DRAW);
 
-        vao.enableAttribute(0);
-        vao.enableAttribute(1);
-
-        vbo.createVertexAttribPointer(0, 3, 5 * Float.BYTES, 0);
-        vbo.createVertexAttribPointer(1, 2, 5 * Float.BYTES, 3 * Float.BYTES);
-
-        vbo.unbind();
-        vao.unbind();
     }
 
 
     private void initShader() {
-        if (shader != null) {
-            shader.dispose();
-        }
         // Create shader program
         var vertPath = vertexShaderFile.getAbsolutePath().toString();
         var fragPath = fragmentShaderFile.getAbsolutePath().toString();
 
-        shader = new Program(vertPath, fragPath);
+        try {
+            var newShader = new Program(vertPath, fragPath);
+            if (shader != null) {
+                shader.dispose();
+            }
+            shader = newShader;
+        } catch (Exception e) {
+            System.err.println("Error loading shader: " + e.getMessage());
+            return;
+        }
 
         // Get uniform locations
         resolutionLocation = shader.getUniformLocation("resolution");
@@ -116,15 +112,7 @@ public class StarShaderBackground extends Background {
             return;
         }
 
-        boolean needsReload = false;
-
-        if (vertexShaderFile.hasChanged()) {
-            needsReload = true;
-        }
-
-        if (fragmentShaderFile.hasChanged()) {
-            needsReload = true;
-        }
+        boolean needsReload = vertexShaderFile.hasChanged() || fragmentShaderFile.hasChanged();
 
         if (!needsReload) return;
 

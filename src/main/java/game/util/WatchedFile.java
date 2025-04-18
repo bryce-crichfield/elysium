@@ -1,7 +1,6 @@
-package game.graphics.background;
+package game.util;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.nio.file.Files;

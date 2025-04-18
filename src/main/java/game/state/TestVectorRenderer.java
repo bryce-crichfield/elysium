@@ -2,7 +2,7 @@ package game.state;
 
 import game.Game;
 import game.graphics.Renderer;
-import game.graphics.background.StarShaderBackground;
+import game.graphics.background.ShaderBackground;
 import game.graphics.vector.VectorRenderer;
 
 import java.time.Duration;
@@ -12,7 +12,7 @@ public class TestVectorRenderer extends GameState {
 
     public TestVectorRenderer(Game game) {
         super(game);
-        addBackground(StarShaderBackground::new);
+        addBackground(ShaderBackground::new);
 //        vectorRenderer = new VectorRenderer();
     }
 

@@ -14,7 +14,7 @@ import lombok.experimental.Delegate;
 
 import java.time.Duration;
 
-public final class Game {
+public final class Game implements AutoCloseable {
     public static final int SCREEN_WIDTH = 480 * 2;
     public static final int SCREEN_HEIGHT = 320 * 2;
     public static final int TILE_SIZE = 32;
@@ -94,5 +94,10 @@ public final class Game {
 
         // Draw the processed result to the screen
 //        graphics.drawImage(processed, 0, 0, null);
+    }
+
+    @Override
+    public void close() throws Exception {
+        audio.close();
     }
 }

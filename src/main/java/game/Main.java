@@ -20,7 +20,7 @@ public enum Main {
         window.onInit();
 
         try {
-            game.setState(TestVectorRenderer::new);
+            game.setState(LoadingState::new);
 
             Instant lastUpdate = Instant.now();
             Instant lastRender = Instant.now();
@@ -48,6 +48,7 @@ public enum Main {
             throw new RuntimeException("An error occurred while running the game", e);
 //            ErrorDialog.showError("An error occurred", e.getMessage());
         } finally {
+            game.close();
             window.onClose();
         }
     }
