@@ -266,4 +266,9 @@ public class GuiDropdown<T> extends GuiComponent {
         // Normal bounds check otherwise
         return super.containsPoint(point);
     }
+
+    @Override
+    protected String getComponentName() {
+        return "dropdown";
+    }
 }

@@ -276,4 +276,9 @@ public class GuiSlider extends GuiComponent {
 
         return GuiEventState.NOT_CONSUMED;
     }
+
+    @Override
+    protected String getComponentName() {
+        return "slider";
+    }
 }

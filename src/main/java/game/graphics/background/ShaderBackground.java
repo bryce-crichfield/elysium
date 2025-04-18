@@ -38,12 +38,12 @@ public class ShaderBackground extends Background {
     private long lastReloadTime = 0;
     private static final long RELOAD_COOLDOWN = 500; // milliseconds
 
-    public ShaderBackground(int screenWidth, int screenHeight) {
+    ShaderBackground(String vertexPath, String fragmentPath, int screenWidth, int screenHeight) {
         super(screenWidth, screenHeight);
 
         // Try to find the shader files
-        this.vertexPath = "shaders/stars/StarsVertex.glsl";
-        this.fragmentPath = "shaders/stars/StarsFragment.glsl";
+        this.vertexPath = vertexPath;
+        this.fragmentPath = fragmentPath;
 
         // Create file watchers
         this.vertexShaderFile = new WatchedFile(vertexPath);

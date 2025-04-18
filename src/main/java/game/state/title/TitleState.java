@@ -2,7 +2,7 @@ package game.state.title;
 
 import game.Game;
 import game.graphics.Renderer;
-import game.graphics.background.StarBackground;
+import game.graphics.background.Background;
 import game.gui.GuiComponent;
 import game.gui.container.GuiContainer;
 import game.gui.container.GuiScrollPanel;
@@ -37,7 +37,7 @@ public class TitleState extends GameState {
     public TitleState(Game game) {
         super(game);
 
-        addBackground(StarBackground::new);
+        addBackground(Background.stars());
 
         // Main container
         var container = new GuiContainer(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
@@ -175,6 +175,11 @@ public class TitleState extends GameState {
                 int textHeight = metrics.getHeight();
                 System.out.println("Text width: " + textWidth + ", Text height: " + textHeight);
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
+            }
+
+            @Override
+            protected String getComponentName() {
+                return "";
             }
         };
 

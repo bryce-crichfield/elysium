@@ -64,12 +64,9 @@ public class GuiScrollPanel extends GuiContainer {
         renderer.pushClip(0, 0, width, height);
 
         // Render container background
-        if (background != null) {
-            background.render(renderer, width, height, 0);
-        }
-
-        if (border != null) {
-            border.render(renderer, width, height, 0);
+        if (style != null) {
+            style.getBackground().render(renderer, width, height, 0);
+            style.getBorder().render(renderer, width, height, 0);
         }
 
         // Push scroll translation

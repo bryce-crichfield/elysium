@@ -16,6 +16,10 @@ import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_INT;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+
 public class VectorRenderer {
     // Constants for vector drawing operations
     private static final int DRAW_LINE = 0;
@@ -65,44 +69,16 @@ public class VectorRenderer {
         vao = new VertexArray();
         vao.bind();
 
-        // Create vertex buffer
-        vbo = new VertexBuffer(GL15.GL_ARRAY_BUFFER);
-        vbo.bind();
-
-        // Allocate buffer space
-        vbo.storeData(BufferUtils.createFloatBuffer(MAX_BATCH_SIZE * getVertexFloatCount()),
-                GL15.GL_DYNAMIC_DRAW);
-
-        // Set up attribute pointers
-        // Position (x, y)
-        vbo.createVertexAttribPointer(0, 2, getVertexSizeBytes(), 0);
-        // Params (x2, y2, stroke, cap or width, height, etc.)
-        vbo.createVertexAttribPointer(1, 4, getVertexSizeBytes(), 2 * Float.BYTES);
-        // Type (DRAW_LINE, DRAW_RECT, etc.)
-        vbo.createVertexAttribPointer(2, 1, getVertexSizeBytes(), 6 * Float.BYTES);
-        // Color (r, g, b, a)
-        vbo.createVertexAttribPointer(3, 4, getVertexSizeBytes(), 7 * Float.BYTES);
-        // Transform matrix (4x4)
-        vbo.createVertexAttribPointer(4, 16, getVertexSizeBytes(), 11 * Float.BYTES);
-        // Clip (x, y, width, height)
-        vbo.createVertexAttribPointer(5, 4, getVertexSizeBytes(), 27 * Float.BYTES);
-        // Viewport (x, y, width, height)
-        vbo.createVertexAttribPointer(6, 4, getVertexSizeBytes(), 31 * Float.BYTES);
-
-        // Enable attributes
-        for (int i = 0; i <= 6; i++) {
-            vao.enableAttribute(i);
-        }
-
-        // Add vertex buffer to vertex array for cleanup
-        vao.addBuffer(vbo);
-
-        // Unbind
-        vbo.unbind();
-        vao.unbind();
-
-        transformStack.push(new Matrix4f().identity());
-        clipStack.push(new Vector4f(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT));
+        var floatArray = new float[MAX_BATCH_SIZE * getVertexFloatCount()];
+        vbo = new VertexBuffer.Builder(vao, GL_ARRAY_BUFFER)
+                .addAttribute(2, GL_FLOAT) // Position
+                .addAttribute(4, GL_FLOAT) // Params
+                .addAttribute(1, GL_INT) // Type
+                .addAttribute(4, GL_FLOAT) // Color
+                .addAttribute(16, GL_FLOAT) // Transform matrix
+                .addAttribute(4, GL_FLOAT) // Clip
+                .addAttribute(4, GL_FLOAT) // Viewport
+                .build(floatArray, GL15.GL_DYNAMIC_DRAW);
     }
 
     private int getVertexFloatCount() {
@@ -110,9 +86,6 @@ public class VectorRenderer {
         return 2 + 4 + 1 + 4 + 16 + 4 + 4;
     }
 
-    private int getVertexSizeBytes() {
-        return getVertexFloatCount() * Float.BYTES;
-    }
 
 
     public void fillRect(int x, int y, int width, int height) {

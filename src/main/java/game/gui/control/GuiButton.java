@@ -72,4 +72,9 @@ public class GuiButton extends GuiComponent {
         renderer.drawString(text, textX, textY);
     }
 
+    @Override
+    protected String getComponentName() {
+        return "button";
+    }
+
 }

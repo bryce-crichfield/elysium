@@ -12,6 +12,7 @@ import java.awt.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class GuiComponent {
     protected final List<GuiMouseHandler> mouseHandlers = new ArrayList<>();
@@ -152,5 +153,14 @@ public abstract class GuiComponent {
     public final void dispatchOnExit(MouseEvent event) {
         isHovered = false;
         hoverHandlers.forEach(h -> h.onExit(event));
+    }
+
+    protected abstract String getComponentName();
+
+    public void applyStyle(Map<String, GuiStyle> styles) {
+        GuiStyle style = styles.get(getComponentName());
+        if (style != null) {
+            setStyle(style);
+        }
     }
 }

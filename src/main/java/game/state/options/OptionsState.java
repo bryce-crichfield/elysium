@@ -187,6 +187,11 @@ public class OptionsState extends GameState {
 
                 g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
             }
+
+            @Override
+            protected String getComponentName() {
+                return "";
+            }
         };
 
         var mouseClick = GuiMouseHandler.onClick(onClick);

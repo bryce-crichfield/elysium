@@ -77,6 +77,11 @@ public class GuiTextField extends GuiComponent {
         }
     }
 
+    @Override
+    protected String getComponentName() {
+        return "textfield";
+    }
+
     protected void onRender(Graphics2D g) {
         // Save original clip and color
         Shape originalClip = g.getClip();

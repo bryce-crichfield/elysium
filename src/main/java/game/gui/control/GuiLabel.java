@@ -25,4 +25,9 @@ public class GuiLabel extends GuiComponent {
     protected void onRender(Renderer renderer) {
         style.getFont().render(renderer, text, getWidth(), getHeight());
     }
+
+    @Override
+    protected String getComponentName() {
+        return "label";
+    }
 }

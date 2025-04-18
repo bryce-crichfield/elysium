@@ -119,5 +119,10 @@ public class GuiTabPane extends GuiContainer {
                 renderer.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
             }
         }
+
+        @Override
+        protected String getComponentName() {
+            return "tabHeader";
+        }
     }
 }

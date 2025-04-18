@@ -13,6 +13,14 @@ public abstract class Background {
         this.screenHeight = screenHeight;
     }
 
+    public static BackgroundFactory stars() {
+        return (screenWidth, screenHeight) -> {
+            var vertexPath = "shaders/stars/StarsVertex.glsl";
+            var fragmentPath = "shaders/stars/StarsFragment.glsl";
+            return new ShaderBackground(vertexPath, fragmentPath, screenWidth, screenHeight);
+        };
+    }
+
     public abstract void update(Duration delta);
 
     public abstract void render(Renderer renderer);

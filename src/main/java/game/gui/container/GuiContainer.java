@@ -3,6 +3,7 @@ package game.gui.container;
 import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
 import game.gui.layout.GuiNullLayout;
+import game.gui.style.GuiStyle;
 import game.input.MouseEvent;
 import game.gui.layout.GuiLayout;
 import game.gui.style.GuiBackground;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GuiContainer extends GuiComponent {
     @Getter
@@ -45,13 +47,17 @@ public class GuiContainer extends GuiComponent {
         renderer.pushClip(0, 0, width, height);
 
         // Render background and border
-        if (background != null) {
-            background.render(renderer, width, height, 0);
+        if (style != null) {
+            style.getBackground().render(renderer, width, height, 0);
+            style.getBorder().render(renderer, width, height, 0);
         }
-
-        if (border != null) {
-            border.render(renderer, width, height, 0);
-        }
+//        if (background != null) {
+//            background.render(renderer, width, height, 0);
+//        }
+//
+//        if (border != null) {
+//            border.render(renderer, width, height, 0);
+//        }
 
         // Render children
         for (GuiComponent child : children) {
@@ -78,6 +84,19 @@ public class GuiContainer extends GuiComponent {
         }
 
         return GuiEventState.NOT_CONSUMED;
+    }
+
+    @Override
+    protected String getComponentName() {
+        return "container";
+    }
+
+    @Override
+    public void applyStyle(Map<String, GuiStyle> styles) {
+        super.applyStyle(styles);
+        for (GuiComponent child : children) {
+            child.applyStyle(styles);
+        }
     }
 
     public void setLayout(GuiLayout guiLayout) {

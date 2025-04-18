@@ -61,6 +61,11 @@ public class LoadingState extends GameState {
                 g.setColor(Color.WHITE);
                 g.drawRect(0, 0, width, height);
             }
+
+            @Override
+            protected String getComponentName() {
+                return "";
+            }
         };
         return progressBar;
     }

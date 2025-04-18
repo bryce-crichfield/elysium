@@ -3,7 +3,7 @@ package game.state.battle;
 import game.Game;
 import game.graphics.Renderer;
 import game.graphics.Transform;
-import game.graphics.background.ShaderBackground;
+import game.graphics.background.Background;
 import game.graphics.sprite.SpriteRenderer;
 import game.gui.container.GuiContainer;
 import game.gui.input.GuiEventState;
@@ -71,7 +71,7 @@ public class BattleState extends GameState {
         Scene.serialize("scene1", scene);
 //        scene = Scene.deserialize("scene1");
         cursor = new Cursor(game, this);
-        addBackground(ShaderBackground::new);
+        addBackground(Background.stars());
 
         transitionTo(ObserverPlayerController::new);
 

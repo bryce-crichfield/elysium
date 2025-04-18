@@ -1,5 +1,7 @@
 package game.gui.style;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Setter;
 import lombok.With;
 
 import java.awt.*;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -28,5 +31,22 @@ public class GuiBorder {
         }
 
         renderer.setLineWidth(oldStroke);
+    }
+
+    public static Optional<GuiBorder> deserialize(JsonObject json) {
+        try {
+            JsonArray colorArray = json.getAsJsonArray("color");
+            Color color = new Color(
+                    colorArray.get(0).getAsInt(),
+                    colorArray.get(1).getAsInt(),
+                    colorArray.get(2).getAsInt(),
+                    colorArray.get(3).getAsInt()
+            );
+
+            int thickness = json.get("thickness").getAsInt();
+            return Optional.of(new GuiBorder(color, thickness));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 }
