@@ -15,7 +15,6 @@ import java.util.Optional;
 public class ObserverPlayerController extends PlayerController {
     public ObserverPlayerController(BattleState state) {
         super(state);
-//        hoveredActorStats = new StatsMenu(20, 20, ActorSelected.event);
     }
 
     @Override
@@ -52,39 +51,14 @@ public class ObserverPlayerController extends PlayerController {
             return;
         }
 
-//        if (hovered.get().isPlayer()) {
-//            if (hovered.get().isWaiting())
-//                return;
         state.getSelection().select(hovered.get());
         state.transitionTo(SelectMovePlayerController::new);
-
-//            ActorSelected.event.fire(actor.get());
-//        }
-    }
-
-    private void forceHoveredActorStats() {
-        int cx = state.getCursor().getCursorX();
-        int cy = state.getCursor().getCursorY();
-        Optional<Entity> hov = state.getScene().findEntityByPosition(cx, cy);
-        hov.ifPresent(actor -> {
-//            onChangeHovered.fire(actor);
-//            hoveredActorStats.setVisible(true);
-        });
     }
 
     @Override
     public void onEnter() {
-        forceHoveredActorStats();
-
         state.getCursor().enterBlinkingMode();
         state.getCursor().setColor(Color.WHITE);
-
-//        context.addListener(ActorSelected.event).run(actor -> {
-//            battleStateMachine.transitionTo(new SelectActionPlayerController(this));
-//            ControllerTransition.defer.fire(() -> new SelectActionPlayerController(this));
-//        });
-
-//        on(CursorMoved.event).run(this::hoverActor);
     }
 
     @Override
@@ -95,26 +69,5 @@ public class ObserverPlayerController extends PlayerController {
     @Override
     public void onWorldRender(Renderer renderer) {
         state.getCursor().onRender(renderer);
-    }
-
-    @Override
-    public void onGuiRender(Renderer renderer) {
-//        hoveredActorStats.onSpriteRender(renderer);
-    }
-
-    private void hoverActor(Cursor cursor) {
-        int cursorX = state.getCursor().getCursorX();
-        int cursorY = state.getCursor().getCursorY();
-
-        Optional<Entity> actor = state.getScene().findEntityByPosition(cursorX, cursorY);
-        if (actor.isEmpty()) {
-//            hoveredActorStats.setVisible(false);
-        }
-
-        if (actor.isPresent()) {
-            Entity hovered = actor.get();
-//            hoveredActorStats.setVisible(true);
-//            onChangeHovered.fire(hovered);
-        }
     }
 }

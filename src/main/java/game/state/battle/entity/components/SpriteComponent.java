@@ -17,14 +17,16 @@ public class SpriteComponent implements RenderableComponent {
     @Override
     public void onSpriteRender(Entity self, SpriteRenderer renderer) {
         if (self.lacksComponent(PositionComponent.class)) return;
+        if (self.lacksComponent(AnimationComponent.class)) return;
 
         var position = self.getComponent(PositionComponent.class);
+        var animation = self.getComponent(AnimationComponent.class);
         var x = position.getX() * Game.TILE_SIZE;
         var y = position.getY() * Game.TILE_SIZE;
 
         // TODO: Delegate the sprite selection to an animation component
         Texture texture = TextureStore.getInstance().getAssets(textureId);
-        Sprite sprite = new Sprite(texture, 0, 0, 64, 64);
+        Sprite sprite = animation.getCurrentSprite(texture);
         renderer.drawSprite(x, y, Game.TILE_SIZE, Game.TILE_SIZE, sprite);
     }
 

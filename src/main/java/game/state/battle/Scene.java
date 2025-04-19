@@ -51,6 +51,8 @@ public class Scene implements Serializable {
         for (Entity entity : entities) {
             entity.onUpdate(duration);
         }
+
+        entities.removeIf(Entity::isDead);
     }
 
     public void onRender(Renderer renderer, SpriteRenderer spriteRenderer) {

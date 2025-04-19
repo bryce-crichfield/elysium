@@ -44,7 +44,7 @@ public class TilePathFinder {
                 int ny = neighbor.getY();
                 String key = nx + "," + ny;
 
-                if (neighbor.isPassable() && !actorOccupies(nx, ny) && !visited.contains(key)) {
+                if (neighbor.isPassable() && !entityOccupies(nx, ny) && !visited.contains(key)) {
                     Node neighborNode = new Node(nx, ny, current);
                     queue.add(neighborNode);
                     visited.add(key);
@@ -69,9 +69,9 @@ public class TilePathFinder {
         return path;
     }
 
-    public boolean actorOccupies(int x, int y) {
-        return false;
-//        return scene.findEntityByPosition(x, y).isPresent();
+    public boolean entityOccupies(int x, int y) {
+//        return false;
+        return scene.findEntityByPosition(x, y).isPresent();
     }
 
     // Simplified Node class - only tracks position and parent

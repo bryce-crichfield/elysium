@@ -5,15 +5,22 @@ import game.graphics.sprite.SpriteRenderer;
 import game.state.battle.entity.component.Component;
 import game.state.battle.entity.component.RenderableComponent;
 import game.state.battle.entity.component.UpdatableComponent;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class Entity implements Serializable {
     private final Map<Class<? extends Component>, Component> components = new HashMap<>();
+
+    @Getter
+    @Setter
+    private boolean isDead = false;
 
     public Entity() {
     }
@@ -75,8 +82,23 @@ public final class Entity implements Serializable {
         return componentClass.cast(components.get(componentClass));
     }
 
+    public <T extends Component> List<T> getAllComponents(Class<T> componentClass) {
+        return components.keySet().stream()
+                .filter(componentClass::isAssignableFrom)
+                .map(components::get)
+                .map(componentClass::cast)
+                .toList();
+    }
+
+
     public <T extends Component> boolean hasComponent(Class<T> componentClass) {
-        return components.containsKey(componentClass);
+        for (var key : components.keySet()) {
+            if (componentClass.isAssignableFrom(key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public <T extends Component> boolean lacksComponent(Class<T> componentClass) {

@@ -10,6 +10,8 @@ import game.graphics.texture.TextureStore;
 import game.gui.GuiComponent;
 import game.state.GameState;
 import game.state.battle.BattleState;
+import game.state.overworld.OverworldState;
+import game.state.title.TitleState;
 import game.transition.Transitions;
 import game.util.Easing;
 
