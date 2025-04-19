@@ -14,6 +14,8 @@ import game.state.battle.controller.BattleController;
 import game.state.battle.controller.BattleControllerFactory;
 import game.state.battle.controller.player.ObserverPlayerController;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.AnimationComponent;
+import game.state.battle.entity.components.TileAnimationComponent;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.entity.components.SpriteComponent;
 import game.state.battle.hud.ActionsMenu;
@@ -65,6 +67,8 @@ public class BattleState extends GameState {
         var entity = new Entity();
         entity.addComponent(new PositionComponent(6, 6));
         entity.addComponent(new SpriteComponent("sprites/test"));
+        entity.addComponent(new AnimationComponent());
+        entity.addComponent(new TileAnimationComponent());
         entities.add(entity);
 
         scene = new Scene(tiles, entities);

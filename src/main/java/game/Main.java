@@ -2,7 +2,6 @@ package game;
 
 import game.graphics.platform.ErrorDialog;
 import game.graphics.platform.Window;
-import game.state.TestVectorRenderer;
 import game.state.loading.LoadingState;
 import game.util.Util;
 
@@ -45,8 +44,7 @@ public enum Main {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("An error occurred while running the game", e);
-//            ErrorDialog.showError("An error occurred", e.getMessage());
+            ErrorDialog.showError("An error occurred", e.getMessage());
         } finally {
             game.close();
             window.onClose();

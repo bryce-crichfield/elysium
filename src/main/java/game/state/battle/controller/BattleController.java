@@ -24,8 +24,6 @@ public abstract class BattleController {
 
     public abstract void onWorldRender(Renderer renderer);
 
-    public abstract void onGuiRender(Renderer renderer);
-
     public void onExit() {
         events.clear();
     }

@@ -6,6 +6,7 @@ import game.input.Mouse;
 import game.input.MouseEvent;
 import game.state.battle.BattleState;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.components.TileAnimationComponent;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.event.ActionActorMoved;
 import game.state.battle.tile.Tile;
@@ -42,7 +43,7 @@ public class SelectMovePlayerController extends PlayerController {
         if (selectedActor.hasComponent(PositionComponent.class)) {
             var position = selectedActor.getComponent(PositionComponent.class);
             var pathfinder = new TilePathFinder(state.getScene());
-            var start = state.getScene().getTile(position.getX(), position.getY());
+            var start = state.getScene().getTile((int) position.getX(), (int) position.getY());
             var end = state.getScene().getTile(cursor.getCursorX(), cursor.getCursorY());
             path = pathfinder.findPath(start, end);
         }
@@ -59,11 +60,6 @@ public class SelectMovePlayerController extends PlayerController {
         drawMoveableArea(renderer);
     }
 
-    @Override
-    public void onGuiRender(Renderer renderer) {
-
-    }
-
     private void drawMoveableArea(Renderer renderer) {
         var selected = state.getSelection().get();
         int distance = 5;
@@ -71,9 +67,9 @@ public class SelectMovePlayerController extends PlayerController {
         if (selected.lacksComponent(PositionComponent.class)) return;
 
         var position = selected.getComponent(PositionComponent.class);
-        int x = position.getX();
-        int y = position.getY();
-        var inRange = state.getScene().getTiles().within(x, y, distance);
+        float x = position.getX();
+        float y = position.getY();
+        var inRange = state.getScene().getTiles().within((int) x, (int) y, distance);
         var fillColor = new Color(255, 165, 0, 128); // Semi-transparent orange
         inRange.fillArea(renderer, fillColor);
         inRange.drawOutline(renderer, Color.ORANGE);
@@ -121,6 +117,11 @@ public class SelectMovePlayerController extends PlayerController {
         Entity entity = state.getSelection().get();
 
         if (!hoveringOnEmptyTile) return;
+
+        if (entity.hasComponent(TileAnimationComponent.class)) {
+            var animation = entity.getComponent(TileAnimationComponent.class);
+            animation.start(entity, path);
+        }
 
         path.clear();
         state.transitionTo(ObserverPlayerController::new);

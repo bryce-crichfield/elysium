@@ -2,38 +2,67 @@ package game.state.overworld;
 
 import game.Game;
 import game.graphics.Renderer;
+import game.graphics.Transform;
 import game.graphics.background.Background;
+import game.graphics.sprite.SpriteRenderer;
 import game.state.GameState;
+import game.state.battle.Scene;
+import game.state.battle.entity.Entity;
+import game.state.battle.entity.component.KeyboardComponent;
+import game.state.battle.entity.components.*;
+import game.state.battle.tile.Tile;
 import game.state.battle.util.Camera;
-import game.state.overworld.entity.Frame;
-import game.state.overworld.entity.Player;
-import game.state.overworld.entity.Tile;
-import game.util.Util;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
 
 public class OverworldState extends GameState {
-    Camera camera;
-    Player player;
-    Map<String, game.state.overworld.entity.Frame> frames = new HashMap<>();
-    String currentFrame = "f1";
+    @Getter
+    @Setter
+    private final Camera camera;
+
+    @Getter
+    @Setter
+    private final Scene scene;
+
+    private final SpriteRenderer spriteRenderer = new SpriteRenderer("shaders/sprite/SpriteVertex.glsl", "shaders/sprite/SpriteFragment.glsl");
+
 
     public OverworldState(Game game) {
         super(game);
-
-        camera = new Camera(game);
-        player = new Player(0, 0, game);
-        var f1 = new game.state.overworld.entity.Frame(10, 10);
-        var f2 = new Frame(20, 20);
-        frames.put("f1", f1);
-        frames.put("f2", f2);
-        f1.getTile(0, 0).setExit("f2");
-        f2.getTile(5, 5).setExit("f1");
-
         addBackground(Background.stars());
+        camera = new Camera(game);
+
+        var tiles = new Tile[16][16];
+        for (int x = 0; x < tiles.length; x++) {
+            for (int y = 0; y < tiles[x].length; y++) {
+                var tile = new Tile(x, y, "tiles/Cyan", true);
+                tiles[x][y] = tile;
+            }
+        }
+
+        var entities = new ArrayList<Entity>();
+
+        // Player Entity
+        var entity = new Entity();
+        entity.addComponent(new PositionComponent(6, 6));
+        entity.addComponent(new SpriteComponent("sprites/test"));
+        entity.addComponent(new KinematicsComponent());
+        entity.addComponent(new PlayerMovementComponent());
+        entities.add(entity);
+
+        // Box that we can Collide Into
+        var box = new Entity();
+        box.addComponent(new PositionComponent(8, 8));
+        entities.add(box);
+
+        scene = new Scene(tiles, entities);
+
+        var transform = Transform.orthographic(0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT, 0, -1, 1);
+        spriteRenderer.setProjection(transform);
+
     }
 
     @Override
@@ -43,41 +72,32 @@ public class OverworldState extends GameState {
 
     @Override
     public void onUpdate(Duration delta) {
-        player.onUpdate(delta);
-
-        float dt = Util.perSecond(delta);
-
-        // lerp the camera towards the player
-        float cameraX = Util.lerp(camera.getX(), player.getX(), 2 * dt);
-        float cameraY = Util.lerp(camera.getY(), player.getY(), 2 * dt);
-        camera.setX(cameraX);
-        camera.setY(cameraY);
-
-        Optional<Tile> intersectingTile = frames.get(currentFrame).getIntersectingTile(
-                player.getX(), player.getY(), 32, 32);
-        if (intersectingTile.isPresent()) {
-            Tile tile = intersectingTile.get();
-            if (tile.isExit()) {
-                String exitFrame = tile.getExitId();
-                if (!exitFrame.equals(currentFrame)) {
-                    System.out.printf("Exiting %s to %s\n", currentFrame, exitFrame);
-                    currentFrame = exitFrame;
-                }
-            }
+        for (var entity : scene.getEntities()) {
+            if (!entity.hasComponent(KeyboardComponent.class)) continue;
+            entity.getAllComponents(KeyboardComponent.class)
+                    .forEach(k -> k.onKeyboard(entity, game.getKeyboard()));
         }
 
-//        if (getGame().getKeyboard().pressed(KeyEvent.VK_ESCAPE)) {
-//            getGame().popState();
-//        }
+
+        // find the player and make the camera follow them
+        var player = scene.getEntities().stream()
+                .filter(e -> e.hasComponent(PlayerMovementComponent.class))
+                .findFirst()
+                .orElse(null);
+
+        // Verify camera updated correctly
+        System.out.println("Camera after update: " + camera.getX() + "," + camera.getY());
+
+        scene.onUpdate(delta);
+
     }
 
     @Override
     public void onRender(Renderer renderer) {
-        // FIXME: temporarily disabled apply composition
         var cameraTransform = camera.getTransform();
         renderer.pushTransform(cameraTransform);
-        frames.get(currentFrame).onRender(renderer);
-        player.onRender(renderer);
+        spriteRenderer.setView(cameraTransform);
+        scene.onRender(renderer, spriteRenderer);
         renderer.popTransform();
     }
 }

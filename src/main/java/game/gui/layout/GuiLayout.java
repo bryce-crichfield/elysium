@@ -1,5 +1,6 @@
 package game.gui.layout;
 
+import com.google.gson.JsonObject;
 import game.gui.container.GuiContainer;
 
 public interface GuiLayout {
@@ -12,4 +13,5 @@ public interface GuiLayout {
     void setSpacing(int spacing);
 
     void onLayout(GuiContainer parent);
+
 }

@@ -2,7 +2,6 @@ package game.state.battle.hud;
 
 import game.gui.container.GuiScrollPanel;
 import game.gui.control.GuiButton;
-import game.gui.layout.GuiHorizontalLayout;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBackground;
 import game.gui.style.GuiBorder;
@@ -10,6 +9,7 @@ import game.gui.style.GuiStyle;
 import game.state.battle.BattleState;
 import game.state.battle.Scene;
 import game.state.battle.entity.Entity;
+import game.state.battle.entity.entities.Fireball;
 import game.state.battle.entity.components.PositionComponent;
 import game.state.battle.entity.components.SpriteComponent;
 import game.state.title.TitleState;
@@ -64,6 +64,13 @@ public class ActionsMenu extends GuiScrollPanel {
             entity.ifPresent(value -> state.getScene().removeEntity(value));
         });
 
+        var spawnFireball = new GuiButton("Fireball", 100, 20, () -> {
+            var cursorX = state.getCursor().getCursorX();
+            var cursorY = state.getCursor().getCursorY();
+            var fireball = Fireball.create(cursorX, cursorY);
+            state.getScene().addEntity(fireball);
+        });
+
         var exitBtn = new GuiButton("Exit", 100, 20, () -> {
             // Exit logic
             var transition = Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn());
@@ -73,6 +80,7 @@ public class ActionsMenu extends GuiScrollPanel {
         this.addChild(saveSceneBtn);
         this.addChild(createEntity);
         this.addChild(removeEntity);
+        this.addChild(spawnFireball);
         this.addChild(exitBtn);
 
         var style = GuiStyle.load(stylesheet.getAbsolutePath().toString());

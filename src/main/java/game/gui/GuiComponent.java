@@ -22,6 +22,7 @@ public abstract class GuiComponent {
     @Getter
     protected int x, y, width, height;
     @Getter
+    @Setter
     protected boolean isVisible = true;
     @Getter
     protected boolean isEnabled = true;

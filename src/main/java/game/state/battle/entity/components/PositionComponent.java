@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class PositionComponent implements Component {
-    private int x;
-    private int y;
+    private float x;
+    private float y;
 
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
