@@ -23,6 +23,15 @@ public class GuiLabel extends GuiComponent {
 
     @Override
     protected void onRender(Renderer renderer) {
+        if (style.getBackground() != null) {
+            style.getBackground().render(renderer, getWidth(), getHeight(), 0);
+        }
+
+        if (style.getBorder() != null) {
+            style.getBorder().render(renderer, getWidth(), getHeight(), 0);
+        }
+
+
         style.getFont().render(renderer, text, getWidth(), getHeight());
     }
 

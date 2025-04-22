@@ -68,7 +68,7 @@ public class OptionsState extends GameState {
         GuiContainer gameTab = createGameTabContent();
         tabPane.addTab("Game", gameTab);
 
-//        mainContainer.addChild(tabPane);
+        mainContainer.addChild(tabPane);
 
         var buttonsRow = createButtonsRow();
 //        mainContainer.addChild(buttonsRow);
