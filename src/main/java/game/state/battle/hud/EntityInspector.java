@@ -24,14 +24,6 @@ public class EntityInspector extends GuiScrollPanel {
         layout.setSpacing(5);
         layout.setPadding(5);
         this.setLayout(layout);
-
-        var background = new GuiBackground.Fill(Color.BLACK);
-        this.setBackground(background);
-
-        var border = new GuiBorder(Color.WHITE, 2);
-        this.setBorder(border);
-
-
     }
 
     @Override

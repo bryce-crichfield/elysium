@@ -3,9 +3,16 @@ package game.state;
 import game.Game;
 import game.graphics.Renderer;
 import game.gui.container.GuiContainer;
+import game.gui.control.GuiSlider;
 import game.gui.control.GuiSpinner;
+import game.gui.control.GuiToggle;
+import game.gui.layout.GuiVerticalLayout;
+import game.gui.style.GuiBorder;
+import game.gui.style.GuiStyle;
+import game.gui.style.GuiTheme;
 import game.input.MouseEvent;
 
+import java.awt.*;
 import java.time.Duration;
 import java.util.List;
 
@@ -24,10 +31,24 @@ public class TestGuiState extends GameState {
         ));
         gui.addChild(spinner);
 
-        var toggle = new game.gui.control.GuiToggle("Toggle", 200, 50);
+        var toggle = new GuiToggle("Toggle", 200, 50);
         toggle.setPosition(400, 100);
+        var toggleStyle = GuiTheme.getInstance().button();
+        toggleStyle = toggleStyle.withBorder(new GuiBorder(Color.WHITE, 2));
+        toggle.setStyle(toggleStyle);
         gui.addChild(toggle);
 
+
+
+        var testContainer = new GuiContainer(600, 100, 200, 200);
+        testContainer.setLayout(new GuiVerticalLayout());
+        testContainer.setStyle(GuiTheme.getInstance().button());
+
+        var slider = new GuiSlider(200, 50);
+        slider.setPosition(600, 100);
+        testContainer.addChild(slider);
+
+        gui.addChild(testContainer);
     }
 
     @Override

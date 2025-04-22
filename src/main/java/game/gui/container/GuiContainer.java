@@ -24,14 +24,6 @@ public class GuiContainer extends GuiComponent {
     @Getter
     protected GuiLayout layout = new GuiNullLayout();
 
-    @Getter
-    @Setter
-    protected GuiBackground background = null;
-
-    @Getter
-    @Setter
-    protected GuiBorder border = null;
-
     public GuiContainer(int x, int y, int width, int height) {
         super(x, y, width, height);
     }

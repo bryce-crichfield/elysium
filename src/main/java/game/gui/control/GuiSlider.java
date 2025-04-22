@@ -5,6 +5,7 @@ import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
 import game.graphics.Renderer;
+import game.util.Util;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,22 +58,22 @@ public class GuiSlider extends GuiComponent {
 
     // State tracking for drag operations
     private boolean isDragging = false;
-    private Point dragStart = null;
+    private Point dragLastLocation = null;
     private double dragStartValue = 0;
 
     // Value change callback
+    @Setter
     private Consumer<Double> onValueChanged = null;
 
-    public GuiSlider(int x, int y, int width, int height) {
-        super(x, y, width, height);
-    }
-
-    public void setOnValueChanged(Consumer<Double> callback) {
-        this.onValueChanged = callback;
+    public GuiSlider(int width, int height) {
+        super(0,0, width, height);
     }
 
     @Override
     protected void onRender(Renderer g) {
+        g.setColor(Color.RED);
+        g.fillRect(0, 0, width, height);
+
         if (vertical) {
             renderVerticalSlider(g);
         } else {
@@ -185,11 +186,9 @@ public class GuiSlider extends GuiComponent {
         if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
         Point point = e.getPoint();
-        // Transform the point to local space
-        Point localPoint = new Point(point.x - x, point.y - y);
 
         // Check if we're in bounds for hover state
-        boolean containsPoint = containsPoint(localPoint);
+        boolean containsPoint = containsPoint(point);
 
         // Update hover state
         if (e instanceof MouseEvent.Pressed) {
@@ -203,32 +202,22 @@ public class GuiSlider extends GuiComponent {
         if (isDragging && GuiMouseManager.isCapturedComponent(this)) {
             if (e instanceof MouseEvent.Dragged) {
                 // Calculate new value based on drag position
-                double newValue;
 
-                if (vertical) {
-                    // Determine value based on vertical position
-                    newValue = positionToValue(localPoint.y);
-                } else {
-                    // Determine value based on horizontal position
-                    newValue = positionToValue(localPoint.x);
-                }
+                // Calculate the change in the drag position
+                float delta = vertical ? (float) (dragLastLocation.y - point.y) : (float) (dragLastLocation.x - point.x);
+                dragLastLocation = new Point(point);
 
-                // Only trigger value changed event if the value actually changed
-                if (newValue != value) {
-                    setValue(newValue);
-
-                    // Trigger callback if set
-                    if (onValueChanged != null) {
-                        onValueChanged.accept(value);
-                    }
-                }
+                // lerp the value
+                double oldValue = Util.rerange(value, minValue, maxValue, 0, vertical ? height : width);
+                value = Util.clamp(oldValue + delta, 0, vertical ? height : width);
+                value = Util.rerange(value, 0, vertical ? height : width, minValue, maxValue);
 
                 return GuiEventState.CONSUMED;
             }
             else if (e instanceof MouseEvent.Released) {
                 // End dragging operation
                 isDragging = false;
-                dragStart = null;
+                dragLastLocation = null;
                 GuiMouseManager.releaseMouseCapture();
                 return GuiEventState.CONSUMED;
             }
@@ -237,35 +226,18 @@ public class GuiSlider extends GuiComponent {
         // Start new drag operation
         if (e instanceof MouseEvent.Pressed) {
             // Check if the click is directly on the thumb
-            boolean onThumb = isPointOnThumb(localPoint);
+            boolean onThumb = isPointOnThumb(point);
 
             // If we clicked on the thumb, start dragging
             if (onThumb) {
                 isDragging = true;
-                dragStart = new Point(localPoint);
+                dragLastLocation = new Point(point);
                 dragStartValue = value;
                 GuiMouseManager.setMouseCapture(this);
                 return GuiEventState.CONSUMED;
             }
-            // If we clicked on the track, jump to that position
             else if (containsPoint) {
-                double newValue;
-
-                if (vertical) {
-                    newValue = positionToValue(localPoint.y);
-                } else {
-                    newValue = positionToValue(localPoint.x);
-                }
-
-                if (newValue != value) {
-                    setValue(newValue);
-
-                    if (onValueChanged != null) {
-                        onValueChanged.accept(value);
-                    }
-                }
-
-                return GuiEventState.CONSUMED;
+                // If we clicked on the track, we should jump to that position
             }
         }
 

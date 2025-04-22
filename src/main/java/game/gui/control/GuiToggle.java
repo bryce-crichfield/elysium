@@ -38,7 +38,6 @@ public class GuiToggle extends GuiContainer {
             }
             @Override
             protected void onRender(Renderer renderer) {
-                System.out.println("Rendering toggle area");
                 // Render the toggle area
                 renderer.setColor(Color.RED);
                 renderer.fillRect(0, 0, getWidth(), getHeight());

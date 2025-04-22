@@ -111,8 +111,8 @@ public class TitleState extends GameState {
             scrollPane.addChild(label);
         }
 
-        scrollPane.setBorder(new GuiBorder(Color.WHITE, 2));
-        scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
+//        scrollPane.setBorder(new GuiBorder(Color.WHITE, 2));
+//        scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
 
         return scrollPane;
     }
@@ -122,7 +122,7 @@ public class TitleState extends GameState {
         container.setLayout(new GuiVerticalLayout());
 
         for (int i = 0; i < 10; i++) {
-            var slider = new GuiSlider(0, 0, 200, 30);
+            var slider = new GuiSlider(200, 30);
             slider.setMinValue(0);
             slider.setMaxValue(100);
             slider.setValue(50); // Initial value
@@ -132,8 +132,8 @@ public class TitleState extends GameState {
             container.addChild(slider);
         }
 
-        container.setBackground(new GuiBackground.Fill(Color.BLACK));
-        container.setBorder(new GuiBorder(Color.WHITE, 2));
+//        container.setBackground(new GuiBackground.Fill(Color.BLACK));
+//        container.setBorder(new GuiBorder(Color.WHITE, 2));
 
         return container;
     }

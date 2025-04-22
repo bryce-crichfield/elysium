@@ -35,7 +35,6 @@ public class OptionsState extends GameState {
         // Create main container
         mainContainer = new GuiContainer(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
         mainContainer.setLayout(new GuiNullLayout());
-        mainContainer.setBackground(new GuiBackground.Fill(new Color(0, 0, 30, 150)));
 
         // Create title
         GuiLabel titleLabel = new GuiLabel((Game.SCREEN_WIDTH - 200) / 2, 50, "OPTIONS");
