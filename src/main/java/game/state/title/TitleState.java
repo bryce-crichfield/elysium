@@ -167,8 +167,7 @@ public class TitleState extends GameState {
                 border.render(g, getWidth(), getHeight(), 0);
 
                 g.setColor(Color.WHITE);
-                Font buttonFont = new Font("fonts/neuropol", Font.BOLD, 18);
-                g.setFont(buttonFont);
+                g.setFont("/fonts/neuropol", 18);
 
                 var metrics = g.getFontInfo();
                 int textWidth = metrics.getStringWidth(text);
@@ -200,8 +199,7 @@ public class TitleState extends GameState {
             @Override
             protected void onRender(Renderer g) {
                 g.setColor(Color.WHITE);
-                Font titleFont = new Font("/fonts/ethnocentric", Font.BOLD, 48);
-                g.setFont(titleFont);
+                g.setFont("/fonts/ethnocentric", 48);
 
                 var metrics = g.getFontInfo();
                 int textWidth = metrics.getStringWidth(getText());

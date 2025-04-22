@@ -5,10 +5,15 @@ import game.graphics.Renderer;
 import game.gui.GuiComponent;
 import game.gui.container.GuiContainer;
 import game.gui.container.GuiTabPane;
+import game.gui.control.GuiButton;
+import game.gui.control.GuiDropdown;
+import game.gui.control.GuiSlider;
 import game.gui.input.GuiMouseHandler;
+import game.gui.layout.GuiHorizontalLayout;
 import game.gui.layout.GuiNullLayout;
 import game.gui.style.GuiBackground;
 import game.gui.control.GuiLabel;
+import game.gui.style.GuiFont;
 import game.input.MouseEvent;
 import game.state.GameState;
 import game.transition.Transitions;
@@ -34,7 +39,9 @@ public class OptionsState extends GameState {
 
         // Create title
         GuiLabel titleLabel = new GuiLabel((Game.SCREEN_WIDTH - 200) / 2, 50, "OPTIONS");
-//        titleLabel.setTextColor(Color.WHITE);
+        var titleFont = new GuiFont(Color.WHITE, "/fonts/ethnocentric", 36);
+        var titleStyle = titleLabel.getStyle().withFont(titleFont);
+        titleLabel.setStyle(titleStyle);
         mainContainer.addChild(titleLabel);
 
         // Create tab pane
@@ -61,21 +68,27 @@ public class OptionsState extends GameState {
         GuiContainer gameTab = createGameTabContent();
         tabPane.addTab("Game", gameTab);
 
-        mainContainer.addChild(tabPane);
+//        mainContainer.addChild(tabPane);
 
-        // Add back and save buttons
-        GuiComponent backButton = createButton((Game.SCREEN_WIDTH - 300) / 2, 550, "Back", () -> {
+        var buttonsRow = createButtonsRow();
+//        mainContainer.addChild(buttonsRow);
+    }
+
+    private GuiContainer createButtonsRow() {
+        var buttonsRow = new GuiContainer(0, 0, 700, 40);
+        buttonsRow.setLayout(new GuiHorizontalLayout());
+
+        GuiComponent backBtn = new GuiButton("Back", BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
             this.game.popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
         });
 
-        GuiComponent saveButton = createButton((Game.SCREEN_WIDTH + 60) / 2, 550, "Save", () -> {
-            System.out.println("Saving options");
-            // Save options logic would go here
+        GuiComponent saveBtn = new GuiButton("Save", BUTTON_WIDTH, BUTTON_HEIGHT, () -> {
             this.game.popState(Transitions.fade(Duration.ofMillis(300), Color.BLACK, Easing.easeOut()));
         });
 
-        mainContainer.addChild(backButton);
-        mainContainer.addChild(saveButton);
+        buttonsRow.addChild(backBtn);
+        buttonsRow.addChild(saveBtn);
+        return buttonsRow;
     }
 
     private GuiContainer createGraphicsTabContent() {
@@ -83,7 +96,17 @@ public class OptionsState extends GameState {
         container.setLayout(new GuiNullLayout());
 
         // Resolution setting
-        container.addChild(new GuiLabel(50, 40, "Resolution:"));
+        var resolutionRow = new GuiContainer(0, 0, 700, 40);
+        resolutionRow.setLayout(new GuiHorizontalLayout());
+        resolutionRow.addChild(new GuiLabel(50, 40, "Resolution:"));
+        var resolutionDropdown = new GuiDropdown<String>(0, 0, 200, 20);
+        resolutionDropdown.addItem("1920x1080");
+        resolutionDropdown.addItem("1280x720");
+        resolutionDropdown.addItem("800x600");
+        resolutionDropdown.setSelectedItem("1920x1080");
+        resolutionRow.addChild(resolutionDropdown);
+        container.addChild(resolutionRow);
+
         // Add dropdown or buttons for resolution options
 
         // Fullscreen setting
@@ -167,54 +190,6 @@ public class OptionsState extends GameState {
         return container;
     }
 
-    private GuiComponent createButton(int x, int y, String text, Runnable onClick) {
-        var button = new GuiComponent(x, y, BUTTON_WIDTH, BUTTON_HEIGHT) {
-            private final boolean hovered = false;
-
-            @Override
-            protected void onRender(Renderer g) {
-                super.onRender(g);
-                g.setColor(hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
-                g.fillRect(0, 0, getWidth(), getHeight());
-
-                g.setColor(Color.WHITE);
-                Font buttonFont = new Font("/fonts/arial", Font.BOLD, 16);
-                g.setFont(buttonFont);
-
-                var metrics = g.getFontInfo();
-                int textWidth = metrics.getStringWidth(text);
-                int textHeight = metrics.getHeight();
-
-                g.drawString(text, (getWidth() - textWidth) / 2, (getHeight() + textHeight / 2) / 2);
-            }
-
-            @Override
-            protected String getComponentName() {
-                return "";
-            }
-        };
-
-        var mouseClick = GuiMouseHandler.onClick(onClick);
-        var mouseHover = new GuiMouseHandler() {
-//            @Override
-//            public boolean onMouseMoved(int x, int y) {
-//                button.hovered = true;
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onMouseExited() {
-//                button.hovered = false;
-//                return true;
-//            }
-        };
-
-        button.addMouseHandler(mouseClick);
-        button.addMouseHandler(mouseHover);
-//        button.setBorder(new GuiBorder(Color.WHITE, 2));
-
-        return button;
-    }
 
     @Override
     public void onEnter() {

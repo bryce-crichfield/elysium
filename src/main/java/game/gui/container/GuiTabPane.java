@@ -105,7 +105,7 @@ public class GuiTabPane extends GuiContainer {
 
             // Draw tab text
             renderer.setColor(tabTextColor);
-            renderer.setFont(tabFont);
+            renderer.setFont(tabFont.getName(), tabFont.getSize());
 
             var metrics = renderer.getFontInfo();
             int textWidth = metrics.getStringWidth(title);

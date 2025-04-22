@@ -104,7 +104,7 @@ public class LoadingState extends GameState {
 
         // Draw the Message String
         if (!loadQueue.isEmpty() && loadQueue.peek() != null) {
-            renderer.setFont(new Font("/fonts/arial", Font.BOLD, 12));
+            renderer.setFont("/fonts/arial", 12);
             renderer.setColor(Color.WHITE);
 
             var message = loadQueue.peek().getDebugMessage();

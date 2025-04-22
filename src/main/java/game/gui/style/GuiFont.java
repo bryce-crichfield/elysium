@@ -9,6 +9,7 @@ import game.gui.layout.GuiJustification;
 import lombok.Getter;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -40,9 +41,9 @@ public class GuiFont {
     }
 
     public void render(Renderer renderer, String text, int width, int height) {
-        renderer.setColor(Color.WHITE);
+        renderer.setColor(this.color);
 
-        FontInfo fontInfo = renderer.getFontInfo();
+        FontInfo fontInfo = renderer.getFontInfo(name, size);
         int textWidth = fontInfo.getStringWidth(text);
         int textHeight = fontInfo.getHeight();
 
@@ -59,6 +60,7 @@ public class GuiFont {
             default -> 0;
         };
 
+        renderer.setFont(name, size);
         renderer.drawString(text, textX, textY);
     }
 }

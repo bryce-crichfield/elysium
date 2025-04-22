@@ -82,7 +82,7 @@ public class Window {
 
     private static void renderDebugStats(float updateTime, float renderTime, Renderer renderer) {
         renderer.setColor(Color.GREEN);
-        renderer.setFont(new Font("/fonts/arial", Font.BOLD, 8));
+        renderer.setFont("/fonts/arial", 8);
         renderer.drawString("FPS: " + (int) (1.0f / renderTime), 10, 10);
         renderer.drawString("UPS: " + (int) (1.0f / updateTime), 10, 20);
         renderer.dispose();

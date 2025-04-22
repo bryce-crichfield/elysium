@@ -134,7 +134,7 @@ public class ShaderBackground extends Background {
 
         // Bind VAO and draw
         vao.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        shader.drawArrays(vao, GL_TRIANGLES, 0, 6);
 
         // Unbind VAO and shader
         vao.unbind();

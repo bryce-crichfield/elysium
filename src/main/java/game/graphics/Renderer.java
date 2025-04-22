@@ -4,6 +4,7 @@ import game.graphics.font.FontInfo;
 import game.graphics.font.FontRenderer;
 import game.graphics.paint.Paint;
 import game.graphics.paint.SolidColorPaint;
+import game.gui.style.GuiFont;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector2f;
@@ -596,10 +597,6 @@ public class Renderer {
         drawFrameBuffer(buffer, i, i1, buffer.getWidth(), buffer.getHeight());
     }
 
-    public void setFont(Font font) {
-        fontRenderer.setFont(font.getName(), font.getSize());
-    }
-
     public void setFont(String name, int size) {
         fontRenderer.setFont(name, size);
     }
@@ -642,8 +639,8 @@ public class Renderer {
         return fontRenderer.getFontInfo();
     }
 
-    public FontInfo getFontInfo(Font font) {
-        return getFontInfo();
+    public FontInfo getFontInfo(String name, int size) {
+        return fontRenderer.getFontInfo(name, size);
     }
 
     public void dispose() {
