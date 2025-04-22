@@ -24,6 +24,10 @@ public class TestGuiState extends GameState {
         ));
         gui.addChild(spinner);
 
+        var toggle = new game.gui.control.GuiToggle("Toggle", 200, 50);
+        toggle.setPosition(400, 100);
+        gui.addChild(toggle);
+
     }
 
     @Override
