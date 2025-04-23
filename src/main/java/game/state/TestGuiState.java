@@ -3,6 +3,7 @@ package game.state;
 import game.Game;
 import game.graphics.Renderer;
 import game.gui.container.GuiContainer;
+import game.gui.control.GuiDropdown;
 import game.gui.control.GuiSlider;
 import game.gui.control.GuiSpinner;
 import game.gui.control.GuiToggle;
@@ -29,14 +30,14 @@ public class TestGuiState extends GameState {
                 "Option 4",
                 "Option 5"
         ));
-        gui.addChild(spinner);
+//        gui.addChild(spinner);
 
         var toggle = new GuiToggle("Toggle", 200, 50);
         toggle.setPosition(400, 100);
         var toggleStyle = GuiTheme.getInstance().button();
         toggleStyle = toggleStyle.withBorder(new GuiBorder(Color.WHITE, 2));
         toggle.setStyle(toggleStyle);
-        gui.addChild(toggle);
+//        gui.addChild(toggle);
 
 
 
@@ -48,7 +49,17 @@ public class TestGuiState extends GameState {
         slider.setPosition(0, 0);
         testContainer.addChild(slider);
 
-        gui.addChild(testContainer);
+        GuiDropdown<String> dropdown = new GuiDropdown<>(200, 200, 200, 25);
+        dropdown.setItems(List.of(
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4"
+        ));
+        dropdown.setSelectedItem("Option 2");
+        gui.addChild(dropdown);
+
+//        gui.addChild(testContainer);
     }
 
     @Override
