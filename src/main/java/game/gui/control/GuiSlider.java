@@ -1,11 +1,10 @@
 package game.gui.control;
 
-import game.gui.input.GuiEventState;
-import game.input.Mouse;
-import game.input.MouseEvent;
-import game.gui.GuiComponent;
-import game.gui.input.GuiMouseManager;
 import game.graphics.Renderer;
+import game.gui.GuiComponent;
+import game.gui.input.GuiEventState;
+import game.gui.input.GuiMouseManager;
+import game.input.MouseEvent;
 import game.util.Util;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,58 +17,44 @@ public class GuiSlider extends GuiComponent {
     @Getter
     @Setter
     private double minValue = 0;
-
     @Getter
     @Setter
     private double maxValue = 100;
-
     @Getter
     @Setter
     private double value = 50;
-
-    private double valuePixels = 0;
-
     @Getter
     @Setter
     private boolean vertical = false;
-
     // Styling properties
     @Getter
     @Setter
     private Color trackColor = new Color(200, 200, 200);
-
     @Getter
     @Setter
     private Color thumbColor = new Color(100, 100, 150);
-
     @Getter
     @Setter
     private Color thumbHoverColor = new Color(120, 120, 180);
-
     @Getter
     @Setter
     private Color thumbActiveColor = new Color(80, 80, 130);
-
     // Thumb dimensions
     @Getter
     @Setter
     private int thumbWidth = 16;
-
     @Getter
     @Setter
     private int thumbHeight = 24;
-
     // State tracking for drag operations
     private boolean isDragging = false;
     private Point dragLastLocation = null;
-    private double dragStartValue = 0;
-
     // Value change callback
     @Setter
     private Consumer<Double> onValueChanged = null;
 
     public GuiSlider(int width, int height) {
-        super(0,0, width, height);
+        super(0, 0, width, height);
     }
 
     @Override
@@ -138,30 +123,21 @@ public class GuiSlider extends GuiComponent {
         g.drawRect(thumbX, thumbY - thumbHeight / 2, thumbWidth, thumbHeight);
     }
 
-    // Converts the current value to a position on the slider
     private int valueToPosition() {
+        // Converts the current value to a position on the slider
         double valueRange = maxValue - minValue;
         double valuePercent = (value - minValue) / valueRange;
 
-        if (vertical) {
-            // For vertical slider, 0 is at the bottom, 100 at the top
-            return height - (int)(valuePercent * height);
-        } else {
-            // For horizontal slider, 0 is at the left, 100 at the right
-            return (int)(valuePercent * width);
-        }
+        return vertical
+                ? (int) (valuePercent * height)
+                : (int) (valuePercent * width);
     }
 
-    // Converts the given position to a slider value
     private double positionToValue(int position) {
-        double percent;
-
-        if (vertical) {
-            // Invert calculation for vertical slider
-            percent = 1.0 - (double)position / height;
-        } else {
-            percent = (double)position / width;
-        }
+        // Converts the given position to a slider value
+        double percent = vertical
+                ? 1.0 - (double) position / height
+                : (double) position / width;
 
         // Clamp percent to 0.0-1.0 range
         percent = Math.max(0.0, Math.min(1.0, percent));
@@ -188,6 +164,7 @@ public class GuiSlider extends GuiComponent {
 
     @Override
     public GuiEventState processMouseEvent(MouseEvent e) {
+        // Early return if not visible nor enabled
         if (!isVisible || !isEnabled) return GuiEventState.NOT_CONSUMED;
 
         Point point = e.getPoint();
@@ -198,41 +175,39 @@ public class GuiSlider extends GuiComponent {
         }
 
         switch (e) {
+            // Continue drag operation
             case MouseEvent.Dragged _ when isDragging && GuiMouseManager.isCapturedComponent(this) -> {
                 updateDrag(point);
                 return GuiEventState.CONSUMED;
             }
 
-
-            // We are dragging, captured, and released
+            // End drag operation
             case MouseEvent.Released _ when isDragging && GuiMouseManager.isCapturedComponent(this) -> {
                 stopDrag();
                 return GuiEventState.CONSUMED;
             }
 
-
-            // Start drag
+            // Start drag when clicking on the thumb
             case MouseEvent.Pressed _ when isPointOnThumb(point) -> {
                 startDrag(point);
                 return GuiEventState.CONSUMED;
             }
 
-
-            // Jump thumb
+            // Jump thumb when clicking elsewhere
             case MouseEvent.Pressed _ when !isPointOnThumb(point) -> {
                 jumpThumb(point);
                 return GuiEventState.CONSUMED;
             }
 
-
-            // Pass to mouseMoved handlers if it's a move event
+            // Handle mouse movement
             case MouseEvent.Moved _ when containsPoint(point) -> {
                 return super.processMouseEvent(e);
             }
+
             default -> {
+                //  Empty
             }
         }
-
 
         return GuiEventState.NOT_CONSUMED;
     }
