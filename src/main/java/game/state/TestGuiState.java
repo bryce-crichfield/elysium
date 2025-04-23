@@ -45,7 +45,7 @@ public class TestGuiState extends GameState {
         testContainer.setStyle(GuiTheme.getInstance().button());
 
         var slider = new GuiSlider(200, 50);
-        slider.setPosition(600, 100);
+        slider.setPosition(0, 0);
         testContainer.addChild(slider);
 
         gui.addChild(testContainer);

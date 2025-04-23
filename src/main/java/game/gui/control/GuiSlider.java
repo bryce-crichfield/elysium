@@ -1,6 +1,7 @@
 package game.gui.control;
 
 import game.gui.input.GuiEventState;
+import game.input.Mouse;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
 import game.gui.input.GuiMouseManager;
@@ -25,6 +26,8 @@ public class GuiSlider extends GuiComponent {
     @Getter
     @Setter
     private double value = 50;
+
+    private double valuePixels = 0;
 
     @Getter
     @Setter
@@ -135,6 +138,7 @@ public class GuiSlider extends GuiComponent {
         g.drawRect(thumbX, thumbY - thumbHeight / 2, thumbWidth, thumbHeight);
     }
 
+    // Converts the current value to a position on the slider
     private int valueToPosition() {
         double valueRange = maxValue - minValue;
         double valuePercent = (value - minValue) / valueRange;
@@ -148,6 +152,7 @@ public class GuiSlider extends GuiComponent {
         }
     }
 
+    // Converts the given position to a slider value
     private double positionToValue(int position) {
         double percent;
 
@@ -187,66 +192,85 @@ public class GuiSlider extends GuiComponent {
 
         Point point = e.getPoint();
 
-        // Check if we're in bounds for hover state
-        boolean containsPoint = containsPoint(point);
-
-        // Update hover state
-        if (e instanceof MouseEvent.Pressed) {
-            isHovered = containsPoint;
-        }
-
         // If we're not in bounds and not captured by a drag operation, ignore the event
-        if (!containsPoint && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
+        if (!containsPoint(point) && !GuiMouseManager.isCapturedComponent(this)) {
+            return GuiEventState.NOT_CONSUMED;
+        }
 
-        // Handle ongoing drag operation
-        if (isDragging && GuiMouseManager.isCapturedComponent(this)) {
-            if (e instanceof MouseEvent.Dragged) {
-                // Calculate new value based on drag position
-
-                // Calculate the change in the drag position
-                float delta = vertical ? (float) (dragLastLocation.y - point.y) : (float) (dragLastLocation.x - point.x);
-                dragLastLocation = new Point(point);
-
-                // lerp the value
-                double oldValue = Util.rerange(value, minValue, maxValue, 0, vertical ? height : width);
-                value = Util.clamp(oldValue + delta, 0, vertical ? height : width);
-                value = Util.rerange(value, 0, vertical ? height : width, minValue, maxValue);
-
+        switch (e) {
+            case MouseEvent.Dragged _ when isDragging && GuiMouseManager.isCapturedComponent(this) -> {
+                updateDrag(point);
                 return GuiEventState.CONSUMED;
             }
-            else if (e instanceof MouseEvent.Released) {
-                // End dragging operation
-                isDragging = false;
-                dragLastLocation = null;
-                GuiMouseManager.releaseMouseCapture();
+
+
+            // We are dragging, captured, and released
+            case MouseEvent.Released _ when isDragging && GuiMouseManager.isCapturedComponent(this) -> {
+                stopDrag();
                 return GuiEventState.CONSUMED;
+            }
+
+
+            // Start drag
+            case MouseEvent.Pressed _ when isPointOnThumb(point) -> {
+                startDrag(point);
+                return GuiEventState.CONSUMED;
+            }
+
+
+            // Jump thumb
+            case MouseEvent.Pressed _ when !isPointOnThumb(point) -> {
+                jumpThumb(point);
+                return GuiEventState.CONSUMED;
+            }
+
+
+            // Pass to mouseMoved handlers if it's a move event
+            case MouseEvent.Moved _ when containsPoint(point) -> {
+                return super.processMouseEvent(e);
+            }
+            default -> {
             }
         }
 
-        // Start new drag operation
-        if (e instanceof MouseEvent.Pressed) {
-            // Check if the click is directly on the thumb
-            boolean onThumb = isPointOnThumb(point);
-
-            // If we clicked on the thumb, start dragging
-            if (onThumb) {
-                isDragging = true;
-                dragLastLocation = new Point(point);
-                dragStartValue = value;
-                GuiMouseManager.setMouseCapture(this);
-                return GuiEventState.CONSUMED;
-            }
-            else if (containsPoint) {
-                // If we clicked on the track, we should jump to that position
-            }
-        }
-
-        // Pass to mouseMoved handlers if it's a move event
-        if (e instanceof MouseEvent.Moved && containsPoint) {
-            return super.processMouseEvent(e);
-        }
 
         return GuiEventState.NOT_CONSUMED;
+    }
+
+    private void startDrag(Point point) {
+        isDragging = true;
+        dragLastLocation = null;
+        value = positionToValue(vertical ? point.y : point.x);
+        GuiMouseManager.setMouseCapture(this);
+    }
+
+    private void stopDrag() {
+        // End dragging operation
+        isDragging = false;
+        dragLastLocation = null;
+        GuiMouseManager.releaseMouseCapture();
+    }
+
+    private void updateDrag(Point point) {
+        double delta = dragLastLocation != null ?
+                (vertical ? point.y - dragLastLocation.y : point.x - dragLastLocation.x) : 0;
+
+        double currentThumbPosition = valueToPosition();
+        currentThumbPosition += delta;
+        currentThumbPosition = Util.clamp(currentThumbPosition, 0, vertical ? height : width);
+        value = positionToValue((int) currentThumbPosition);
+
+        // Update last position
+        dragLastLocation = point;
+
+        // Trigger callback
+        if (onValueChanged != null) {
+            onValueChanged.accept(value);
+        }
+    }
+
+    private void jumpThumb(Point point) {
+        positionToValue(vertical ? point.y : point.x);
     }
 
     @Override
