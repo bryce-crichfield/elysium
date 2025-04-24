@@ -3,7 +3,7 @@ package game.gui.control;
 import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
-import game.gui.input.GuiMouseManager;
+import game.gui.input.GuiMouseCapture;
 import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.Setter;
@@ -90,6 +90,7 @@ public class GuiDropdown<T> extends GuiComponent {
         drawDropdownArrow(renderer, width - 15, height / 2, 8, state == DropdownState.EXPANDED);
 
         // Draw dropdown menu if expanded
+
         if (state == DropdownState.EXPANDED) {
             // We'll need to save the apply since we're breaking out of our bounds
 
@@ -165,14 +166,18 @@ public class GuiDropdown<T> extends GuiComponent {
     }
 
     private void toggleDropdown() {
-        state = (state == DropdownState.COLLAPSED) ?
-                DropdownState.EXPANDED : DropdownState.COLLAPSED;
-
-        handler = (state == DropdownState.COLLAPSED) ?
-                new CollapsedHandler<>() : new ExpandedHandler<>();
-
         if (state == DropdownState.EXPANDED) {
-            GuiMouseManager.setMouseCapture(this);
+            state = DropdownState.COLLAPSED;
+            handler = new CollapsedHandler<>();
+            GuiMouseCapture.releaseMouseCapture();
+            return;
+        }
+
+        if (state == DropdownState.COLLAPSED) {
+            state = DropdownState.EXPANDED;
+            handler = new ExpandedHandler<>();
+            GuiMouseCapture.setMouseCapture(this);
+            return;
         }
     }
 
@@ -211,37 +216,6 @@ public class GuiDropdown<T> extends GuiComponent {
     protected String getComponentName() {
         return "dropdown";
     }
-    
-    private enum DropdownState {
-        COLLAPSED,
-        EXPANDED
-    }
-
-    @FunctionalInterface
-    private interface DropdownHandler<T> {
-        GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint);
-    }
-
-
-    private static class CollapsedHandler<T> implements DropdownHandler<T> {
-        @Override
-        public GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint) {
-            boolean wasPress = e instanceof MouseEvent.Pressed;
-            boolean wasInToggleArea = self.isPointInToggleArea(localPoint);
-
-            if (wasInToggleArea && wasPress) {
-                self.toggleDropdown(); // Transitions to EXPANDED state
-                return GuiEventState.CONSUMED;
-            }
-
-            if (wasInToggleArea && !wasPress) {
-                return self.processBaseMouseEvent(e);
-            }
-
-            return GuiEventState.NOT_CONSUMED;
-        }
-    }
-
 
     protected GuiEventState processBaseMouseEvent(MouseEvent e) {
         return super.processMouseEvent(e);
@@ -250,36 +224,6 @@ public class GuiDropdown<T> extends GuiComponent {
     private boolean isPointInToggleArea(Point localPoint) {
         return new Rectangle(0, 0, width, height).contains(localPoint);
     }
-
-    private static class ExpandedHandler<T> implements DropdownHandler<T> {
-        @Override
-        public GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint) {
-            boolean wasPress = e instanceof MouseEvent.Pressed || e instanceof MouseEvent.Clicked || e instanceof MouseEvent.Released;
-            boolean wasInSelectionArea = self.isPointInSelectionArea(localPoint);
-            boolean wasInToggleArea = self.isPointInToggleArea(localPoint);
-
-            if (!wasInToggleArea && !wasInSelectionArea && wasPress) {
-                self.toggleDropdown(); // Transitions to COLLAPSED state
-                GuiMouseManager.releaseMouseCapture();
-                return GuiEventState.CONSUMED;
-            }
-
-            if (wasInToggleArea && wasPress) {
-//            self.toggleDropdown(); // Transitions to COLLAPSED state
-                return GuiEventState.CONSUMED;
-            }
-
-            if (wasInSelectionArea && wasPress) {
-                self.selectItemAtPoint(localPoint);
-                self.toggleDropdown(); // Transitions to COLLAPSED state
-                GuiMouseManager.releaseMouseCapture();
-                return GuiEventState.CONSUMED;
-            }
-
-            return GuiEventState.NOT_CONSUMED;
-        }
-    }
-
 
     private void selectItemAtPoint(Point localPoint) {
         int itemIndex = getItemIndexAtPoint(localPoint);
@@ -295,5 +239,61 @@ public class GuiDropdown<T> extends GuiComponent {
         return new Rectangle(0, height, width, Math.min(maxDropdownHeight, items.size() * itemHeight))
                 .contains(localPoint);
     }
+    
+    private enum DropdownState {
+        COLLAPSED,
+        EXPANDED
+    }
 
+    @FunctionalInterface
+    private interface DropdownHandler<T> {
+        GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint);
+    }
+
+    private static class CollapsedHandler<T> implements DropdownHandler<T> {
+        @Override
+        public GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint) {
+            boolean wasPress = e instanceof MouseEvent.Pressed;
+            boolean wasInToggleArea = self.isPointInToggleArea(localPoint);
+
+            if (wasInToggleArea && wasPress) {
+                self.toggleDropdown(); // Transitions to EXPANDED state
+                return GuiEventState.CONSUMED;
+            }
+
+            if (wasInToggleArea) {
+//                return self.processBaseMouseEvent(e);
+            }
+
+            return GuiEventState.NOT_CONSUMED;
+        }
+    }
+
+    private static class ExpandedHandler<T> implements DropdownHandler<T> {
+
+        @Override
+        public GuiEventState handleMouseEvent(GuiDropdown<T> self, MouseEvent e, Point localPoint) {
+            boolean wasPress = e instanceof MouseEvent.Pressed;
+            boolean wasInSelectionArea = self.isPointInSelectionArea(localPoint);
+            boolean wasInToggleArea = self.isPointInToggleArea(localPoint);
+
+            if (!wasInToggleArea && !wasInSelectionArea && wasPress) {
+                self.toggleDropdown(); // Transitions to COLLAPSED state
+                return GuiEventState.CONSUMED;
+            }
+
+            if (wasInToggleArea && wasPress) {
+                self.toggleDropdown(); // Transitions to COLLAPSED state
+                return GuiEventState.CONSUMED;
+            }
+
+            if (wasInSelectionArea && wasPress) {
+                self.selectItemAtPoint(localPoint);
+                self.toggleDropdown(); // Transitions to COLLAPSED state
+                return GuiEventState.CONSUMED;
+            }
+
+            return GuiEventState.CONSUMED;
+        }
+    }
 }

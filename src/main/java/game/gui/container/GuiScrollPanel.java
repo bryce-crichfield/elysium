@@ -4,7 +4,7 @@ import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.input.GuiHoverManager;
-import game.gui.input.GuiMouseManager;
+import game.gui.input.GuiMouseCapture;
 import game.graphics.Renderer;
 import game.graphics.Transform;
 import lombok.Getter;
@@ -164,22 +164,22 @@ public class GuiScrollPanel extends GuiContainer {
         boolean mouseExited = e instanceof MouseEvent.Moved && (isHovered && !isInBounds);
         isHovered = isInBounds;
 
-        if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
+        if (mouseEntered && GuiMouseCapture.lacksCapturedComponent()) {
             // HOW DOES THIS WORK!?!?!?
             GuiHoverManager.getInstance().enter(e, this);
         }
 
-        if (mouseExited && !GuiMouseManager.hasCapturedComponent()) {
+        if (mouseExited && GuiMouseCapture.lacksCapturedComponent()) {
             // HOW DOES THIS WORK!?!?!?
             GuiHoverManager.getInstance().exit(e, this);
         }
 
         // Check that we are not hovered and not captured by some dragging event
-        if (!isHovered && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
+        if (!isHovered && !GuiMouseCapture.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
 
         // Check to see if there is a scroll bar interaction (click, release or drag).  If there isn't, but we are hovered
         // return true to ensure we consume the event.
-        if (isPointOnScrollbar(localPoint) || GuiMouseManager.isCapturedComponent(this)) {
+        if (isPointOnScrollbar(localPoint) || GuiMouseCapture.isCapturedComponent(this)) {
 //            var localEvent = Mouse.translateEvent(e, localPoint.x, localPoint.y);
             var localEvent = e.withPoint(localPoint);
             boolean handledScrollbar = handleScrollbarInteraction(localEvent, localPoint);
@@ -260,7 +260,7 @@ public class GuiScrollPanel extends GuiContainer {
                 isDraggingVertical = false;
                 isDraggingHorizontal = false;
                 dragStart = null;
-                GuiMouseManager.releaseMouseCapture();
+                GuiMouseCapture.releaseMouseCapture();
                 return true;
             }
         }
@@ -276,7 +276,7 @@ public class GuiScrollPanel extends GuiContainer {
                     dragStart = new Point(localPoint); // Create new point to avoid reference issues
                     dragStartScrollX = scrollState.getScrollXOffset();
                     dragStartScrollY = scrollState.getScrollYOffset();
-                    GuiMouseManager.setMouseCapture(this); // Capture mouse events
+                    GuiMouseCapture.setMouseCapture(this); // Capture mouse events
                     return true;
                 }
 
@@ -304,7 +304,7 @@ public class GuiScrollPanel extends GuiContainer {
                     dragStart = new Point(localPoint);
                     dragStartScrollX = scrollState.getScrollXOffset();
                     dragStartScrollY = scrollState.getScrollYOffset();
-                    GuiMouseManager.setMouseCapture(this); // Capture mouse events
+                    GuiMouseCapture.setMouseCapture(this); // Capture mouse events
                     return true;
                 }
 

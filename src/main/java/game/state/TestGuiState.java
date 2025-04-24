@@ -3,10 +3,8 @@ package game.state;
 import game.Game;
 import game.graphics.Renderer;
 import game.gui.container.GuiContainer;
-import game.gui.control.GuiDropdown;
-import game.gui.control.GuiSlider;
-import game.gui.control.GuiSpinner;
-import game.gui.control.GuiToggle;
+import game.gui.container.GuiScrollPanel;
+import game.gui.control.*;
 import game.gui.layout.GuiVerticalLayout;
 import game.gui.style.GuiBorder;
 import game.gui.style.GuiStyle;
@@ -30,7 +28,7 @@ public class TestGuiState extends GameState {
                 "Option 4",
                 "Option 5"
         ));
-//        gui.addChild(spinner);
+        gui.addChild(spinner);
 
         var toggle = new GuiToggle("Toggle", 200, 50);
         toggle.setPosition(400, 100);
@@ -38,7 +36,6 @@ public class TestGuiState extends GameState {
         toggleStyle = toggleStyle.withBorder(new GuiBorder(Color.WHITE, 2));
         toggle.setStyle(toggleStyle);
 //        gui.addChild(toggle);
-
 
 
         var testContainer = new GuiContainer(600, 100, 200, 200);
@@ -59,6 +56,19 @@ public class TestGuiState extends GameState {
         dropdown.setSelectedItem("Option 2");
         gui.addChild(dropdown);
 
+        GuiButton button = new GuiButton("Click Me", 200, 50, () -> {});
+        button.setPosition(200, 275);
+        gui.addChild(button);
+
+
+        GuiScrollPanel scroll = new GuiScrollPanel(300, 300, 200, 200);
+        scroll.setLayout(new GuiVerticalLayout());
+        for (int i = 0; i < 20; i++) {
+            GuiButton btn = new GuiButton("Button " + (i + 1), 200, 50, () -> {});
+            btn.setStyle(GuiTheme.getInstance().button());
+            scroll.addChild(btn);
+        }
+        gui.addChild(scroll);
 //        gui.addChild(testContainer);
     }
 

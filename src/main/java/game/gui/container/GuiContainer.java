@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GuiContainer extends GuiComponent {
     @Getter
@@ -43,15 +44,9 @@ public class GuiContainer extends GuiComponent {
             style.getBackground().render(renderer, width, height, 0);
             style.getBorder().render(renderer, width, height, 0);
         }
-//        if (background != null) {
-//            background.render(renderer, width, height, 0);
-//        }
-//
-//        if (border != null) {
-//            border.render(renderer, width, height, 0);
-//        }
 
         // Render children
+
         for (GuiComponent child : children) {
             child.render(renderer);
         }
