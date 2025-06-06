@@ -92,4 +92,27 @@ public enum Util {
         }
         return Optional.of(queue.peek());
     }
+
+    public static double rerange(Number value, Number oldMin, Number oldMax, Number newMin, Number newMax) {
+        double oldMinD = oldMin.doubleValue();
+        double oldMaxD = oldMax.doubleValue();
+        double newMinD = newMin.doubleValue();
+        double newMaxD = newMax.doubleValue();
+        double oldRange = oldMaxD - oldMinD;
+        double newRange = newMaxD - newMinD;
+        if (oldRange == 0) {
+            throw new IllegalArgumentException("Old range cannot be zero");
+        }
+        double newValue = ((value.doubleValue() - oldMinD) * newRange / oldRange) + newMinD;
+        return newValue;
+    }
+
+    public static double clamp(double v, int i, int i1) {
+        if (v < i) {
+            return i;
+        } else if (v > i1) {
+            return i1;
+        }
+        return v;
+    }
 }

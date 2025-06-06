@@ -1,4 +1,4 @@
-package game.gui.input;
+package game.gui.manager;
 
 import game.gui.GuiComponent;
 import lombok.Getter;

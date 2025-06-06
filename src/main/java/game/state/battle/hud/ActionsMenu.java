@@ -35,10 +35,8 @@ public class ActionsMenu extends GuiScrollPanel {
         this.setLayout(layout);
 
         var background = new GuiBackground.Fill(new Color(0, 0, 0, 0.5f));
-        this.setBackground(background);
 
         var border = new GuiBorder(Color.WHITE, 2);
-        this.setBorder(border);
 
         var saveSceneBtn = new GuiButton("Save Scene", 100, 20, () -> {
             // Save scene logic

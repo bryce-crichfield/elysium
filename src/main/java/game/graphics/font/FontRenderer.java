@@ -26,7 +26,7 @@ public class FontRenderer {
     private static final Map<String, ByteBuffer> fontBufferCache = new HashMap<>();
 
     // Current font properties
-    private FontInfo currentFont;
+    private String currentFontKey;
     private STBTTBakedChar.Buffer charData;
     private int textureId;
 
@@ -40,7 +40,7 @@ public class FontRenderer {
 
         // If font is already cached, just retrieve it
         if (fontCache.containsKey(fontKey)) {
-            currentFont = fontCache.get(fontKey);
+            currentFontKey = fontKey;
             charData = charDataCache.get(fontKey);
             textureId = textureCache.get(fontKey);
             return;
@@ -92,16 +92,39 @@ public class FontRenderer {
         textureCache.put(fontKey, textureId);
 
         // Set current font properties
-        currentFont = fontData;
+        currentFontKey = fontKey;
     }
 
     public FontInfo getFontInfo() {
-        return currentFont;
+        return fontCache.get(currentFontKey);
     }
 
-    public FontInfo getFontInfo(String name) {
-        String fontKey = name + "_" + currentFont.getSize();
-        return fontCache.get(fontKey);
+    public FontInfo getFontInfo(String name, int size) {
+        String fontKey = name + "_" + size;
+
+        // The font is already loaded, so just return its info
+        if (fontCache.get(fontKey) != null) return fontCache.get(fontKey);
+
+        // The font we are looking for is not cached, so we need to load it...
+        // Store the current font key
+        var currentKey = currentFontKey;
+
+        // Load the font we are looking for by calling setFont
+        setFont(name, size);
+
+        // Now grab the font info from the cache
+        var fontInfo = fontCache.get(fontKey);
+        if (fontInfo == null) {
+            throw new IllegalStateException("Font " + fontKey + " is not cached, cannot load font " + fontKey);
+        }
+
+        // Set back to the original font
+        var originalName = currentKey.split("_")[0];
+        var originalSize = Integer.parseInt(currentKey.split("_")[1]);
+        setFont(originalName, originalSize);
+
+        // Return the font info
+        return fontInfo;
     }
 
     public void drawString(String text, int x, int y, Color color) {

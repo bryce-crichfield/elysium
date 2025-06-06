@@ -24,8 +24,8 @@ public class GuiTabPane extends GuiContainer {
     public GuiTabPane(int x, int y, int width, int height) {
         super(x, y, width, height);
         setLayout(new GuiNullLayout());
-        setBorder(new GuiBorder(Color.WHITE, 2));
-        setBackground(new GuiBackground.Fill(new Color(30, 30, 60, 180)));
+//        setBorder(new GuiBorder(Color.WHITE, 2));
+//        setBackground(new GuiBackground.Fill(new Color(30, 30, 60, 180)));
     }
 
     public void addTab(String title, GuiContainer content) {
@@ -105,7 +105,7 @@ public class GuiTabPane extends GuiContainer {
 
             // Draw tab text
             renderer.setColor(tabTextColor);
-            renderer.setFont(tabFont);
+            renderer.setFont(tabFont.getName(), tabFont.getSize());
 
             var metrics = renderer.getFontInfo();
             int textWidth = metrics.getStringWidth(title);

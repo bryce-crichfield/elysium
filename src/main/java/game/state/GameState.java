@@ -4,7 +4,8 @@ import game.Game;
 import game.graphics.Renderer;
 import game.graphics.background.Background;
 import game.graphics.background.BackgroundFactory;
-import game.gui.input.GuiMouseManager;
+import game.gui.input.GuiEventState;
+import game.gui.manager.GuiMouseCaptureManager;
 import game.input.MouseEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public abstract class GameState {
     }
 
     public final void dispatchMouseEvent(MouseEvent event) {
-        if (GuiMouseManager.dispatchToCapturedComponent(event)) {
+        if (GuiMouseCaptureManager.getInstance().dispatchToCapturedComponent(event) == GuiEventState.CONSUMED) {
             return; // event was handled by the captured component
         }
 

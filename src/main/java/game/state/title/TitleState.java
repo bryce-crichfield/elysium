@@ -111,8 +111,8 @@ public class TitleState extends GameState {
             scrollPane.addChild(label);
         }
 
-        scrollPane.setBorder(new GuiBorder(Color.WHITE, 2));
-        scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
+//        scrollPane.setBorder(new GuiBorder(Color.WHITE, 2));
+//        scrollPane.setBackground(new GuiBackground.Fill(Color.BLACK));
 
         return scrollPane;
     }
@@ -122,7 +122,7 @@ public class TitleState extends GameState {
         container.setLayout(new GuiVerticalLayout());
 
         for (int i = 0; i < 10; i++) {
-            var slider = new GuiSlider(0, 0, 200, 30);
+            var slider = new GuiSlider(200, 30);
             slider.setMinValue(0);
             slider.setMaxValue(100);
             slider.setValue(50); // Initial value
@@ -132,8 +132,8 @@ public class TitleState extends GameState {
             container.addChild(slider);
         }
 
-        container.setBackground(new GuiBackground.Fill(Color.BLACK));
-        container.setBorder(new GuiBorder(Color.WHITE, 2));
+//        container.setBackground(new GuiBackground.Fill(Color.BLACK));
+//        container.setBorder(new GuiBorder(Color.WHITE, 2));
 
         return container;
     }
@@ -167,8 +167,7 @@ public class TitleState extends GameState {
                 border.render(g, getWidth(), getHeight(), 0);
 
                 g.setColor(Color.WHITE);
-                Font buttonFont = new Font("fonts/neuropol", Font.BOLD, 18);
-                g.setFont(buttonFont);
+                g.setFont("/fonts/neuropol", 18);
 
                 var metrics = g.getFontInfo();
                 int textWidth = metrics.getStringWidth(text);
@@ -200,8 +199,7 @@ public class TitleState extends GameState {
             @Override
             protected void onRender(Renderer g) {
                 g.setColor(Color.WHITE);
-                Font titleFont = new Font("/fonts/ethnocentric", Font.BOLD, 48);
-                g.setFont(titleFont);
+                g.setFont("/fonts/ethnocentric", 48);
 
                 var metrics = g.getFontInfo();
                 int textWidth = metrics.getStringWidth(getText());

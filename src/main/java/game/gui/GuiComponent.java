@@ -3,6 +3,9 @@ package game.gui;
 import game.graphics.Renderer;
 import game.graphics.Transform;
 import game.gui.input.*;
+import game.gui.manager.GuiFocusManager;
+import game.gui.manager.GuiHoverManager;
+import game.gui.manager.GuiMouseCaptureManager;
 import game.gui.style.GuiStyle;
 import game.input.MouseEvent;
 import lombok.Getter;
@@ -94,18 +97,19 @@ public abstract class GuiComponent {
         boolean mouseExited = e instanceof MouseEvent.Moved && (isHovered && !isInBounds);
         isHovered = isInBounds;
 
-        if (mouseEntered && !GuiMouseManager.hasCapturedComponent()) {
+        if (mouseEntered && GuiMouseCaptureManager.getInstance().lacksCapturedComponent()) {
             // HOW DOES THIS WORK!?!?!?
+            System.out.println("Capture Mouse Component: " + GuiMouseCaptureManager.getInstance().getCapturedComponent());
             GuiHoverManager.getInstance().enter(e, this);
         }
 
-        if (mouseExited && !GuiMouseManager.hasCapturedComponent()) {
+        if (mouseExited && GuiMouseCaptureManager.getInstance().lacksCapturedComponent()) {
             // HOW DOES THIS WORK!?!?!?
             GuiHoverManager.getInstance().exit(e, this);
         }
 
         // Check if point is within bounds for other events
-        if (!isInBounds && !GuiMouseManager.isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
+        if (!isInBounds && !GuiMouseCaptureManager.getInstance().isCapturedComponent(this)) return GuiEventState.NOT_CONSUMED;
 
         // Set focus on mouse click
         if (e instanceof MouseEvent.Pressed && isInBounds) {

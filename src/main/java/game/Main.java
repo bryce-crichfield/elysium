@@ -2,7 +2,9 @@ package game;
 
 import game.graphics.platform.ErrorDialog;
 import game.graphics.platform.Window;
+import game.state.TestGuiState;
 import game.state.loading.LoadingState;
+import game.state.options.OptionsState;
 import game.util.Util;
 
 import java.time.Duration;
@@ -19,7 +21,7 @@ public enum Main {
         window.onInit();
 
         try {
-            game.setState(LoadingState::new);
+            game.setState(TestGuiState::new);
 
             Instant lastUpdate = Instant.now();
             Instant lastRender = Instant.now();
