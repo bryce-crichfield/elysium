@@ -1,0 +1,155 @@
+package game.battle.util;
+
+import core.GameContext;
+import core.graphics.Renderer;
+import core.input.KeyEvent;
+import core.input.Keyboard;
+import core.input.MouseEvent;
+import game.battle.BattleState;
+import core.util.Util;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.awt.*;
+import java.time.Duration;
+
+public class Cursor {
+    private final GameContext gameContext;
+    private final BattleState state;
+
+    private final float timerMax = .75f;
+    @Getter
+    public int cursorX;
+    @Getter
+    public int cursorY;
+    float velocityX;
+    float velocityY;
+    float accelerationX;
+    float accelerationY;
+    Mode mode = Mode.NORMAL;
+    @Setter
+    Color color = Color.RED;
+    float timer = 0;
+
+    public Cursor(GameContext gameContext, BattleState state) {
+        this.gameContext = gameContext;
+        this.state = state;
+
+        cursorX = 0;
+        cursorY = 0;
+        velocityX = 0;
+        velocityY = 0;
+        accelerationX = 0;
+        accelerationY = 0;
+    }
+
+    public void setPosition(int x, int y) {
+        var newCursorX = Util.clamp(x, 0, state.getScene().getWidth() - 1);
+        var newCursorY = Util.clamp(y, 0, state.getScene().getHeight() - 1);
+
+        if (newCursorX == cursorX && newCursorY == cursorY) {
+            return;
+        }
+
+        cursorX = newCursorX;
+        cursorY = newCursorY;
+        gameContext.getAudio().play("type_preview/swipe");
+        state.getController().onCursorMoved(this);
+    }
+
+    public void onKeyPressed(Integer keyCode) {
+        switch (keyCode) {
+            case Keyboard.LEFT -> {
+                setPosition(cursorX - 1, cursorY);
+            }
+            case Keyboard.RIGHT -> {
+                setPosition(cursorX + 1, cursorY);
+            }
+            case Keyboard.UP -> {
+                setPosition(cursorX, cursorY - 1);
+            }
+            case Keyboard.DOWN -> {
+                setPosition(cursorX, cursorY + 1);
+            }
+            case KeyEvent.VK_MINUS -> {
+                float zoom = state.getCamera().getZoom();
+                zoom = Math.max(zoom - 0.25f, 0.25f);
+                state.getCamera().setZoom(zoom);
+            }
+            case KeyEvent.VK_EQUALS -> {
+                float zoom = state.getCamera().getZoom();
+                zoom = Math.min(zoom + 0.25f, 2);
+                state.getCamera().setZoom(zoom);
+            }
+        }
+    }
+
+    public void enterBlinkingMode() {
+        mode = Mode.BLINKING;
+    }
+
+    public void onUpdate(Duration duration) {
+        updateCameraKinematics(duration);
+    }
+
+    private void updateCameraKinematics(Duration duration) {
+        float dt = Util.perSecond(duration);
+
+        if (mode == Mode.BLINKING) {
+            timer += dt;
+            timer = Util.wrap(timer, 0, timerMax);
+        }
+
+        int cursorWorldX = cursorX * GameContext.TILE_SIZE;
+        int cursorWorldY = cursorY * GameContext.TILE_SIZE;
+
+        velocityX = (cursorWorldX - state.getCamera().getX()) * 10;
+        velocityY = (cursorWorldY - state.getCamera().getY()) * 10;
+
+        var cameraX = state.getCamera().getX() + (velocityX * dt);
+        var cameraY = state.getCamera().getY() + (velocityY * dt);
+        state.getCamera().setX(cameraX);
+        state.getCamera().setY(cameraY);
+
+        velocityX *= 0.9;
+        velocityY *= 0.9;
+    }
+
+    public void onRender(Renderer renderer) {
+        int offset = 0;
+        if ((mode == Mode.BLINKING || mode == Mode.DILATED) && timer < timerMax / 2) {
+            offset = 5;
+        }
+
+        int size = GameContext.TILE_SIZE + offset;
+        int x = cursorX * GameContext.TILE_SIZE - offset / 2;
+        int y = cursorY * GameContext.TILE_SIZE - offset / 2;
+
+        var oldStroke = renderer.getLineWidth();
+        renderer.setColor(Color.BLACK);
+        renderer.setLineWidth(3);
+        renderer.drawRect(x, y, size, size);
+        renderer.setLineWidth(oldStroke);
+        renderer.setColor(color);
+        renderer.drawRect(x, y, size, size);
+    }
+
+    public void onMouseClicked(MouseEvent event) {
+        int x = event.getX();
+        int y = event.getY();
+        setPosition(x / GameContext.TILE_SIZE, y / GameContext.TILE_SIZE);
+    }
+
+    public void onMouseWheelMoved(MouseEvent.WheelMoved event) {
+        int wheelRotation = (int) event.getWheelRotation();
+        float newZoom = state.getCamera().getZoom() + (Math.signum(wheelRotation) * -0.1f);
+        newZoom = Util.clamp(newZoom, 0.25f, 4f);
+        state.getCamera().setZoom(newZoom);
+    }
+
+    enum Mode {
+        BLINKING,
+        DILATED,
+        NORMAL
+    }
+}
