@@ -1,14 +1,18 @@
-package game.gui.input;
+package game.gui.manager;
 
 import game.gui.GuiComponent;
+import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import lombok.Getter;
 
-public class GuiMouseCapture {
+public class GuiMouseCaptureManager {
     @Getter
-    private static GuiComponent capturedComponent = null;
+    private static final GuiMouseCaptureManager instance = new GuiMouseCaptureManager();
 
-    public static boolean isCapturedComponent(GuiComponent component) {
+    @Getter
+    private GuiComponent capturedComponent = null;
+
+    public boolean isCapturedComponent(GuiComponent component) {
         if (capturedComponent == null) {
             return false;
         }
@@ -16,19 +20,19 @@ public class GuiMouseCapture {
         return capturedComponent.equals(component);
     }
 
-    public static boolean lacksCapturedComponent() {
+    public boolean lacksCapturedComponent() {
         return capturedComponent == null;
     }
 
-    public static void setMouseCapture(GuiComponent component) {
+    public void setMouseCapture(GuiComponent component) {
         capturedComponent = component;
     }
 
-    public static void releaseMouseCapture() {
+    public void releaseMouseCapture() {
         capturedComponent = null;
     }
 
-    public static GuiEventState dispatchToCapturedComponent(MouseEvent e) {
+    public GuiEventState dispatchToCapturedComponent(MouseEvent e) {
 //        boolean isCapturedEvent = (e instanceof MouseEvent.Dragged || e instanceof MouseEvent.Released);
         if (capturedComponent != null) {
             // Send directly to captured component

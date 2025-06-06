@@ -3,7 +3,7 @@ package game.gui.control;
 import game.graphics.Renderer;
 import game.gui.GuiComponent;
 import game.gui.input.GuiEventState;
-import game.gui.input.GuiMouseCapture;
+import game.gui.manager.GuiMouseCaptureManager;
 import game.input.MouseEvent;
 import game.util.Util;
 import lombok.Getter;
@@ -170,19 +170,19 @@ public class GuiSlider extends GuiComponent {
         Point point = e.getPoint();
 
         // If we're not in bounds and not captured by a drag operation, ignore the event
-        if (!containsPoint(point) && !GuiMouseCapture.isCapturedComponent(this)) {
+        if (!containsPoint(point) && !GuiMouseCaptureManager.getInstance().isCapturedComponent(this)) {
             return GuiEventState.NOT_CONSUMED;
         }
 
         switch (e) {
             // Continue drag operation
-            case MouseEvent.Dragged _ when isDragging && GuiMouseCapture.isCapturedComponent(this) -> {
+            case MouseEvent.Dragged _ when isDragging && GuiMouseCaptureManager.getInstance().isCapturedComponent(this) -> {
                 updateDrag(point);
                 return GuiEventState.CONSUMED;
             }
 
             // End drag operation
-            case MouseEvent.Released _ when isDragging && GuiMouseCapture.isCapturedComponent(this) -> {
+            case MouseEvent.Released _ when isDragging && GuiMouseCaptureManager.getInstance().isCapturedComponent(this) -> {
                 stopDrag();
                 return GuiEventState.CONSUMED;
             }
@@ -216,14 +216,14 @@ public class GuiSlider extends GuiComponent {
         isDragging = true;
         dragLastLocation = null;
         value = positionToValue(vertical ? point.y : point.x);
-        GuiMouseCapture.setMouseCapture(this);
+        GuiMouseCaptureManager.getInstance().setMouseCapture(this);
     }
 
     private void stopDrag() {
         // End dragging operation
         isDragging = false;
         dragLastLocation = null;
-        GuiMouseCapture.releaseMouseCapture();
+        GuiMouseCaptureManager.getInstance().releaseMouseCapture();
     }
 
     private void updateDrag(Point point) {

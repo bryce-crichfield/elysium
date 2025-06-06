@@ -3,7 +3,7 @@ package game.gui.control;
 import game.gui.input.GuiEventState;
 import game.input.MouseEvent;
 import game.gui.GuiComponent;
-import game.gui.input.GuiMouseCapture;
+import game.gui.manager.GuiMouseCaptureManager;
 import game.graphics.Renderer;
 import lombok.Getter;
 import lombok.Setter;
@@ -169,14 +169,14 @@ public class GuiDropdown<T> extends GuiComponent {
         if (state == DropdownState.EXPANDED) {
             state = DropdownState.COLLAPSED;
             handler = new CollapsedHandler<>();
-            GuiMouseCapture.releaseMouseCapture();
+            GuiMouseCaptureManager.getInstance().releaseMouseCapture();
             return;
         }
 
         if (state == DropdownState.COLLAPSED) {
             state = DropdownState.EXPANDED;
             handler = new ExpandedHandler<>();
-            GuiMouseCapture.setMouseCapture(this);
+            GuiMouseCaptureManager.getInstance().setMouseCapture(this);
             return;
         }
     }
