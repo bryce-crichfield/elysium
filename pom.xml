@@ -105,6 +105,41 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                        <source>23</source>
+                        <outputDirectory>${project.build.directory}/docs</outputDirectory>
+
+                        <additionalJOptions>
+                            <additionalJOption>--enable-preview</additionalJOption>
+                        </additionalJOptions>
+                        <outputDirectory>${project.basedir}/docs</outputDirectory>
+
+                        <!-- Custom styling -->
+<!--                        <stylesheetfile>${project.basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>-->
+
+                        <!-- Window title -->
+<!--                        <windowTitle>My Project API</windowTitle>-->
+
+                        <!-- Header/footer -->
+<!--                        <doctitle>My Project Documentation</doctitle>-->
+<!--                        <header>&lt;b&gt;My Project&lt;/b&gt;</header>-->
+<!--                        <footer>&lt;b&gt;My Project&lt;/b&gt;</footer>-->
+
+                        <!-- Additional options -->
+                        <additionalOptions>
+                            <additionalOption>-Xdoclint:none</additionalOption>
+                        </additionalOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>lwjgl-natives-linux</id>
