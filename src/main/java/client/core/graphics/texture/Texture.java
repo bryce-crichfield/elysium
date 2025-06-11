@@ -10,16 +10,16 @@ import java.util.Optional;
 
 public class Texture {
     @Getter
-    private String name;
+    private final String name;
     // Getters
     @Getter
     private int id;
     @Getter
-    private int width;
+    private final int width;
     @Getter
-    private int height;
+    private final int height;
     @Getter
-    private int channels;
+    private final int channels;
     private final int target;
 
     private Optional<ByteBuffer> imageData;

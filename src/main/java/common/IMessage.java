@@ -1,4 +1,4 @@
-package interfaces;
+package common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;

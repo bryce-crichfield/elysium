@@ -2,30 +2,29 @@ package client.runtime.system;
 
 import client.runtime.config.RuntimeArguments;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.Arrays;
+import java.util.Map;
+
+@Getter
+@RequiredArgsConstructor
 public abstract class System {
-    @Getter
+    private final SystemContext context;
+    private final Map<SystemFlag, Boolean> flags = Arrays.stream(SystemFlag.values())
+            .collect(java.util.stream.Collectors.toMap(flag -> flag, flag -> false));
     @Setter
-    private boolean isAutoStart = true;
+    private SystemState systemState = SystemState.INACTIVE;
 
-    @Getter
-    @Setter
-    private boolean initialized = false;
+    public abstract void activate(RuntimeArguments arguments) throws Exception;
+    public abstract void deactivate() throws Exception;
 
-    private final SystemRuntimeContext context;
-
-    public System(SystemRuntimeContext runtimeContext) {
-        this.context = runtimeContext;
+    public boolean getSystemFlag(SystemFlag flag) {
+        return flags.getOrDefault(flag, false);
     }
 
-    public abstract void initialize(RuntimeArguments arguments) throws Exception;
-
-    public SystemRuntimeContext getContext() {
-        return context;
-    }
-
-    public void shutdown() {
-
+    public void setSystemFlag(SystemFlag flag, boolean value) {
+        flags.put(flag, value);
     }
 }

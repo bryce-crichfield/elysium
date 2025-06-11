@@ -3,8 +3,10 @@ package client.runtime.application;
 
 import client.runtime.config.RuntimeArguments;
 import client.runtime.system.System;
-import client.runtime.system.SystemRuntimeContext;
+import client.runtime.system.SystemContext;
 import client.runtime.system.Systems;
+
+import java.util.Optional;
 
 public class ApplicationRuntimeContext {
     private final RuntimeArguments arguments;
@@ -19,7 +21,7 @@ public class ApplicationRuntimeContext {
         return systems;
     }
 
-    public <T extends System> T getSystem(Class<T> clazz) {
+    public <T extends System> Optional<T> getSystem(Class<T> clazz) {
         return systems.get(clazz);
     }
 
@@ -27,11 +29,7 @@ public class ApplicationRuntimeContext {
         return arguments;
     }
 
-    public <T extends System> boolean isSystemLoaded(Class<T> clazz) {
-        return systems.isPluginLoaded(clazz);
-    }
-
     public <T extends System> void loadSystemBlocking(Class<T> networkingPluginClass, Application application) throws Exception {
-        systems.loadSystemBlocking(networkingPluginClass, arguments, new SystemRuntimeContext(application));
+        systems.loadSystem(networkingPluginClass, arguments, new SystemContext(application));
     }
 }

@@ -1,12 +1,12 @@
 package sampleGame.data.entity.components;
 
-import com.google.gson.JsonObject;
 import client.core.graphics.Renderer;
+import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import sampleGame.data.entity.Entity;
 import sampleGame.data.entity.component.Component;
 import sampleGame.data.entity.component.RenderableComponent;
-import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 
@@ -33,7 +33,7 @@ public class VitalsComponent implements RenderableComponent {
         var character = self.getComponent(CharacterComponent.class);
         var position = self.getComponent(PositionComponent.class);
 
-        float healthPercentage = character.getHealth() / character.getHealth();
+        float healthPercentage = 1.0f;
         Color healthColor = healthPercentage > 0.5 ? Color.GREEN : healthPercentage > 0.25 ? Color.YELLOW : Color.RED;
         renderer.setColor(healthColor);
         int healthWidth = (int) ((32 - 10) * healthPercentage);

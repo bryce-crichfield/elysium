@@ -1,7 +1,8 @@
 package server;
 
-import interfaces.*;
+import common.*;
 
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,6 @@ public abstract class AbstractServer implements IServer, IConnectionHandler {
 
     @Override
     public void broadcast(IMessage message) {
-        System.out.println("Broadcasting message: " + message);
         for (IConnection connection : connections) {
             try {
                 connection.send(message);
@@ -128,27 +128,35 @@ public abstract class AbstractServer implements IServer, IConnectionHandler {
 
     // Abstract method for subclasses to implement custom message handling
     protected void handleServiceCall(IConnection connection, ServiceCall call) {
+        var context = new ServiceContext(connection, call.requestId(), this);
+
         try {
-            IService service = getService(call.name());
-//            IService service = services.get(call.name());
+            // If the service is not found, send an error response
+            var service = getService(call.name());
             if (service == null) {
-                System.err.println("Service not found: " + call.name());
-                IMessage error = new ErrorMessage("Service not found: " + call.name());
-                connection.send(error);
+                var result = Try.failure("Service not found: " + call.name());
+                var response = new ServiceResponse(call.requestId(), result);
+                connection.send(response);
                 return;
             }
 
-            ServiceContext context = new ServiceContext(connection, call.requestId(), this);
-            Optional<IMessage> response = service.execute(context, call.request());
-            if (response.isPresent()) {
-                ServiceResponse responseMessage = new ServiceResponse(call.requestId(), response.get());
-                System.out.println("Service response: " + responseMessage);
-                connection.send(responseMessage);
+
+            // If the service doesn't return a value, move on
+            var response = service.execute(context, call.request());
+            if (!response.isPresent()) {
+                return;
             }
+
+            // Send the response back to the client
+            var result = Try.success((Serializable) response.get());
+            var responseMessage = new ServiceResponse(call.requestId(), result);
+            connection.send(responseMessage);
         } catch (Exception e) {
+            // The service execution failed, send an error response, barring that log
             try {
-                IMessage error = new ErrorMessage("Service execution error: " + e.getMessage());
-                connection.send(error);
+                var result = Try.failure("Service execution error: " + e.getMessage());
+                var response = new ServiceResponse(call.requestId(), result);
+                connection.send(response);
             } catch (Exception ex) {
                 System.err.println("Failed to send error message: " + ex.getMessage());
             }

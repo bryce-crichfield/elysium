@@ -1,11 +1,11 @@
 package client.core.graphics.background;
 
-import client.runtime.application.Application;
 import client.core.graphics.Renderer;
 import client.core.graphics.gl.Program;
 import client.core.graphics.gl.VertexArray;
 import client.core.graphics.gl.VertexBuffer;
 import client.core.util.WatchedFile;
+import client.runtime.application.Application;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -31,8 +31,8 @@ public class ShaderBackground extends Background {
     private final String fragmentPath;
 
     // File watchers
-    private WatchedFile vertexShaderFile;
-    private WatchedFile fragmentShaderFile;
+    private final WatchedFile vertexShaderFile;
+    private final WatchedFile fragmentShaderFile;
 
     // Debounce timer
     private long lastReloadTime = 0;

@@ -6,7 +6,7 @@ import client.runtime.system.loading.LoadingStage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AssetLoadingStage implements LoadingStage {
-    private AssetLoader<?, ?> assetLoader;
+    private final AssetLoader<?, ?> assetLoader;
 
     public AssetLoadingStage(AssetLoader<?, ?> assetLoader) {
         this.assetLoader = assetLoader;

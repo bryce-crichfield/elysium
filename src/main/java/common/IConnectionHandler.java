@@ -1,4 +1,4 @@
-package interfaces;
+package common;
 
 public interface IConnectionHandler {
     void onConnect(IConnection connection);

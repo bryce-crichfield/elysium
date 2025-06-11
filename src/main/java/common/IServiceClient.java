@@ -1,4 +1,4 @@
-package interfaces;
+package common;
 
 public interface IServiceClient extends IClient {
     IMessage callService(String serviceName, IMessage parameters) throws Exception;

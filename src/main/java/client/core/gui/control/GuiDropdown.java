@@ -1,10 +1,10 @@
 package client.core.gui.control;
 
-import client.core.gui.input.GuiEventState;
-import client.core.input.MouseEvent;
-import client.core.gui.GuiComponent;
-import client.core.gui.manager.GuiMouseCaptureManager;
 import client.core.graphics.Renderer;
+import client.core.gui.GuiComponent;
+import client.core.gui.input.GuiEventState;
+import client.core.gui.manager.GuiMouseCaptureManager;
+import client.core.input.MouseEvent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,7 +50,7 @@ public class GuiDropdown<T> extends GuiComponent {
     private final int scrollOffset = 0;
 
     // Z-order management - dropdowns should be rendered above other components
-    private static GuiDropdown<?> activeDropdown = null;
+    private static final GuiDropdown<?> activeDropdown = null;
 
     public GuiDropdown(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -177,7 +177,6 @@ public class GuiDropdown<T> extends GuiComponent {
             state = DropdownState.EXPANDED;
             handler = new ExpandedHandler<>();
             GuiMouseCaptureManager.getInstance().setMouseCapture(this);
-            return;
         }
     }
 

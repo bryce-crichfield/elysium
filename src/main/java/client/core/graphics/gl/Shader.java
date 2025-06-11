@@ -2,7 +2,7 @@ package client.core.graphics.gl;
 
 import lombok.Getter;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL32; // For geometry shader support
+import org.lwjgl.opengl.GL32;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,10 +10,10 @@ import java.nio.charset.StandardCharsets;
 public class Shader {
     @Getter
     private final int programID;
-    private int vertexShaderID;
+    private final int vertexShaderID;
     private int geometryShaderID; // New field for geometry shader
-    private int fragmentShaderID;
-    private boolean hasGeometryShader; // Track if geometry shader is used
+    private final int fragmentShaderID;
+    private final boolean hasGeometryShader; // Track if geometry shader is used
 
     /**
      * Create a shader program with just vertex and fragment shaders

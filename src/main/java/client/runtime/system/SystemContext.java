@@ -2,10 +2,10 @@ package client.runtime.system;
 
 import client.runtime.application.Application;
 
-public class SystemRuntimeContext {
+public class SystemContext {
     private final Application application;
 
-    public SystemRuntimeContext(Application application) {
+    public SystemContext(Application application) {
         this.application = application;
     }
 

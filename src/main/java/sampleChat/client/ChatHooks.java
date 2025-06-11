@@ -4,7 +4,7 @@ import client.core.scene.ApplicationScene;
 import client.runtime.application.Application;
 import client.runtime.system.networking.NetworkingHooks;
 import client.runtime.system.networking.NetworkingSystem;
-import interfaces.IMessage;
+import common.IMessage;
 
 public class ChatHooks implements NetworkingHooks {
     @Override

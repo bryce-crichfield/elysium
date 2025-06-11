@@ -1,6 +1,6 @@
 package sampleChat.base;
 
-import interfaces.IMessage;
+import common.IMessage;
 
 public interface ChatAction extends IMessage {
     record Add(ChatMessage message) implements ChatAction {}

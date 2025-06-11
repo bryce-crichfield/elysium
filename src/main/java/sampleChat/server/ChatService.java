@@ -1,8 +1,8 @@
 package sampleChat.server;
 
-import interfaces.IMessage;
-import interfaces.IService;
-import interfaces.ServiceContext;
+import common.IMessage;
+import common.IService;
+import common.ServiceContext;
 import sampleChat.base.Chat;
 import sampleChat.base.ChatAction;
 import sampleChat.base.ChatUpdate;

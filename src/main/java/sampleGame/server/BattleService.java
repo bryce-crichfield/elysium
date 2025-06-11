@@ -1,8 +1,7 @@
 package sampleGame.server;
 
-import interfaces.IService;
-import interfaces.ServiceContext;
-import sampleGame.battle.BattleScene;
+import common.IService;
+import common.ServiceContext;
 import sampleGame.data.BattleData;
 import sampleGame.data.entity.Entity;
 import sampleGame.data.entity.components.AnimationComponent;
@@ -17,7 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class BattleService implements IService<BattleAction, Serializable> {
-    private BattleData battleData;
+    private final BattleData battleData;
 
     public BattleService() {
         var tiles = new Tile[16][16];
@@ -42,10 +41,11 @@ public class BattleService implements IService<BattleAction, Serializable> {
         }
 
         switch (action) {
-            default -> {}
+            default -> {
+                return Optional.of(getData());
+            }
         }
 
-        return Optional.empty(); // No valid action processed
     }
 
     private static ArrayList<Function<String, Entity>> defineEntities() {

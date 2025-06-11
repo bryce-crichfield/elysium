@@ -1,13 +1,11 @@
 package client.runtime.system.loading;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LoadingThread extends Thread {
     private int totalStages;
-    private ConcurrentLinkedQueue<LoadingStage> loadingQueue;
+    private final ConcurrentLinkedQueue<LoadingStage> loadingQueue;
     private LoadingStage currentStage;
 
     public LoadingThread() {

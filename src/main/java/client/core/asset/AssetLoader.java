@@ -78,8 +78,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: Since we are now using a single loading thread for the whole runtime, we should probably redesign this
-// to not use it's own thread for loading, but for now it's fine.
+// TODO: Rework to utilize the LoadingThread for more unified concurrency management
 public abstract class AssetLoader<K, A> {
     @Getter
     private final String name;
