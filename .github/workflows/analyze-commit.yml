@@ -1,4 +1,4 @@
-name: Analyze Format
+name: Analyze Commit
 on:
   push:
     branches: [master]
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  analyze-format:
+  analyze-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +25,9 @@ jobs:
 
       - name: Apply formatting
         run: mvn spotless:apply
+
+      - name: Check compilation
+        run: mvn compile
 
       - name: Commit changes
         run: |
