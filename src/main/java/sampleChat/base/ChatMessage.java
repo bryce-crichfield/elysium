@@ -1,8 +1,6 @@
 package sampleChat.base;
 
-import interfaces.IMessage;
-
-import java.io.Serializable;
+import common.IMessage;
 
 public class ChatMessage implements IMessage {
     private final String sender;

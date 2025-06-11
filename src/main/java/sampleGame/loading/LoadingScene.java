@@ -10,6 +10,7 @@ import client.core.gui.GuiComponent;
 import client.core.scene.ApplicationScene;
 import client.runtime.application.ApplicationRuntimeContext;
 import client.runtime.system.SystemRuntimeContext;
+import client.runtime.system.SystemState;
 import client.runtime.system.loading.LoadingStage;
 import client.runtime.system.loading.LoadingSystem;
 import client.runtime.system.loading.LoadingThread;
@@ -40,7 +41,7 @@ public class LoadingScene extends ApplicationScene {
 
         // ensure the loading system is initialized
         var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
-        if (loadingSystem == null || !loadingSystem.isInitialized()) {
+        if (loadingSystem.isEmpty() || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
             throw new IllegalStateException("LoadingSystem must be initialized before loading scene.");
         }
 
@@ -57,7 +58,7 @@ public class LoadingScene extends ApplicationScene {
         );
         stages.add(networkLoader);
 
-        loadingSystem.queueStages(stages);
+        loadingSystem.ifPresent(s -> s.queueStages(stages));
 
         // Reset progress bar
         progressBar.setVisible(true);
@@ -75,13 +76,15 @@ public class LoadingScene extends ApplicationScene {
             protected void onRender(Renderer g) {
                 // if the loading system is not initialized, don't render the progress bar
                 var loadingSystem = context.getSystem(LoadingSystem.class);
-                if (loadingSystem == null || !loadingSystem.isInitialized()) {
+
+
+                if (loadingSystem.isEmpty() || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
                     setVisible(false);
                     return;
                 }
 
                 g.setColor(Color.BLUE);
-                var drawWidth = (int) (width * loadingSystem.getProgress());
+                var drawWidth = (int) (width * loadingSystem.get().getProgress());
                 g.fillRect(0, 0, drawWidth, height);
                 g.setColor(Color.WHITE);
                 g.drawRect(0, 0, width, height);
@@ -100,7 +103,11 @@ public class LoadingScene extends ApplicationScene {
         progressBar.update(delta);
 
         var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
-        if (!loadingSystem.isComplete()) {
+        if (loadingSystem.isEmpty()) {
+            return; // loading system not initialized
+        }
+
+        if (!loadingSystem.get().isComplete()) {
             return; // still loading
         }
 
@@ -122,22 +129,21 @@ public class LoadingScene extends ApplicationScene {
         renderer.setFont("/fonts/arial", 12);
         renderer.setColor(Color.WHITE);
 
-        var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
-        var message = loadingSystem.getLoadingMessage();
-        var fontInfo = renderer.getFontInfo();
-        var textWidth = fontInfo.getStringWidth(message);
-        var textX = (Application.SCREEN_WIDTH - textWidth) / 2;
-        var textY = progressBar.getY() - fontInfo.getHeight() - 5;
-        renderer.drawString(message, textX, textY);
+        getApplication().getRuntimeContext().getSystem(LoadingSystem.class)
+                .ifPresent(loadingSystem -> {
+                    var message = loadingSystem.getLoadingMessage();
+                    var fontInfo = renderer.getFontInfo();
+                    var textWidth = fontInfo.getStringWidth(message);
+                    var textX = (Application.SCREEN_WIDTH - textWidth) / 2;
+                    var textY = progressBar.getY() - fontInfo.getHeight() - 5;
+                    renderer.drawString(message, textX, textY);
+                });
     }
 
     @Override
     public void onExit() {
         super.onExit();
 
-        // stop the loading thread if it is still running
-//        if (loadingThread != null && loadingThread.isAlive()) {
-//            loadingThread.interrupt();
-//        }
+        // TODO: Should we make sure the loading system is deactivated here?
     }
 }

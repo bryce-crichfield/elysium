@@ -1,7 +1,7 @@
 package client.runtime.system.networking;
 
 import client.runtime.application.Application;
-import interfaces.IMessage;
+import common.IMessage;
 
 public interface NetworkingHooks {
     void onMessage(Application application, IMessage message);

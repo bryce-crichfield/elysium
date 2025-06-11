@@ -12,9 +12,11 @@ import client.core.gui.style.GuiBackground;
 import client.core.gui.style.GuiStyle;
 import client.core.input.MouseEvent;
 import client.core.scene.ApplicationScene;
+import client.runtime.application.ApplicationRuntimeContext;
 import client.runtime.config.RuntimeArguments;
+import client.runtime.system.SystemState;
 import client.runtime.system.networking.NetworkingSystem;
-import interfaces.IMessage;
+import common.IMessage;
 import sampleChat.base.Chat;
 import sampleChat.base.ChatAction;
 import sampleChat.base.ChatMessage;
@@ -102,7 +104,8 @@ public class ChatScene extends ApplicationScene {
         super.onEnter();
         isNetworkingAvailable = false;
         // Ensure the NetworkingPlugin is loaded (is disabled by default, which allows for some scenes to run without it)
-        if (!getApplication().getRuntimeContext().isSystemLoaded(NetworkingSystem.class)) {
+        ApplicationRuntimeContext applicationRuntimeContext = getApplication().getRuntimeContext();
+        if (!(applicationRuntimeContext.systems.getState(NetworkingSystem.class) == SystemState.ACTIVE)) {
             try {
                 getApplication().getRuntimeContext().loadSystemBlocking(NetworkingSystem.class, getApplication());
                 isNetworkingAvailable = true; // if load succeeds, we can send messages

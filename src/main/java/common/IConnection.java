@@ -1,4 +1,4 @@
-package interfaces;
+package common;
 
 // Represents any connection (client or server-side)
 public interface IConnection {

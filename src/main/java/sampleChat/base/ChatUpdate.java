@@ -1,6 +1,6 @@
 package sampleChat.base;
 
-import interfaces.IMessage;
+import common.IMessage;
 
 import java.util.List;
 

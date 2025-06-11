@@ -1,8 +1,8 @@
 package server;
 
-import interfaces.IConnection;
-import interfaces.IConnectionHandler;
-import interfaces.IMessage;
+import common.IConnection;
+import common.IConnectionHandler;
+import common.IMessage;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

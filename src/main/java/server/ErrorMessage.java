@@ -1,6 +1,6 @@
 package server;
 
-import interfaces.IMessage;
+import common.IMessage;
 
 public record ErrorMessage(String error) implements IMessage {
 }

@@ -1,4 +1,4 @@
-package interfaces;
+package common;
 
 public interface IServer {
     void start(int port) throws Exception;

@@ -1,10 +1,8 @@
 package sampleGame.server;
 
-import interfaces.IConnection;
-import interfaces.IMessage;
-import interfaces.IServices;
-import sampleChat.server.ChatServer;
-import sampleChat.server.ChatService;
+import common.IConnection;
+import common.IMessage;
+import common.IServices;
 import server.AbstractServer;
 import server.Services;
 
@@ -43,7 +41,7 @@ public class BattleServer extends AbstractServer {
             while (server.isRunning()) {
                 var battleData = server.battleService.getData().deepCopy();
                 // battle data is serializable so clone it for broadcast
-                server.broadcast(new BattleTick(battleData)); // Assuming BattleTick is an IMessage for game updates
+//                server.broadcast(new BattleTick(battleData)); // Assuming BattleTick is an IMessage for game updates
                 Thread.sleep(100); // 100ms tick rate
             }
 

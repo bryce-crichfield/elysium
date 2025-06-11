@@ -7,23 +7,20 @@ import client.runtime.system.SystemRuntimeContext;
 import java.util.List;
 
 public class LoadingSystem extends System {
-    private LoadingThread thread;
+    private LoadingThread thread = new LoadingThread();
 
     public LoadingSystem(SystemRuntimeContext runtimeContext) {
         super(runtimeContext);
     }
 
     @Override
-    public void initialize(RuntimeArguments arguments) throws Exception {
-        if (isInitialized()) {
-            return; // already initialized
-        }
-
-        thread = new LoadingThread();
+    public void activate(RuntimeArguments arguments) throws Exception {
         thread.start();
-        setInitialized(true);
+    }
 
-        java.lang.System.out.println("LoadingSystem initialized with thread: " + thread.getName());
+    @Override
+    public void deactivate() throws Exception {
+        thread.interrupt();
     }
 
     public void queueStages(List<LoadingStage> stages) {
@@ -54,6 +51,4 @@ public class LoadingSystem extends System {
 
         return thread.getLoadingMessage();
     }
-
-
 }

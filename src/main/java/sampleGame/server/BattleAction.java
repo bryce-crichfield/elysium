@@ -1,6 +1,6 @@
 package sampleGame.server;
 
-import interfaces.IMessage;
+import common.IMessage;
 
 public interface BattleAction extends IMessage {
     record GetState() implements BattleAction {}

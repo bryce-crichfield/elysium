@@ -1,7 +1,7 @@
 package server;
 
-import interfaces.IService;
-import interfaces.IServices;
+import common.IService;
+import common.IServices;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,6 +1,6 @@
 package sampleGame.server;
 
-import interfaces.IMessage;
+import common.IMessage;
 import sampleGame.data.BattleData;
 
 public class BattleTick implements IMessage {

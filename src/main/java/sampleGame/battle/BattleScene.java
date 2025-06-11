@@ -11,7 +11,7 @@ import client.core.gui.layout.GuiNullLayout;
 import client.core.input.MouseEvent;
 import client.core.scene.ApplicationScene;
 import client.runtime.system.networking.NetworkingSystem;
-import interfaces.IServiceCallback;
+import common.IServiceCallback;
 import sampleGame.battle.controller.BattleController;
 import sampleGame.battle.controller.BattleControllerFactory;
 import sampleGame.battle.controller.player.ObserverPlayerController;
@@ -28,7 +28,6 @@ import sampleGame.battle.util.Camera;
 import sampleGame.battle.util.Cursor;
 import sampleGame.battle.util.Selection;
 import sampleGame.server.BattleAction;
-import sampleGame.server.BattleTick;
 import sampleGame.title.TitleScene;
 import client.core.transition.Transitions;
 import client.core.util.Easing;
@@ -104,20 +103,17 @@ public class BattleScene extends ApplicationScene {
 
     @Override
     public void onEnter() {
-        application.getRuntimeContext().getSystem(NetworkingSystem.class).setHooks(new BattleSceneHooks());
+//        application.getRuntimeContext().getSystem(NetworkingSystem.class).setHooks(new BattleSceneHooks());
         application.getAudio().play("ambience/ambience_spacecraft_hold_loop", true, 0.25f);
 
         var reqId = UUID.randomUUID().toString();
         try {
-            var system = application.getRuntimeContext().getSystem(NetworkingSystem.class);
-            system.setHooks(new BattleSceneHooks());
-            system.callServiceAsync("BattleService", new BattleAction.GetState(), IServiceCallback.create(response -> {
-//                if (response instanceof BattleTick battleTick) {
-//                    setBattleData(battleTick.getBattleData());
-//                } else {
-//                    throw new RuntimeException("Invalid response from server: " + response);
-//                }
-            }));
+            application.getRuntimeContext().getSystem(NetworkingSystem.class)
+                .ifPresent(networking -> {
+                    networking.callAsync("BattleService", new BattleAction.GetState(), response -> {
+                        response.result().forEach(message -> System.out.println("Received battle state: " + message));
+                    });
+                });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -151,6 +147,23 @@ public class BattleScene extends ApplicationScene {
 
     @Override
     public void onUpdate(Duration delta) {
+        var networking = application.getRuntimeContext().getSystem(NetworkingSystem.class);
+        networking.ifPresent(net -> {
+            var messages = net.getMessages();
+            for (var message : messages) {
+//                System.out.println("BattleScene: Processing message: " + message);
+            }
+
+            var runnables = net.getQueue().getRunnables();
+            for (var runnable : runnables) {
+                try {
+                    runnable.run();
+                } catch (Exception e) {
+                    System.err.println("Error running networking callback: " + e.getMessage());
+                }
+            }
+        });
+
         gui.update(delta);
         data.onUpdate(delta);
         controller.onUpdate(delta);

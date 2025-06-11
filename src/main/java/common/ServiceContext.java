@@ -1,6 +1,4 @@
-package interfaces;
-
-import interfaces.ServiceResponse;
+package common;
 
 public class ServiceContext {
     private final IConnection connection;
@@ -11,17 +9,6 @@ public class ServiceContext {
         this.connection = connection;
         this.requestId = requestId;
         this.server = server;
-    }
-
-    public void respond(IMessage message) {
-        ServiceResponse response = new ServiceResponse(requestId, message);
-
-        try {
-            connection.send(response);
-        } catch (Exception e) {
-            // TODO: Handle exception more gracefully
-            throw new RuntimeException(e);
-        }
     }
 
     public void broadcast(IMessage message) {
