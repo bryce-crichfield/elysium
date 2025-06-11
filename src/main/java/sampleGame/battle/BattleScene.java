@@ -1,6 +1,5 @@
 package sampleGame.battle;
 
-import client.runtime.application.Application;
 import client.core.graphics.Renderer;
 import client.core.graphics.Transform;
 import client.core.graphics.background.Background;
@@ -10,28 +9,28 @@ import client.core.gui.input.GuiEventState;
 import client.core.gui.layout.GuiNullLayout;
 import client.core.input.MouseEvent;
 import client.core.scene.ApplicationScene;
+import client.core.transition.Transitions;
+import client.core.util.Easing;
+import client.runtime.application.Application;
 import client.runtime.system.networking.NetworkingSystem;
-import common.IServiceCallback;
+import lombok.Getter;
 import sampleGame.battle.controller.BattleController;
 import sampleGame.battle.controller.BattleControllerFactory;
 import sampleGame.battle.controller.player.ObserverPlayerController;
-import sampleGame.data.BattleData;
-import sampleGame.data.entity.Entity;
-import sampleGame.data.entity.components.AnimationComponent;
-import sampleGame.data.entity.components.TileAnimationComponent;
-import sampleGame.data.entity.components.PositionComponent;
-import sampleGame.data.entity.components.SpriteComponent;
 import sampleGame.battle.hud.ActionsMenu;
 import sampleGame.battle.hud.EntityInspector;
-import sampleGame.data.tile.Tile;
 import sampleGame.battle.util.Camera;
 import sampleGame.battle.util.Cursor;
 import sampleGame.battle.util.Selection;
+import sampleGame.data.BattleData;
+import sampleGame.data.entity.Entity;
+import sampleGame.data.entity.components.AnimationComponent;
+import sampleGame.data.entity.components.PositionComponent;
+import sampleGame.data.entity.components.SpriteComponent;
+import sampleGame.data.entity.components.TileAnimationComponent;
+import sampleGame.data.tile.Tile;
 import sampleGame.server.BattleAction;
 import sampleGame.title.TitleScene;
-import client.core.transition.Transitions;
-import client.core.util.Easing;
-import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -159,7 +158,7 @@ public class BattleScene extends ApplicationScene {
                 try {
                     runnable.run();
                 } catch (Exception e) {
-                    System.err.println("Error running networking callback: " + e.getMessage());
+//                    System.err.println("Error running networking callback: " + e.getMessage());
                 }
             }
         });

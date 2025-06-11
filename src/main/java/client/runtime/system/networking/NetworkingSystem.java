@@ -2,16 +2,17 @@ package client.runtime.system.networking;
 
 import client.runtime.config.RuntimeArguments;
 import client.runtime.system.System;
+import client.runtime.system.SystemContext;
 import client.runtime.system.SystemFlag;
-import client.runtime.system.SystemRuntimeContext;
-import common.*;
+import common.IMessage;
+import common.IServiceCallback;
+import common.ServiceCall;
+import common.Try;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -22,7 +23,7 @@ public final class NetworkingSystem extends System {
     private NetworkingThread thread = new NetworkingThread(this);
 
 
-    public NetworkingSystem(SystemRuntimeContext runtimeContext) {
+    public NetworkingSystem(SystemContext runtimeContext) {
         super(runtimeContext);
 
         setSystemFlag(SystemFlag.IS_AUTO_START_DISABLED, true);

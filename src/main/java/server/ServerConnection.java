@@ -10,11 +10,11 @@ import java.net.Socket;
 import java.util.UUID;
 
 public class ServerConnection implements IConnection, Runnable {
-    private Socket socket;
+    private final Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-    private String connectionId;
-    private IConnectionHandler handler;
+    private final String connectionId;
+    private final IConnectionHandler handler;
     private volatile boolean connected = false;
 
     public ServerConnection(Socket socket, IConnectionHandler handler) throws Exception {

@@ -1,19 +1,17 @@
 package client.core.graphics.vector;
 
-import client.runtime.application.Application;
 import client.core.graphics.gl.Program;
 import client.core.graphics.gl.VertexArray;
 import client.core.graphics.gl.VertexBuffer;
+import client.runtime.application.Application;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
-
-import java.util.Stack;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
+import java.util.Stack;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_INT;
@@ -33,17 +31,17 @@ public class VectorRenderer {
     // Maximum number of vector shapes in one batch
     private static final int MAX_BATCH_SIZE = 1000;
 
-    private Program shader;
+    private final Program shader;
     private VertexArray vao;
     private VertexBuffer vbo;
 
-    private Stack<Matrix4f> transformStack = new Stack<>();
-    private Stack<Vector4f> clipStack = new Stack<>();
+    private final Stack<Matrix4f> transformStack = new Stack<>();
+    private final Stack<Vector4f> clipStack = new Stack<>();
 
-    private Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    private final Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Batch data
-    private float[] batchData;
+    private final float[] batchData;
     private int batchCount;
 
     public VectorRenderer() {

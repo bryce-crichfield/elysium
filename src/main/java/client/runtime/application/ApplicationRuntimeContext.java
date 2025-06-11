@@ -3,7 +3,7 @@ package client.runtime.application;
 
 import client.runtime.config.RuntimeArguments;
 import client.runtime.system.System;
-import client.runtime.system.SystemRuntimeContext;
+import client.runtime.system.SystemContext;
 import client.runtime.system.Systems;
 
 import java.util.Optional;
@@ -30,6 +30,6 @@ public class ApplicationRuntimeContext {
     }
 
     public <T extends System> void loadSystemBlocking(Class<T> networkingPluginClass, Application application) throws Exception {
-        systems.loadSystem(networkingPluginClass, arguments, new SystemRuntimeContext(application));
+        systems.loadSystem(networkingPluginClass, arguments, new SystemContext(application));
     }
 }

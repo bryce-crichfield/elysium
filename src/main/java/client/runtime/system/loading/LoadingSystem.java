@@ -2,14 +2,14 @@ package client.runtime.system.loading;
 
 import client.runtime.config.RuntimeArguments;
 import client.runtime.system.System;
-import client.runtime.system.SystemRuntimeContext;
+import client.runtime.system.SystemContext;
 
 import java.util.List;
 
 public class LoadingSystem extends System {
-    private LoadingThread thread = new LoadingThread();
+    private final LoadingThread thread = new LoadingThread();
 
-    public LoadingSystem(SystemRuntimeContext runtimeContext) {
+    public LoadingSystem(SystemContext runtimeContext) {
         super(runtimeContext);
     }
 

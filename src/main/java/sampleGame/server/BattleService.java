@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class BattleService implements IService<BattleAction, Serializable> {
-    private BattleData battleData;
+    private final BattleData battleData;
 
     public BattleService() {
         var tiles = new Tile[16][16];

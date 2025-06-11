@@ -1,6 +1,5 @@
 package sampleGame.loading;
 
-import client.runtime.application.Application;
 import client.core.audio.AudioLoader;
 import client.core.audio.AudioStore;
 import client.core.graphics.Renderer;
@@ -8,23 +7,22 @@ import client.core.graphics.texture.TextureLoader;
 import client.core.graphics.texture.TextureStore;
 import client.core.gui.GuiComponent;
 import client.core.scene.ApplicationScene;
+import client.core.transition.Transitions;
+import client.core.util.Easing;
+import client.runtime.application.Application;
 import client.runtime.application.ApplicationRuntimeContext;
-import client.runtime.system.SystemRuntimeContext;
 import client.runtime.system.SystemState;
 import client.runtime.system.loading.LoadingStage;
 import client.runtime.system.loading.LoadingSystem;
-import client.runtime.system.loading.LoadingThread;
-import client.runtime.system.networking.NetworkingSystem;
-import sampleGame.battle.BattleScene;
-import client.core.transition.Transitions;
-import client.core.util.Easing;
 import client.runtime.system.loading.stages.AssetLoadingStage;
 import client.runtime.system.loading.stages.SystemLoadingStage;
+import client.runtime.system.networking.NetworkingSystem;
+import sampleGame.battle.BattleScene;
 
 import java.awt.*;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LoadingScene extends ApplicationScene {

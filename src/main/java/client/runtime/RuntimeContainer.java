@@ -1,13 +1,13 @@
 package client.runtime;
 
-import client.runtime.application.ApplicationFactory;
 import client.core.graphics.platform.ErrorDialog;
 import client.core.graphics.platform.Window;
 import client.core.scene.ApplicationSceneFactory;
 import client.core.util.Util;
+import client.runtime.application.ApplicationFactory;
 import client.runtime.application.ApplicationRuntimeContext;
 import client.runtime.config.RuntimeArguments;
-import client.runtime.system.SystemRuntimeContext;
+import client.runtime.system.SystemContext;
 import client.runtime.system.Systems;
 import lombok.Getter;
 
@@ -33,7 +33,7 @@ public class RuntimeContainer {
     public void start() throws Exception {
         var application = applicationFactory.create(new ApplicationRuntimeContext(systems, arguments));
 
-        systems.start(arguments, new SystemRuntimeContext(application));
+        systems.start(arguments, new SystemContext(application));
 
         Window window = new Window(640 * 3, 480 * 3, application);
         window.onInit();

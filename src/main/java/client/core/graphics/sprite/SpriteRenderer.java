@@ -35,7 +35,7 @@ public class SpriteRenderer {
     private VertexArray vao;
     private VertexBuffer vertexVertexBuffer;
     private VertexBuffer indexVertexBuffer;
-    private Program shader;
+    private final Program shader;
 
     private final float[] vertices;
     private final int[] indices;
@@ -82,14 +82,14 @@ public class SpriteRenderer {
             int offsetVertexIndex = i * VERTICES_PER_SPRITE;
 
             // First triangle
-            indices[offsetArrayIndex + 0] = offsetVertexIndex + 0;
+            indices[offsetArrayIndex] = offsetVertexIndex;
             indices[offsetArrayIndex + 1] = offsetVertexIndex + 1;
             indices[offsetArrayIndex + 2] = offsetVertexIndex + 2;
 
             // Second triangle
             indices[offsetArrayIndex + 3] = offsetVertexIndex + 2;
             indices[offsetArrayIndex + 4] = offsetVertexIndex + 3;
-            indices[offsetArrayIndex + 5] = offsetVertexIndex + 0;
+            indices[offsetArrayIndex + 5] = offsetVertexIndex;
         }
     }
 

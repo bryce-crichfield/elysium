@@ -11,10 +11,18 @@ public interface Try<T extends Serializable> extends Serializable {
         return this instanceof Failure;
     }
 
+    static <T extends Serializable> Try<T> success(T value) {
+        return new Success<>(value);
+    }
+
+    static <T extends Serializable> Try<T> failure(String error) {
+        return new Failure<>(new Exception(error));
+    }
+
     // foreach
     default void forEach(java.util.function.Consumer<T> action) {
-        if (this instanceof Success<T> success) {
-            action.accept(success.value);
+        if (this instanceof Success<T>(T value)) {
+            action.accept(value);
         } else {
             // Do nothing for failure
         }
@@ -22,35 +30,27 @@ public interface Try<T extends Serializable> extends Serializable {
 
     // map and flat
     default <R extends Serializable> Try<R> compose(java.util.function.Function<T, R> mapper) {
-        if (this instanceof Success<T> success) {
-            return new Success<>(mapper.apply(success.value));
+        if (this instanceof Success<T>(T value)) {
+            return new Success<>(mapper.apply(value));
         } else {
             return new Failure<>(((Failure<T>) this).error);
         }
     }
 
     default <R extends Serializable> Try<R> flatMap(java.util.function.Function<T, Try<R>> mapper) {
-        if (this instanceof Success<T> success) {
-            return mapper.apply(success.value);
+        if (this instanceof Success<T>(T value)) {
+            return mapper.apply(value);
         } else {
             return new Failure<>(((Failure<T>) this).error);
         }
     }
 
     default T getValue() {
-        if (this instanceof Success<T> success) {
-            return success.value;
+        if (this instanceof Success<T>(T value)) {
+            return value;
         } else {
             throw new IllegalStateException("Cannot get value from a failure");
         }
-    }
-
-    public static <T extends Serializable> Try<T> success(T value) {
-        return new Success<>(value);
-    }
-
-    public static <T extends Serializable> Try<T> failure(String error) {
-        return new Failure<>(new Exception(error));
     }
 
     record Success<T extends Serializable>(T value) implements Try<T> {

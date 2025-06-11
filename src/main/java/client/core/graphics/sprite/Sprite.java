@@ -25,10 +25,10 @@ public class Sprite {
     }
 
     float[] getSubImageCoordinates() {
-        float u1 = (float) subX / texture.getWidth();
-        float v1 = (float) subY / texture.getHeight();
-        float u2 = (float) (subX + subWidth) / texture.getWidth();
-        float v2 = (float) (subY + subHeight) / texture.getHeight();
+        float u1 = subX / texture.getWidth();
+        float v1 = subY / texture.getHeight();
+        float u2 = (subX + subWidth) / texture.getWidth();
+        float v2 = (subY + subHeight) / texture.getHeight();
 
         // Return texture coordinates in the order expected by drawSprite:
         // Bottom-left, Bottom-right, Top-right, Top-left

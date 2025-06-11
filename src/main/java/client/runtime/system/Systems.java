@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class Systems {
-    private final Map<Class<? extends System>, Function<SystemRuntimeContext, System>> factories = new HashMap<>();
+    private final Map<Class<? extends System>, Function<SystemContext, System>> factories = new HashMap<>();
     private final Map<Class<? extends System>, System> instances = new HashMap<>();
 
     // when we define, we provide the class and a factory
-    public <T extends System> void define(Class<T> clazz, Function<SystemRuntimeContext, T> factory) {
-        factories.put(clazz, (Function<SystemRuntimeContext, System>) factory);
+    public <T extends System> void define(Class<T> clazz, Function<SystemContext, T> factory) {
+        factories.put(clazz, (Function<SystemContext, System>) factory);
     }
 
     // Remember, the plugin may not be initialized yet, so it may return null
@@ -21,12 +21,12 @@ public class Systems {
     // eg. NetworkingManager is only needed when we connect to a server
     public <T extends System> Optional<T> get(Class<T> clazz) {
         if (factories.get(clazz) == null) {
-            java.lang.System.err.println("No factory found for system: " + clazz.getName());
+//            java.lang.System.err.println("No factory found for system: " + clazz.getName());
             return Optional.empty();
         }
 
         if (instances.get(clazz) == null) {
-            java.lang.System.err.println("System " + clazz.getName() + " is not initialized yet.");
+//            java.lang.System.err.println("System " + clazz.getName() + " is not initialized yet.");
             return Optional.empty();
         }
 
@@ -36,11 +36,11 @@ public class Systems {
     // Creates an instance of each system using the provided factory
     // If set to auto-start, it will activate the system
     // otherwise it will not activate the system until someone calls activate on it
-    public void start(RuntimeArguments arguments, SystemRuntimeContext context) {
+    public void start(RuntimeArguments arguments, SystemContext context) {
         java.lang.System.out.println("RuntimeSystems: Starting plugins...");
         for (var entry : factories.entrySet()) {
             Class<? extends System> clazz = entry.getKey();
-            Function<SystemRuntimeContext, System> factory = entry.getValue();
+            Function<SystemContext, System> factory = entry.getValue();
             System instance = factory.apply(context);
             try {
                 if (instance == null) {
@@ -79,7 +79,7 @@ public class Systems {
     // This will block the caller until the system has yielded control
     // 1. Instantiates the system using the factory
     // 2. Activates the system with the provided arguments
-    public <T extends System> void loadSystem(Class<T> clazz, RuntimeArguments arguments, SystemRuntimeContext context) throws Exception {
+    public <T extends System> void loadSystem(Class<T> clazz, RuntimeArguments arguments, SystemContext context) throws Exception {
         var factory = factories.get(clazz);
         if (factory == null) {
             java.lang.System.err.println("No factory found for system: " + clazz.getName());
