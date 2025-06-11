@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class NetworkingConfig {
-    private final String host;
-    private final int port;
+  private final String host;
+  private final int port;
 }
