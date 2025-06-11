@@ -17,5 +17,13 @@ jobs:
           java-version: '23'
           distribution: 'temurin'
 
-      - name: Check formatting
-        run: mvn spotless:check
+      - name: Apply formatting
+        run: mvn spotless:apply
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --staged --quiet || git commit -m "Auto-format code"
+          git push
