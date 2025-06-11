@@ -3,16 +3,13 @@ package client.core.graphics.postprocessing;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 
-/**
- * Represents a post-processing effect that can be applied to the game's graphics
- */
+/** Represents a post-processing effect that can be applied to the game's graphics */
 public interface Effect {
-    default void update(Duration delta) {
-    }
+  default void update(Duration delta) {}
 
-    void process(BufferedImage input, BufferedImage output);
+  void process(BufferedImage input, BufferedImage output);
 
-    boolean isEnabled();
+  boolean isEnabled();
 
-    void setEnabled(boolean enabled);
+  void setEnabled(boolean enabled);
 }

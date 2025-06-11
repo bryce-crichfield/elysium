@@ -1,4 +1,3 @@
 package common.functional;
 
-public interface Immutable {
-}
+public interface Immutable {}

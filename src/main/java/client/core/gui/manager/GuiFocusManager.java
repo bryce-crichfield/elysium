@@ -4,40 +4,39 @@ import client.core.gui.GuiComponent;
 import lombok.Getter;
 
 public class GuiFocusManager {
-    @Getter
-    private static final GuiFocusManager instance = new GuiFocusManager();
+  @Getter private static final GuiFocusManager instance = new GuiFocusManager();
 
-    private GuiComponent focusedComponent = null;
+  private GuiComponent focusedComponent = null;
 
-    public void setFocus(GuiComponent component) {
-        if (focusedComponent == component) return;
+  public void setFocus(GuiComponent component) {
+    if (focusedComponent == component) return;
 
-        // Remove focus from previous component
-        if (focusedComponent != null) {
-            focusedComponent.setFocused(false);
-        }
-
-        // Set focus to new component
-        focusedComponent = component;
-        if (component != null) {
-            component.setFocused(true);
-        }
+    // Remove focus from previous component
+    if (focusedComponent != null) {
+      focusedComponent.setFocused(false);
     }
 
-    public GuiComponent getFocusedComponent() {
-        return focusedComponent;
+    // Set focus to new component
+    focusedComponent = component;
+    if (component != null) {
+      component.setFocused(true);
     }
+  }
 
-    public void clearFocus() {
-        setFocus(null);
-    }
+  public GuiComponent getFocusedComponent() {
+    return focusedComponent;
+  }
 
-    // Add method for tab traversal between components
-    public void moveFocusForward() {
-        // Implementation to find next focusable component
-    }
+  public void clearFocus() {
+    setFocus(null);
+  }
 
-    public void moveFocusBackward() {
-        // Implementation to find previous focusable component
-    }
+  // Add method for tab traversal between components
+  public void moveFocusForward() {
+    // Implementation to find next focusable component
+  }
+
+  public void moveFocusBackward() {
+    // Implementation to find previous focusable component
+  }
 }

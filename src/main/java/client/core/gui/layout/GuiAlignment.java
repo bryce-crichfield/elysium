@@ -1,7 +1,7 @@
 package client.core.gui.layout;
 
 public enum GuiAlignment {
-    START,
-    CENTER,
-    END
+  START,
+  CENTER,
+  END
 }

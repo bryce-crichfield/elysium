@@ -17,131 +17,138 @@ import client.runtime.system.loading.LoadingSystem;
 import client.runtime.system.loading.stages.AssetLoadingStage;
 import client.runtime.system.loading.stages.SystemLoadingStage;
 import client.runtime.system.networking.NetworkingSystem;
-import sampleGame.battle.BattleScene;
-
 import java.awt.*;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import sampleGame.battle.BattleScene;
 
 public class LoadingScene extends ApplicationScene {
-    private final GuiComponent progressBar;
+  private final GuiComponent progressBar;
 
-    public LoadingScene(Application game) {
-        super(game);
+  public LoadingScene(Application game) {
+    super(game);
 
-        progressBar = createProgressBar(getApplication().getRuntimeContext());
+    progressBar = createProgressBar(getApplication().getRuntimeContext());
+  }
+
+  public void onEnter() {
+    super.onEnter();
+
+    // ensure the loading system is initialized
+    var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
+    if (loadingSystem.isEmpty()
+        || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
+      throw new IllegalStateException("LoadingSystem must be initialized before loading scene.");
     }
 
-    public void onEnter() {
-        super.onEnter();
+    List<LoadingStage> stages = new ArrayList<>();
+    var audioLoader =
+        new AudioLoader(
+            AudioStore.getInstance(),
+            Path.of("resources/audio"),
+            application.getAudio().getFormat());
+    stages.add(new AssetLoadingStage(audioLoader));
 
-        // ensure the loading system is initialized
-        var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
-        if (loadingSystem.isEmpty() || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
-            throw new IllegalStateException("LoadingSystem must be initialized before loading scene.");
-        }
+    var textureLoader = new TextureLoader(TextureStore.getInstance(), Path.of("resources/texture"));
+    stages.add(new AssetLoadingStage(textureLoader));
 
-        List<LoadingStage> stages = new ArrayList<>();
-        var audioLoader = new AudioLoader(AudioStore.getInstance(), Path.of("resources/audio"), application.getAudio().getFormat());
-        stages.add(new AssetLoadingStage(audioLoader));
+    var networkLoader =
+        new SystemLoadingStage<NetworkingSystem>(this.getApplication(), NetworkingSystem.class);
+    stages.add(networkLoader);
 
-        var textureLoader = new TextureLoader(TextureStore.getInstance(), Path.of("resources/texture"));
-        stages.add(new AssetLoadingStage(textureLoader));
+    loadingSystem.ifPresent(s -> s.queueStages(stages));
 
-        var networkLoader = new SystemLoadingStage<NetworkingSystem>(
-                this.getApplication(),
-                NetworkingSystem.class
-        );
-        stages.add(networkLoader);
+    // Reset progress bar
+    progressBar.setVisible(true);
+    progressBar.update(Duration.ZERO);
+  }
 
-        loadingSystem.ifPresent(s -> s.queueStages(stages));
+  private static GuiComponent createProgressBar(ApplicationRuntimeContext context) {
+    final GuiComponent progressBar;
+    var width = (int) (Application.SCREEN_WIDTH * 0.75f);
+    var height = 25;
+    var x = (Application.SCREEN_WIDTH - width) / 2;
+    var y = (Application.SCREEN_HEIGHT - (4 * height));
+    progressBar =
+        new GuiComponent(x, y, width, height) {
+          @Override
+          protected void onRender(Renderer g) {
+            // if the loading system is not initialized, don't render the progress bar
+            var loadingSystem = context.getSystem(LoadingSystem.class);
 
-        // Reset progress bar
-        progressBar.setVisible(true);
-        progressBar.update(Duration.ZERO);
-    }
-
-    private static GuiComponent createProgressBar(ApplicationRuntimeContext context) {
-        final GuiComponent progressBar;
-        var width = (int) (Application.SCREEN_WIDTH * 0.75f);
-        var height = 25;
-        var x = (Application.SCREEN_WIDTH - width) / 2;
-        var y = (Application.SCREEN_HEIGHT - (4 * height));
-        progressBar = new GuiComponent(x, y, width, height) {
-            @Override
-            protected void onRender(Renderer g) {
-                // if the loading system is not initialized, don't render the progress bar
-                var loadingSystem = context.getSystem(LoadingSystem.class);
-
-
-                if (loadingSystem.isEmpty() || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
-                    setVisible(false);
-                    return;
-                }
-
-                g.setColor(Color.BLUE);
-                var drawWidth = (int) (width * loadingSystem.get().getProgress());
-                g.fillRect(0, 0, drawWidth, height);
-                g.setColor(Color.WHITE);
-                g.drawRect(0, 0, width, height);
+            if (loadingSystem.isEmpty()
+                || !loadingSystem.get().getSystemState().equals(SystemState.ACTIVE)) {
+              setVisible(false);
+              return;
             }
 
-            @Override
-            protected String getComponentName() {
-                return "";
-            }
+            g.setColor(Color.BLUE);
+            var drawWidth = (int) (width * loadingSystem.get().getProgress());
+            g.fillRect(0, 0, drawWidth, height);
+            g.setColor(Color.WHITE);
+            g.drawRect(0, 0, width, height);
+          }
+
+          @Override
+          protected String getComponentName() {
+            return "";
+          }
         };
-        return progressBar;
+    return progressBar;
+  }
+
+  @Override
+  public void onUpdate(Duration delta) {
+    progressBar.update(delta);
+
+    var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
+    if (loadingSystem.isEmpty()) {
+      return; // loading system not initialized
     }
 
-    @Override
-    public void onUpdate(Duration delta) {
-        progressBar.update(delta);
-
-        var loadingSystem = getApplication().getRuntimeContext().getSystem(LoadingSystem.class);
-        if (loadingSystem.isEmpty()) {
-            return; // loading system not initialized
-        }
-
-        if (!loadingSystem.get().isComplete()) {
-            return; // still loading
-        }
-
-        // All loaders are done, initialize textures
-        for (var key : TextureStore.getInstance().getAssets()) {
-            var texture = TextureStore.getInstance().getAssets(key);
-            texture.initialize();
-        }
-
-        // Transition to the next state
-        application.pushState(BattleScene::new,
-                Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+    if (!loadingSystem.get().isComplete()) {
+      return; // still loading
     }
 
-    @Override
-    public void onRender(Renderer renderer) {
-        progressBar.render(renderer);
-
-        renderer.setFont("/fonts/arial", 12);
-        renderer.setColor(Color.WHITE);
-
-        getApplication().getRuntimeContext().getSystem(LoadingSystem.class)
-                .ifPresent(loadingSystem -> {
-                    var message = loadingSystem.getLoadingMessage();
-                    var fontInfo = renderer.getFontInfo();
-                    var textWidth = fontInfo.getStringWidth(message);
-                    var textX = (Application.SCREEN_WIDTH - textWidth) / 2;
-                    var textY = progressBar.getY() - fontInfo.getHeight() - 5;
-                    renderer.drawString(message, textX, textY);
-                });
+    // All loaders are done, initialize textures
+    for (var key : TextureStore.getInstance().getAssets()) {
+      var texture = TextureStore.getInstance().getAssets(key);
+      texture.initialize();
     }
 
-    @Override
-    public void onExit() {
-        super.onExit();
+    // Transition to the next state
+    application.pushState(
+        BattleScene::new,
+        Transitions.fade(Duration.ofMillis(1000), Color.BLACK, Easing.cubicEaseIn()));
+  }
 
-        // TODO: Should we make sure the loading system is deactivated here?
-    }
+  @Override
+  public void onRender(Renderer renderer) {
+    progressBar.render(renderer);
+
+    renderer.setFont("/fonts/arial", 12);
+    renderer.setColor(Color.WHITE);
+
+    getApplication()
+        .getRuntimeContext()
+        .getSystem(LoadingSystem.class)
+        .ifPresent(
+            loadingSystem -> {
+              var message = loadingSystem.getLoadingMessage();
+              var fontInfo = renderer.getFontInfo();
+              var textWidth = fontInfo.getStringWidth(message);
+              var textX = (Application.SCREEN_WIDTH - textWidth) / 2;
+              var textY = progressBar.getY() - fontInfo.getHeight() - 5;
+              renderer.drawString(message, textX, textY);
+            });
+  }
+
+  @Override
+  public void onExit() {
+    super.onExit();
+
+    // TODO: Should we make sure the loading system is deactivated here?
+  }
 }

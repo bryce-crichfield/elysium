@@ -1,19 +1,16 @@
 package sampleGame.data.entity.components;
 
-
-import com.google.gson.JsonObject;
-import sampleGame.data.entity.component.Component;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import sampleGame.data.entity.component.Component;
 
 @Getter
 @AllArgsConstructor
 public class CharacterComponent implements Component {
-    private float health;
+  private float health;
 
-
-    @Override
-    public Component clone() {
-        return new CharacterComponent(health);
-    }
+  @Override
+  public Component clone() {
+    return new CharacterComponent(health);
+  }
 }

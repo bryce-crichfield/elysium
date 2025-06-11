@@ -1,17 +1,17 @@
-//package game.audio;
+// package game.audio;
 //
-//import game.asset.AssetLoader;
+// import game.asset.AssetLoader;
 //
-//import javax.sound.sampled.*;
-//import java.io.ByteArrayOutputStream;
-//import java.io.File;
-//import java.io.IOException;
-//import java.nio.file.Path;
-//import java.util.HashSet;
-//import java.util.Set;
-//import java.util.concurrent.atomic.AtomicInteger;
+// import javax.sound.sampled.*;
+// import java.io.ByteArrayOutputStream;
+// import java.io.File;
+// import java.io.IOException;
+// import java.nio.file.Path;
+// import java.util.HashSet;
+// import java.util.Set;
+// import java.util.concurrent.atomic.AtomicInteger;
 //
-//public class AudioAssetLoader extends AssetLoader<String, AudioSample> {
+// public class AudioAssetLoader extends AssetLoader<String, AudioSample> {
 //    // Statistics counters
 //    private final AtomicInteger successfullyLoaded = new AtomicInteger(0);
 //    private final AtomicInteger failedToLoad = new AtomicInteger(0);
@@ -81,9 +81,11 @@
 //                isLoading = false;
 //
 //                System.out.println("Asset loading complete: " +
-//                        successfullyLoaded.get() + "/" + fileCount + " assets loaded successfully");
+//                        successfullyLoaded.get() + "/" + fileCount + " assets loaded
+// successfully");
 //                if (convertedAssets.get() > 0) {
-//                    System.out.println("Converted " + convertedAssets.get() + " high-resolution audio files");
+//                    System.out.println("Converted " + convertedAssets.get() + " high-resolution
+// audio files");
 //                }
 //
 //                // Run callback if provided
@@ -127,7 +129,8 @@
 //            // Check if conversion is needed
 //            if (!isFormatCompatible(sourceFormat, targetFormat)) {
 //                // Convert to target format
-//                AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, originalStream);
+//                AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat,
+// originalStream);
 //                data = readAllBytes(convertedStream);
 //                convertedStream.close();
 //            } else {
@@ -176,13 +179,11 @@
 //
 //        return byteStream.toByteArray();
 //    }
-//}
+// }
 
 package client.core.audio;
 
 import client.core.asset.AssetLoader;
-
-import javax.sound.sampled.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -190,119 +191,120 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.sound.sampled.*;
 
 public class AudioLoader extends AssetLoader<String, AudioSample> {
-    // Additional statistics counter for converted assets
-    private final AtomicInteger convertedAssets = new AtomicInteger(0);
+  // Additional statistics counter for converted assets
+  private final AtomicInteger convertedAssets = new AtomicInteger(0);
 
-    // Default conversion format (16-bit PCM stereo at 44.1kHz)
-    private final AudioFormat targetFormat;
+  // Default conversion format (16-bit PCM stereo at 44.1kHz)
+  private final AudioFormat targetFormat;
 
-    public AudioLoader(AudioStore store, Path assetDirectory) {
-        this(store, assetDirectory, new AudioFormat(44100.0f, 16, 2, true, false));
+  public AudioLoader(AudioStore store, Path assetDirectory) {
+    this(store, assetDirectory, new AudioFormat(44100.0f, 16, 2, true, false));
+  }
+
+  public AudioLoader(AudioStore store, Path assetDirectory, AudioFormat format) {
+    super(store, assetDirectory, "Audio Assets");
+    this.targetFormat = format;
+  }
+
+  @Override
+  public Set<String> getExtensions() {
+    Set<String> extensions = new HashSet<>();
+    extensions.add(".wav");
+    extensions.add(".mp3");
+    extensions.add(".ogg");
+    extensions.add(".aiff");
+    return extensions;
+  }
+
+  @Override
+  protected AudioSample loadFile(File file, String key) throws Exception {
+    // Load the audio file directly
+    AudioInputStream originalStream = AudioSystem.getAudioInputStream(file);
+    AudioFormat sourceFormat = originalStream.getFormat();
+    byte[] data;
+
+    // Check if conversion is needed
+    if (!isFormatCompatible(sourceFormat, targetFormat)) {
+      // Convert to target format
+      AudioInputStream convertedStream =
+          AudioSystem.getAudioInputStream(targetFormat, originalStream);
+      data = readAllBytes(convertedStream);
+      convertedStream.close();
+      convertedAssets.incrementAndGet();
+    } else {
+      // No conversion needed
+      data = readAllBytes(originalStream);
+    }
+    originalStream.close();
+
+    return new AudioSample(targetFormat, data);
+  }
+
+  @Override
+  protected String generateKey(File file) {
+    // Generate a key based on the file path relative to the base directory
+    String absolutePath = file.getAbsolutePath();
+    String basePath = path.toFile().getAbsolutePath();
+
+    String relativePath = absolutePath.substring(basePath.length() + 1);
+    // Remove file extension
+    String key = relativePath.substring(0, relativePath.lastIndexOf('.'));
+    // Replace backslashes with forward slashes for consistent keys across platforms
+    key = key.replace('\\', '/');
+
+    return key;
+  }
+
+  /** Checks if source format is compatible with target format */
+  private boolean isFormatCompatible(AudioFormat source, AudioFormat target) {
+    return source.getSampleRate() == target.getSampleRate()
+        && source.getSampleSizeInBits() == target.getSampleSizeInBits()
+        && source.getChannels() == target.getChannels()
+        && source.isBigEndian() == target.isBigEndian()
+        && source.getEncoding().equals(target.getEncoding());
+  }
+
+  /** Reads all bytes from an audio input stream */
+  private byte[] readAllBytes(AudioInputStream stream) throws IOException {
+    byte[] buffer = new byte[4096];
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    int bytesRead;
+
+    while ((bytesRead = stream.read(buffer)) != -1) {
+      byteStream.write(buffer, 0, bytesRead);
     }
 
-    public AudioLoader(AudioStore store, Path assetDirectory, AudioFormat format) {
-        super(store, assetDirectory, "Audio Assets");
-        this.targetFormat = format;
-    }
+    return byteStream.toByteArray();
+  }
 
-    @Override
-    public Set<String> getExtensions() {
-        Set<String> extensions = new HashSet<>();
-        extensions.add(".wav");
-        extensions.add(".mp3");
-        extensions.add(".ogg");
-        extensions.add(".aiff");
-        return extensions;
-    }
+  @Override
+  public boolean load(Runnable onComplete) {
+    // Reset the converted assets counter
+    convertedAssets.set(0);
 
-    @Override
-    protected AudioSample loadFile(File file, String key) throws Exception {
-        // Load the audio file directly
-        AudioInputStream originalStream = AudioSystem.getAudioInputStream(file);
-        AudioFormat sourceFormat = originalStream.getFormat();
-        byte[] data;
+    // Call the parent load method
+    boolean result =
+        super.load(
+            () -> {
+              // Add additional logging for audio-specific information
+              if (convertedAssets.get() > 0) {
+                System.out.println(
+                    "Converted " + convertedAssets.get() + " high-resolution audio files");
+              }
 
-        // Check if conversion is needed
-        if (!isFormatCompatible(sourceFormat, targetFormat)) {
-            // Convert to target format
-            AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, originalStream);
-            data = readAllBytes(convertedStream);
-            convertedStream.close();
-            convertedAssets.incrementAndGet();
-        } else {
-            // No conversion needed
-            data = readAllBytes(originalStream);
-        }
-        originalStream.close();
-
-        return new AudioSample(targetFormat, data);
-    }
-
-    @Override
-    protected String generateKey(File file) {
-        // Generate a key based on the file path relative to the base directory
-        String absolutePath = file.getAbsolutePath();
-        String basePath = path.toFile().getAbsolutePath();
-
-        String relativePath = absolutePath.substring(basePath.length() + 1);
-        // Remove file extension
-        String key = relativePath.substring(0, relativePath.lastIndexOf('.'));
-        // Replace backslashes with forward slashes for consistent keys across platforms
-        key = key.replace('\\', '/');
-
-        return key;
-    }
-
-    /**
-     * Checks if source format is compatible with target format
-     */
-    private boolean isFormatCompatible(AudioFormat source, AudioFormat target) {
-        return source.getSampleRate() == target.getSampleRate() &&
-                source.getSampleSizeInBits() == target.getSampleSizeInBits() &&
-                source.getChannels() == target.getChannels() &&
-                source.isBigEndian() == target.isBigEndian() &&
-                source.getEncoding().equals(target.getEncoding());
-    }
-
-    /**
-     * Reads all bytes from an audio input stream
-     */
-    private byte[] readAllBytes(AudioInputStream stream) throws IOException {
-        byte[] buffer = new byte[4096];
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        int bytesRead;
-
-        while ((bytesRead = stream.read(buffer)) != -1) {
-            byteStream.write(buffer, 0, bytesRead);
-        }
-
-        return byteStream.toByteArray();
-    }
-
-    @Override
-    public boolean load(Runnable onComplete) {
-        // Reset the converted assets counter
-        convertedAssets.set(0);
-
-        // Call the parent load method
-        boolean result = super.load(() -> {
-            // Add additional logging for audio-specific information
-            if (convertedAssets.get() > 0) {
-                System.out.println("Converted " + convertedAssets.get() + " high-resolution audio files");
-            }
-
-            // Run the original callback if provided
-            if (onComplete != null) {
+              // Run the original callback if provided
+              if (onComplete != null) {
                 onComplete.run();
-            }
-        });
+              }
+            });
 
-        return result;
-    }
+    return result;
+  }
 
-    public int getConvertedAssets() {
-        return convertedAssets.get();
-    }
+  public int getConvertedAssets() {
+    return convertedAssets.get();
+  }
 }
